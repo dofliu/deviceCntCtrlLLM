@@ -1,7 +1,7 @@
 # V6.3 → Codex / Git repo 移交
 
 移交日期：2026-10-12（Asia/Taipei）。版本：V6.3 / 0.6.3。
-這是開發版本快照；尚未初始化或推送 Git repo，也沒有新增完整五回合驗收結果。
+這是開發版本快照；已初始化 Git repo 並同步推送至 GitHub (https://github.com/dofliu/deviceCntCtrlLLM)，未新增完整五回合驗收結果。
 
 ## 目標與目前能力
 
@@ -56,21 +56,22 @@
 5. 驗收重點是五回合都有獨立取放與穩定性證據；若失敗，區分影像／控制／驅動／API／預算，不要統一歸為 AI 失敗。
 6. 五回合穩定後，再做跨工作站、選擇性重校正與控制程式生成的比較實驗。
 
-## 建立 repo
-
-候選名稱 `dof-device-agent`；建議先私人 repo，公開授權尚未由作者決定。本次沒有建立遠端 repo。
-可先在本機（新解壓目錄）執行：
-
+## 建立 repo 與同步
+ 
+遠端儲存庫已設定為 `https://github.com/dofliu/deviceCntCtrlLLM` (main 分支)。
+已完成初次建立與基準提交：
+ 
 ```powershell
 git init -b main
 git add .
-git diff --cached --stat
-git diff --cached --check
+git commit -m "chore: import V6.3 development handoff"
+git remote add origin https://github.com/dofliu/deviceCntCtrlLLM.git
+git fetch origin
+git rebase origin/main
+git push -u origin main
 ```
-
-檢查 `git status`，確認不含 API key、生成 HTML、ZIP、大型匯出或本機暫存，再由作者選定 GitHub 帳號／repo／可見性後建立遠端並推送。
-既有 `.gitignore` 已排除常見本機與生成檔案；仍須人工核對 staged 清單。
-確認 staged 清單後才提交：`git commit -m "chore: import V6.3 development handoff"`。
+ 
+既有 `.gitignore` 已排除常見本機與生成檔案（HTML、ZIP、暫存、金鑰）。
 原始碼是維護來源；HTML 可作為版本發布附件。第三方 Three.js 授權必須隨原始碼保留，見 `vendor/THREE-LICENSE.txt`。
 
 ## 給下一個 Codex 工作階段的起始指令

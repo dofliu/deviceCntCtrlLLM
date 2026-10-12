@@ -7,7 +7,7 @@
 - 題目候選：以視覺與通訊證據驅動的陌生設備自主啟用與選擇性重校正。
 - 目標期刊、作者名單：未決定。
 - 目前階段：01 貢獻定位；尚未凍結正式實驗協定。
-- 專案：virtual-device-v5，開發版本 V6.3。現行資料夾尚未初始化為 Git repo。
+- 專案：virtual-device-v5，開發版本 V6.3。已初始化為 Git repo 並同步至遠端 https://github.com/dofliu/deviceCntCtrlLLM。
 
 ## 輸入版本與證據
 - unknown-device-v6.1.html，SHA256: cdccbc76ca55a63765199bc5b3599ef4d666c18166982810f9c367169c5416d0
@@ -51,3 +51,5 @@
 
 
 2026-10-12（Codex 移交）：新增 AGENTS.md、忽略規則與接續指南，完成靜態建置的移交準備。模型排程最終修訂測試仍未確認，詳見 docs/VALIDATION_STATUS.md；未新增真實模型或五回合結果。
+
+2026-10-12（Repo 初始化與同步）：初始化本機 Git 儲存庫，依 .gitignore 排除了生成 HTML、大型產物與敏感設定；整合遠端既有 MIT LICENSE commit 後，完成基準提交並推送到遠端 https://github.com/dofliu/deviceCntCtrlLLM (main 分支)。
