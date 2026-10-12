@@ -106,7 +106,10 @@
     // The object's rectangular silhouette still provides opposite extrema
     // around a central gripper occlusion. Circular references use the separate
     // robust fit above, including an explicit failure when too little is seen.
-    if(ringPixels.destinationSurface.length>=8&&out.object){const b=bounds.object;out.object=[(b[0]+b[2])/2,(b[1]+b[3])/2];}
+    // When the endpoint disk hides a whole top or bottom edge (low platform),
+    // release-height evidence anchors on the visible edge with the visible width.
+    if(ringPixels.destinationSurface.length>=8&&out.object){const b=bounds.object;out.object=[(b[0]+b[2])/2,(b[1]+b[3])/2];
+      const w=b[2]-b[0],hgt=b[3]-b[1];out.objectEdgeAnchored=out.object.slice();if(out.tip&&w-hgt>1)out.objectEdgeAnchored[1]=out.tip[1]>out.object[1]?b[1]+w/2:b[3]-w/2;}
     if(out.destinationSurface&&out.destination)out.surfaceOffsetPx=out.destination[1]-out.destinationSurface[1];
     if(out.tip&&out.object)out.raisedOffsetError=distance(out.object,[out.tip[0],out.tip[1]-18*Math.min(width/640,height/480)]);
     return out;
@@ -261,7 +264,7 @@
           else if(phase==='release'){
             const released=inspectTaskFrame(this.frameGetter());
             this._task.released=true;this._releaseEvidence=released.object;
-            this._releaseHeightEvidence={source:'release-camera-frame',tip:copy(released.tip),object:copy(released.object),destination:copy(released.destination),surface:copy(released.destinationSurface),expectedOffsetPx:released.surfaceOffsetPx,observedOffsetPx:released.tip&&released.object?released.tip[1]-released.object[1]:null};
+            this._releaseHeightEvidence={source:'release-camera-frame',tip:copy(released.tip),object:copy(released.object),destination:copy(released.destination),surface:copy(released.destinationSurface),expectedOffsetPx:released.surfaceOffsetPx,observedOffsetPx:released.tip&&released.object?released.tip[1]-(released.objectEdgeAnchored||released.object)[1]:null};
             this._setPhase('raise_clearance');
           }else if(phase==='raise_clearance')this._setPhase('clearance');
           summary=d.tool==='lift'?`設備已確認升降命令：${d.args.position==='up'?'升起':'下降'}。是否持有物件仍由相機驗證。`:`設備已確認夾爪命令：${d.args.state==='open'?'張開':'合攏'}。回覆本身不代表取放成功。`;

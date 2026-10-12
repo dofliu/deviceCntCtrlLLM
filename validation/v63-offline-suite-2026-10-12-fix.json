@@ -1,0 +1,21 @@
+{
+  "version": "0.6.3",
+  "date": "2026-10-12",
+  "baseCommit": "5544545",
+  "scope": "Offline headless five-trial suite (tests/test_v6_suite.cjs, adaptive offline policy, seeds 42 and 1) after two fixes. No browser, CSP, real model or hardware. seed 42 and seed 1 are development/regression data.",
+  "fixes": [
+    "src/pick-place.js: release-height evidence anchors the object on its visible edge when the endpoint disk hides a whole top/bottom edge (0.35 platform). The 2.5 px releaseHeightMatched tolerance is unchanged.",
+    "src/agent-core.js: offline adaptive policy reverses a probe that the device clamped to zero at a joint limit instead of repeating it."
+  ],
+  "rootCause": {
+    "releaseHeight": "Grasp snaps the object to the tip, so true tip-object offset equals the platform offset. At h=0.35 the object's bottom edge (tip+0.95 px) lies inside the 7.5 px endpoint disk, so the orange bounding-box centre shifted 2-3 px upward; tip, B and platform markers were unbiased (~0.5 px uniform pixel-centre offset). At h=0 the occlusion is symmetric and at h=0.65 the edge is clear.",
+    "probeLoop": "seed 1 trial 5 (exposed once trial 4 passed): elbow at its 2.85 rad limit; probe channel A +1 was clamped to applied 0, added no sample, and the policy chose the same probe until the 180-action limit."
+  },
+  "passed": true,
+  "seeds": [
+    {"seed": 42, "completed": 5, "trialActions": [69, 51, 60, 63, 62], "releaseHeightDeltaPx": [-0.39, -0.45, -0.02, 0.44, -0.14]},
+    {"seed": 1, "completed": 5, "trialActions": [71, 53, 64, 64, 57], "releaseHeightDeltaPx": [-0.07, 0.07, 0.06, 0.52, -0.28]}
+  ],
+  "otherOfflineTests": "All 18 other offline Node/Python tests listed in docs/VALIDATION_STATUS.md passed on the same tree; seed 42 action counts are identical to the pre-fix run.",
+  "notRun": ["Browser/Playwright UI", "Real Claude/Gemini five-trial experiment"]
+}

@@ -1,0 +1,14 @@
+{
+  "version": "0.6.3",
+  "date": "2026-10-12",
+  "passed": true,
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "scope": "Synthetic RGBA detector fixture and AgentCore offline policy; not a browser, model or complete pick/place run.",
+  "checks": [
+    "0.35 occluded-edge bias removed; 0 and 0.65 unchanged",
+    "wrong release heights still exceed the unchanged 2.5 px tolerance",
+    "probe clamped to zero is reversed; partial clamps and fresh starts keep prior behaviour"
+  ]
+}

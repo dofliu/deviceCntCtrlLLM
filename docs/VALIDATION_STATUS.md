@@ -29,6 +29,14 @@
 - **`tests/test_v6_suite.cjs` 未通過**：seed 42 五回合完成；seed 1 第 4 回合（低台 0.35）`releaseHeightMatched` 偏差 2.52 px，超過 2.5 px 門檻而停止，完成 3 回合。所有 0.35 回合都有 +1.5～2.5 px 的系統偏差，0 與 0.65 約在 0.4 px 內。成因未定，門檻未修改。
 - 仍未執行：瀏覽器 UI／CSP、真實模型五回合。
 
+## 2026-10-12 低台偏差修正（離線）
+
+紀錄：`validation/v63-offline-suite-2026-10-12-fix.json`、`validation/v63-release-probe-regression.json`。
+
+- 成因一（低台放置高度）：夾取時物件吸附到末端，真實的末端－物件偏移等於平台偏移。0.35 時物件底邊落在末端 7.5 px 的圓盤內而被整條遮住，橘色外框中心因此上移 2～3 px；末端、B 與平台標記都沒有偏差。修正後放手高度證據改以可見邊加可見寬度定位，`releaseHeightMatched` 的 2.5 px 門檻未改；錯誤高度仍會被拒絕（新測試涵蓋）。
+- 成因二（在第 4 回合通過後才浮現）：seed 1 第 5 回合肘關節卡在 2.85 rad 上限，通道 A +1 試動被裁成 0，不會產生樣本，離線策略一直重送同一個試動，直到 180 次上限。修正後若上一次試動被完全裁掉，就改試反方向。只影響離線規則代理。
+- 結果：`test_v6_suite.cjs` seed 42 與 seed 1 都完成五回合，放手高度偏差 ≤ 0.52 px；其餘 18 項離線測試通過，seed 42 動作數與修正前相同。仍無瀏覽器或真實模型結果。
+
 ## 新環境待執行的最小聚焦清單
 
 這些是接手後的命令清單，並非本次已執行的結果。需要可用的 Python 3 與支援測試語法／標準模組的 Node.js；此移交尚未建立跨版本相容矩陣。
@@ -40,6 +48,7 @@ node tests/test_v63_model_reporting.cjs
 node tests/test_claude_provider.cjs
 node tests/test_gemini_provider.cjs
 node tests/test_expected_contract.cjs
+node tests/test_v63_release_probe_regression.cjs
 ```
 
 先檢查本機環境是否有額外連線限制；若遭拒，記錄實際理由，不得改名／轉交代理繞過。
