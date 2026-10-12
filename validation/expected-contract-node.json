@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "credentialRead": false,
+  "scope": "Contract and bounded proposal/execution regression with synthetic image and actuator fixtures; not a live model or complete pick/place test.",
+  "checks": [
+    "Omitted narrative passes provider/core proposal without motion; only next execution actuates once",
+    "Missing narrative never bypasses tool allowlist, numeric bounds, required arguments or two-correction limit",
+    "Navigation, onboarding and mission validators preserve absence/presence and legacy description compatibility",
+    "Report counts each accepted model decision once and excludes offline decisions/result duplicates"
+  ]
+}

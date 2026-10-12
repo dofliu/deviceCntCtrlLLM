@@ -1,0 +1,25 @@
+{
+  "version": "0.6.3",
+  "scope": "Focused offline tests of actual production provider code with canned HTTP and a virtual clock. No API keys, network, browser, device actuation, or complete five-trial experiment.",
+  "passed": null,
+  "verificationStatus": "final-revision-unconfirmed",
+  "earlierRevision": {"passed": true, "groups": 10, "providers": ["claude", "gemini"]},
+  "finalRevision": {"addedAssertions": ["Immediate abort before dispatch produces zero fetches and zero calls", "A one-call budget exhausted by a 429 stops before cooldown", "Retry request evidence updates modelRequests.used to 0, 1, 2"], "result": "Result retrieval was blocked by automatic approval review because of incidental Visual Studio telemetry with an unknown payload. No rerouted test execution was attempted."},
+  "providers": [
+    "claude",
+    "gemini"
+  ],
+  "groups": 10,
+  "checks": [
+    "Start-to-start spacing, BUSY while waiting, and no added delay after a slow response",
+    "429 honors Retry-After seconds and HTTP dates before returning one validated proposal",
+    "At most two retries; every generation attempt consumes the existing call budget",
+    "Bridge call budget is terminal and cannot be retried as a temporary 429",
+    "Daily, spending, and zero quota signals are terminal without automatic retries",
+    "Server waits over 180 seconds stop explicitly and are never shortened into an early retry",
+    "Abort during cooldown or spacing cancels waiting and prevents another fetch",
+    "Cooldown is outside the HTTP timeout; actual request timeout remains enforced",
+    "A recovered HTTP request still obeys tool bounds; invalid decisions receive no transport retry",
+    "Request diagnostics and wait status remain bounded and omit keys and raw HTTP errors"
+  ]
+}

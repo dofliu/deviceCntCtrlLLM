@@ -1,0 +1,19 @@
+{
+  "scope": "mock-only; no live Gemini request or credential lookup",
+  "passed": true,
+  "checks": [
+    "official generateContent request: one user image/context, parametersJsonSchema, ANY, key only in header",
+    "exact call budget and disposal",
+    "onboarding complete manual and failed driver test evidence; private fields removed",
+    "all mission tool contracts; only observed pixel/ack evidence exposed",
+    "reject malformed, disallowed, multiple, truncated, text-only, thought-only and blocked decisions",
+    "missing optional expected is preserved as absent in onboarding/probe/mission with one request; command limits, required reason, extra fields and supplied expected remain strict",
+    "shared and native rejection diagnostics preserve exact issue plus usage; no raw output, key, thoughts or hidden retries",
+    "corrective feedback allowlist works across all three phases without replaying rejected model output",
+    "no thought/signature export or history replay; credential echo redaction and rejection",
+    "sanitized failures; no fallback; timeout, busy and cancellation",
+    "typed bridge/Google errors distinguish HTTP 400 invalid key and HTTP 503 missing key in decide/listModels; no raw error echo",
+    "paginated live-account model schema; generateContent filter; pagination loop guard",
+    "loopback bridge request envelope; no credential transfer; strict model and bridge inputs"
+  ]
+}

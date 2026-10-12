@@ -1,0 +1,24 @@
+{
+  "version": "0.6.3",
+  "finalRevisionTestResult": "unconfirmed",
+  "confirmedEarlierChecks": {
+    "providerPacingGroups": 10,
+    "providers": [
+      "Claude",
+      "Gemini"
+    ],
+    "bridgeTests": 12,
+    "modelReportingGroups": 2
+  },
+  "pendingFinalChecks": [
+    "Cancel before dispatch consumes zero calls",
+    "Exhausted call budget does not enter cooldown",
+    "Retry prompt contains the current call count",
+    "Final provider protocol regressions"
+  ],
+  "blocker": "Automatic approval review rejected final test result retrieval because possible Visual Studio telemetry payload and authorization could not be established. No rejected tests were rerun.",
+  "browserRun": false,
+  "liveModelRun": false,
+  "fiveTrialCompletionVerified": false,
+  "note": "Earlier passing checks do not certify the final revision. This handoff performs static packaging only."
+}

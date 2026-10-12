@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "credentialRead": false,
+  "checks": [
+    "Two corrections then terminal rejection",
+    "All validation codes share one limit",
+    "Accepted decision resets consecutive limit",
+    "Feedback preserves observation and Jacobian",
+    "HTTP, timeout, budget and credential errors stop immediately",
+    "Diagnostic and usage allowlists discard private data"
+  ]
+}

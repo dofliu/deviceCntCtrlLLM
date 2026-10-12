@@ -1,0 +1,118 @@
+{
+  "version": "0.6.0",
+  "date": "2026-10-11",
+  "overallStatus": "partially-verified-full-suite-blocked",
+  "environment": {
+    "browserLaunched": false,
+    "modelRequests": 0,
+    "networkUsedByHarness": false,
+    "renderer": "software raster of production plant draw calls",
+    "workerTransport": "Node VM running production Worker and driver broker scripts",
+    "limitations": [
+      "No text raster or browser antialiasing; precise action counts can differ from browser runs.",
+      "Does not certify browser iframe/CSP/Worker security, rendered UI, real APIs or hardware.",
+      "Node VM is a test transport, not a replacement production security sandbox."
+    ]
+  },
+  "completed": [
+    {
+      "name": "pre-V6 baseline full pick/place",
+      "status": "passed-before-V6-edits",
+      "seed": 42,
+      "versionUnderTest": "0.5.3",
+      "actionCount": 26,
+      "placementErrorPx": 2.185564209724849,
+      "done": true,
+      "failure": null,
+      "scope": "Real production plant frame, driver round trip, onboarding and independent controller worker; offline preset policy."
+    },
+    {
+      "name": "V6 camera rejects incorrect release height",
+      "status": "passed",
+      "durationSeconds": 0.394321099,
+      "runner": "tests/test_v6_mechanics.cjs exported cameraRejectsWrongHeight",
+      "cases": [
+        {
+          "platformHeight": 0.35,
+          "placementErrorPx": 5.5,
+          "insideDestination": true,
+          "releaseHeightMatched": false,
+          "completed": false
+        },
+        {
+          "platformHeight": 0.65,
+          "placementErrorPx": 10.5,
+          "insideDestination": true,
+          "releaseHeightMatched": false,
+          "completed": false
+        }
+      ],
+      "scope": "Explicit validation fixtures assume preceding transport prerequisites; actual inspect_scene, grip release camera capture and verify_place run on production PickPlaceController. The object stays on the tabletop within one XY pixel of the platform reference. Not a full mission success test."
+    },
+    {
+      "name": "headless harness and test syntax",
+      "status": "passed",
+      "files": [
+        "tests/headless-runtime.cjs",
+        "tests/test_v6_mechanics.cjs",
+        "tests/test_v6_suite.cjs"
+      ]
+    },
+    {
+      "name": "V6 platform physics",
+      "status": "passed",
+      "groups": 6,
+      "detailsFile": "validation/platform-physics-node.json"
+    },
+    {
+      "name": "Provider mock contracts",
+      "status": "passed",
+      "claudeGroups": 12,
+      "geminiGroups": 13,
+      "modelRequests": 0
+    },
+    {
+      "name": "Expected-text regression and decision recovery",
+      "status": "passed",
+      "expectedContractGroups": 4,
+      "recoveryGroups": 6
+    },
+    {
+      "name": "V6 action budget boundary",
+      "status": "passed",
+      "runner": "tests/test_v6_action_budget.cjs",
+      "checks": [
+        "No extra actuator command at limit",
+        "Below-limit movement allowed",
+        "Visual verification remains available at limit"
+      ]
+    },
+    {
+      "name": "Static integration",
+      "status": "passed",
+      "checks": [
+        "App DOM references present; no duplicate IDs",
+        "V6 UI version and default five trials",
+        "Build and both Python bridges parse",
+        "Both bridge CLIs default to V6 and 300 total calls"
+      ],
+      "doesNotVerify": "Actual browser layout, model behavior or full five-trial completion"
+    }
+  ],
+  "blocked": [
+    {
+      "name": "V6 five-trial full production run, seed 42",
+      "status": "started-but-result-unavailable",
+      "initialOutput": "0 decision 1 inspect_scene 0",
+      "actionRejected": "tools.write_stdin({session_id:50712,chars:'',yield_time_ms:1000,max_output_tokens:4500})",
+      "reason": "The local test triggered telemetry to an external Visual Studio endpoint, but the transmitted payload is unspecified and may include sensitive execution or environment data; the user's broad telemetry approval does not authorize this specific unknown data egress.",
+      "actionTaken": "Did not poll again or restart/indirectly rerun the rejected full-suite action. No full result file was written by the original run.",
+      "successClaim": false
+    }
+  ],
+  "notVerified": [
+    "Five-trial completion for seeds 42 and 1; prepared tests/test_v6_suite.cjs was syntax-checked only.",
+    "Actual browser UI and real model performance for V6.",
+    "The full tests/test_v6_mechanics.cjs script was not rerun after correcting the fixture to revalidate the driver after deliberate collision rejection. Separate production-physics checks are recorded by the plant agent."
+  ]
+}

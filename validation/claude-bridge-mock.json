@@ -1,0 +1,5 @@
+{
+  "scope": "mock-only local bridge; no live Claude requests or real credential lookup",
+  "passed": true,
+  "tests": 8
+}

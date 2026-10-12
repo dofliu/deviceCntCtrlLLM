@@ -1,0 +1,226 @@
+{
+  "source": {
+    "library_file_id": "libfile_e3675a2f43588191a4c8af9ae581f7f4",
+    "file_id": "file_00000000446481fa97bc4dffd3912828",
+    "file_name": "unknown-device-v6-experiment.json",
+    "version": "0.6.0",
+    "model": "claude-haiku-5-5",
+    "eventIndex": 470
+  },
+  "agentContext": {
+    "phase": "mission",
+    "scope": "simulated-pick-place",
+    "allowedTools": [
+      "inspect_scene",
+      "verify_place",
+      "stop"
+    ],
+    "observed": {
+      "tip": [
+        421.04901960784315,
+        202.02941176470588
+      ],
+      "object": [
+        443.5,
+        196
+      ],
+      "destination": [
+        446,
+        205
+      ],
+      "destinationSurface": [
+        439,
+        196
+      ],
+      "surfaceOffsetPx": 9,
+      "objectPixels": 182,
+      "destinationPixels": 710,
+      "raisedOffsetError": 25.442906737791837
+    },
+    "actuator": {
+      "lift": "up",
+      "gripper": "open"
+    },
+    "taskProgress": {
+      "phase": "verify_place",
+      "label": "驗證物件留在 B 區",
+      "objectDetected": true,
+      "atObject": true,
+      "graspVerified": true,
+      "coMotionVerified": true,
+      "atDestination": true,
+      "released": true,
+      "cleared": true,
+      "completed": false,
+      "attempts": 1,
+      "placementError": 4.5
+    },
+    "lastResult": {
+      "tool": "inspect_scene",
+      "ok": true,
+      "summary": "已從 RGBA 影像定位夾具、橘色物件與藍色 B 區；尚未假設物件已被夾住。"
+    },
+    "budgets": {
+      "actionsUsed": 60,
+      "maxActions": 180,
+      "decisionsUsed": 15,
+      "maxDecisions": 40
+    }
+  },
+  "toolResult": {
+    "ok": false,
+    "data": {
+      "checks": {
+        "objectVisible": true,
+        "destinationVisible": true,
+        "insideDestination": true,
+        "objectStayedAfterRelease": true,
+        "gripperVisiblyAway": true,
+        "liftCommandConfirmed": true,
+        "openCommandConfirmed": true,
+        "graspImageVerified": true,
+        "transportCoMotionVerified": true,
+        "clearanceReached": true,
+        "surfaceMarkerVisible": true,
+        "releaseHeightMatched": true,
+        "platformStayedAfterRelease": false
+      },
+      "placementError": 4.5,
+      "separation": 23.24651214262873,
+      "releaseDrift": 0,
+      "surfaceEvidence": {
+        "source": "release-camera-frame",
+        "tip": [
+          443.75728155339806,
+          207.8640776699029
+        ],
+        "object": [
+          443.5,
+          196
+        ],
+        "destination": [
+          446,
+          205
+        ],
+        "surface": [
+          445.5,
+          192.5
+        ],
+        "expectedOffsetPx": 12.5,
+        "observedOffsetPx": 11.864077669902912
+      },
+      "source": "new-camera-frame"
+    }
+  },
+  "evaluatorDiagnostics": {
+    "seed": 42,
+    "tip": [
+      421.66103087729766,
+      202.56033255239737
+    ],
+    "target": [
+      418.22893822701917,
+      201.42674825945846
+    ],
+    "trueError": 3.6144533901121814,
+    "cameraVersion": 0,
+    "motorFlips": 0,
+    "occluded": false,
+    "scenario": {
+      "type": "five-trial-series",
+      "trialIndex": 2,
+      "trialNumber": 3,
+      "totalTrials": 5,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "liftSafeHeight": 1,
+      "heightUnits": "relative-to-safe-lift",
+      "initialDistancePx": 121.06906154530974,
+      "transferDistancePx": 222.69269917793326,
+      "platformMode": "compliant-surface-stop"
+    },
+    "pickPlace": {
+      "object": [
+        122.20028707460094,
+        -34.01794846043374
+      ],
+      "destination": [
+        124.38671328608149,
+        -36.62134677857436
+      ],
+      "lift": "up",
+      "gripper": "open",
+      "held": false,
+      "objectHeight": 0.65,
+      "liftHeight": 1,
+      "destinationHeight": 0.65,
+      "platformRadius": 24,
+      "graspCount": 3,
+      "releaseCount": 3,
+      "placed": true
+    },
+    "manipulation": {
+      "lift": "up",
+      "gripper": "open",
+      "attached": false,
+      "objectHeight": 0.65,
+      "liftHeight": 1,
+      "destinationHeight": 0.65,
+      "object": [
+        444.2110094777778,
+        208.1610554108126
+      ],
+      "objectVisual": [
+        444.2110094777778,
+        196.4610554108126
+      ],
+      "destination": [
+        446.22749805895495,
+        205.64908713530994
+      ],
+      "destinationSurface": [
+        446.22749805895495,
+        193.94908713530995
+      ],
+      "graspCount": 3,
+      "releaseCount": 3,
+      "placed": true
+    },
+    "description": "裝置 #42 · 二連桿平面機構 · 相機變更 0 · 馬達反轉 0 · 第 3/5 回合 · B 相對高度 0.65",
+    "geometry": {
+      "lengths": [
+        95.2242825422436,
+        73.17264894396067
+      ],
+      "jointAngles": [
+        -1.1237880633929453,
+        1.7933371618873766
+      ],
+      "channelToJoint": [
+        0,
+        1
+      ],
+      "channelGains": [
+        -1.2343073897645809,
+        1.2686606288771145
+      ],
+      "camera": {
+        "angle": -0.02214635591953995,
+        "scale": 0.9474916107649916,
+        "x": 329.1694120038301,
+        "y": 242.94885077979416,
+        "fit": 1
+      },
+      "object": [
+        122.20028707460094,
+        -34.01794846043374
+      ],
+      "destination": [
+        124.38671328608149,
+        -36.62134677857436
+      ],
+      "destinationHeight": 0.65,
+      "platformRadius": 24
+    }
+  }
+}

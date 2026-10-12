@@ -1,0 +1,24 @@
+# V3 implementation contract
+
+New directory virtual-device-v3; preserve V2. Traditional Chinese. Scope planar image-control, not grasping or physics. Genuine Gemini strategy plus explicitly labelled offline adaptive strategy and V2 fixed-policy baseline. Never silently substitute local policy for Gemini or invent live-model results.
+
+## Engine public API
+Global AutonomousEngine; constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300}); initialize(), next(), reset(seed,options?), snapshot(), review(index), report(), dispose(), perturb(kind='motor'), setTargetPixel(x,y). Same state/render fields as V2 when possible. next alternates proposal and actual tool execution. A proposal cannot move plant. Observer-only fields diagnostics and scenario/change metadata NEVER enter agent context. expose historyLength getter. State also decision:{tool,args,reason,expected,source}, agentContext, strategy, modelCalls, toolResult, policyStatus. done/failure explicit.
+
+Tools: observe, probe, fit_model, move, reset_model, verify, stop. Decision shape {tool,args,reason,expected}; args is object. probe args {channel:0|1,direction:-1|1,amplitude:0.045}; move args {scale:0.7}. Each probe/move is ONE bounded command. fit_model estimates mapping from observed samples. verify compares image error<=7; cannot fake completion. Evidence/brief decision rationale only, no private chain-of-thought. Unknown tool/malformed inputs do not actuate. No hidden trajectory.
+
+Independent worker numerical core receives only camera dimensions/RGBA and own command acknowledgements/selected tool; no seed, geometry, scenario phase, changed channel, evaluator truth. Context is image-derived observation, fitted mapping and sample coverage, measured prior outcome/residual, allowed tools/budgets. Diagnostics solely human 3D/evaluator. No hidden change signal. A bounded event/tool execution loop is allowed; scenario does NOT select tools.
+
+## Provider
+global GeminiAgentProvider constructor({apiKey,model,maxCalls=60,timeoutMs=45000}); async decide(context,frame) where frame is {width,height,pixels} OR PNG {dataURL}; returns validated parsed {tool,args,reason,expected,source:'gemini',model,usage?}; calls getter, abort(), dispose(). static listModels(apiKey): [{id,displayName}]. Send rendered raw camera image and allowlisted context only. Key memory only, no export/log/storage/URL query. endpoint official Google fixed. No fallback. Provider errors engine pauses/stops clearly; maxCalls enforced. Model selection from actual list/manual entry, no assumed latest model. tests can mock transport but must label mock vs real.
+
+## Scenario / benchmark fairness
+Two target episodes, hidden motor reversal after verified first reach if challenge=true. Goals must be precomputed at reset and identical for both strategies, not sampled from each controller's resulting pose. Suggest initialize plant, record target1 diagnostics.target, call newTarget once to capture target2, restore target1 using setTargetPixel; at challenge set target2 and perturbMotor (same RNG state). Agent sees only pixels/new user goal, NOT the flip. Manual target/challenge buttons optional; pending proposal must be cleared before any perturbation. Completion only after actual verify; comparison 20 fixed seeds with same goals, perturbation and action budget. Report all failures. Offline comparison is not an LLM benchmark.
+
+## UI
+Own app.js/index.template.html/styles.css. Retain DeviceScene(canvas) and V2 evidence drawing/replay. New headline 自主設備控制實驗 V3. Strategy selector: adaptive 離線自適應策略, gemini Gemini 模型代理, baseline V2 固定策略. Clearly say offline isn't LLM. Gemini configuration password key + model dropdown/manual model + refresh-models button; key only current tab. Main next/play/pause/restart, milestone pause, recorded readonly replay. Display selected tool, concise reason, expected outcome, actual result. State changes driven by engine, no scripted UI trajectory. Screenshot evidence before/after and predictions; 3D human view. Add benchmark button, progress and summary/table via global V3Benchmark.run({strategies:['baseline','adaptive'],seeds?,onProgress,signal}); bench source root handles. Export JSON / source ZIP. Do not include credentials in exports.
+
+## Script placeholders
+STYLES,THREE,PLANT,CONTROLLER (plain-text V2 class),AGENT (plain-text worker core),PROVIDERS,ENGINE,SCENE,BENCHMARK,APP. controller-source and agent-source script ids. Bench engine instances recordFrames=false. Source archive source-archive injected by build.py.
+
+Root owns build.py, benchmark.js, tests/integration, README, final packaging. Engine agent owns engine.js and agent-core.js. UI agent owns app.js/index.template.html/styles.css. Provider agent owns providers.js, provider-specific tests and docs. Review agent read-only plus reports.

@@ -1,0 +1,216 @@
+{
+  "version": "0.5.0",
+  "realAPI": false,
+  "liveModelCalls": 0,
+  "credentialRead": false,
+  "scope": "Production GeminiAgentProvider with locally mocked generateContent responses. Decisions are supplied by the explicit local adaptive oracle, never a Gemini model. Gemini source/usage below are injected transport-contract fixtures, not live provenance.",
+  "fullWorkflow": [
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "completed": true,
+      "transport": "serial",
+      "mockRequests": 42,
+      "acceptedGeminiSourceDecisions": 42,
+      "phases": [
+        "onboarding",
+        "mission",
+        "control"
+      ],
+      "xyActions": 16,
+      "auxiliaryActions": 8,
+      "totalActions": 24,
+      "placementErrorPx": 6.393189924352163,
+      "checks": {
+        "objectVisible": true,
+        "destinationVisible": true,
+        "insideDestination": true,
+        "objectStayedAfterRelease": true,
+        "gripperVisiblyAway": true,
+        "liftCommandConfirmed": true,
+        "openCommandConfirmed": true,
+        "graspImageVerified": true,
+        "transportCoMotionVerified": true,
+        "clearanceReached": true
+      },
+      "finalSource": "new-camera-frame",
+      "usageFixture": {
+        "promptTokenCount": 504,
+        "candidatesTokenCount": 336,
+        "totalTokenCount": 840,
+        "thoughtsTokenCount": 0,
+        "cachedContentTokenCount": 0
+      },
+      "driverSourceHash": "fnv1a-ca8e22a5",
+      "actualCommandsAndAcksMatch": true,
+      "samePlantAcrossAllPhases": true,
+      "privilegedInputsExcluded": true,
+      "sourceFixture": "gemini",
+      "decisionOracle": "explicit local adaptive oracle; not a Gemini model"
+    },
+    {
+      "seed": 1,
+      "mockOnly": true,
+      "completed": true,
+      "transport": "tcp",
+      "mockRequests": 45,
+      "acceptedGeminiSourceDecisions": 45,
+      "phases": [
+        "onboarding",
+        "mission",
+        "control"
+      ],
+      "xyActions": 19,
+      "auxiliaryActions": 8,
+      "totalActions": 27,
+      "placementErrorPx": 5.561189583730919,
+      "checks": {
+        "objectVisible": true,
+        "destinationVisible": true,
+        "insideDestination": true,
+        "objectStayedAfterRelease": true,
+        "gripperVisiblyAway": true,
+        "liftCommandConfirmed": true,
+        "openCommandConfirmed": true,
+        "graspImageVerified": true,
+        "transportCoMotionVerified": true,
+        "clearanceReached": true
+      },
+      "finalSource": "new-camera-frame",
+      "usageFixture": {
+        "promptTokenCount": 540,
+        "candidatesTokenCount": 360,
+        "totalTokenCount": 900,
+        "thoughtsTokenCount": 0,
+        "cachedContentTokenCount": 0
+      },
+      "driverSourceHash": "fnv1a-ca8e22a5",
+      "actualCommandsAndAcksMatch": true,
+      "samePlantAcrossAllPhases": true,
+      "privilegedInputsExcluded": true,
+      "sourceFixture": "gemini",
+      "decisionOracle": "explicit local adaptive oracle; not a Gemini model"
+    }
+  ],
+  "failures": [
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": "onboarding",
+      "mismatchPhase": null,
+      "failedAt": "onboarding",
+      "mismatchAt": null,
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 0,
+      "mockRequests": 1,
+      "acceptedGeminiSourceDecisions": 0,
+      "phases": [
+        "onboarding"
+      ]
+    },
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": "mission",
+      "mismatchPhase": null,
+      "failedAt": "mission",
+      "mismatchAt": null,
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 0,
+      "mockRequests": 9,
+      "acceptedGeminiSourceDecisions": 8,
+      "phases": [
+        "onboarding",
+        "mission"
+      ]
+    },
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": "control",
+      "mismatchPhase": null,
+      "failedAt": "control",
+      "mismatchAt": null,
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 2,
+      "mockRequests": 13,
+      "acceptedGeminiSourceDecisions": 12,
+      "phases": [
+        "onboarding",
+        "mission",
+        "control"
+      ]
+    }
+  ],
+  "sourceMismatch": [
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": null,
+      "mismatchPhase": "onboarding",
+      "failedAt": null,
+      "mismatchAt": "onboarding",
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 0,
+      "mockRequests": 1,
+      "acceptedGeminiSourceDecisions": 0,
+      "phases": [
+        "onboarding"
+      ]
+    },
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": null,
+      "mismatchPhase": "mission",
+      "failedAt": null,
+      "mismatchAt": "mission",
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 0,
+      "mockRequests": 9,
+      "acceptedGeminiSourceDecisions": 8,
+      "phases": [
+        "onboarding",
+        "mission"
+      ]
+    },
+    {
+      "seed": 42,
+      "mockOnly": true,
+      "failPhase": null,
+      "mismatchPhase": "control",
+      "failedAt": null,
+      "mismatchAt": "control",
+      "stopped": true,
+      "noFallback": true,
+      "noActuationAfterFault": true,
+      "actions": 2,
+      "mockRequests": 13,
+      "acceptedGeminiSourceDecisions": 12,
+      "phases": [
+        "onboarding",
+        "mission",
+        "control"
+      ]
+    }
+  ],
+  "passed": true,
+  "externalRequests": [],
+  "pageErrors": [],
+  "productionBridgeValidation": {
+    "checkedRequestBodies": 133,
+    "allAccepted": true,
+    "validator": "gemini_bridge.validate_message",
+    "scope": "Exact production request bodies including all declared tool schemas, PNG images and fake model ID; no API key lookup or upstream call."
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "version": "0.6.3",
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "checks": [
+    "Rate, long-wait, bridge budget and hard-quota failures remain terminal with sanitized transport diagnostics; never consume format-correction retries",
+    "Full report retains request timing/retry metadata; each event uses a compact independent snapshot and waiting never increments device actions"
+  ]
+}

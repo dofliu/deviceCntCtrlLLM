@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "version": "0.6.2",
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "credentialRead": false,
+  "scope": "Fault-injection regression of production navigation, mission and report paths with synthetic frames and actuator boundary fixtures; not a browser, live model, or five-trial completion test.",
+  "checks": [
+    "Navigation encode startup/execution failures preserve typed diagnostics, count zero transmissions/actions, and stop without another model call",
+    "Navigation post-transmission decode failure retains the acknowledged action and diagnostic, then stops with no resend",
+    "Unconfirmed sent command remains separate from acknowledged motion and is never resent",
+    "Auxiliary encode timeout ends the mission at its current phase instead of asking the model to retry",
+    "Auxiliary decode failure records one acknowledged motion and stops without another model call or actuation",
+    "Front engine invalidates readiness for typed terminal driver faults, retains handshake evidence, exports complete runtime diagnostics, and keeps event metadata compact; vision-only failures do not invalidate the driver"
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "passed": true,
+  "realAPI": false,
+  "fixturesOnly": true,
+  "presetNoAutomaticCalls": true,
+  "applyNoAutomaticCalls": true,
+  "geminiDecisionAndEvidenceLabels": true,
+  "providerSwitchClearsKeyAndModel": true,
+  "missingKeyVisible": true,
+  "viewports": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "overview",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "evidence",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "driver",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "records",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "settings",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "overview",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "evidence",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "driver",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "records",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "settings",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "overview",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "evidence",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "driver",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "records",
+      "wholePageOverflow": false
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "settings",
+      "wholePageOverflow": false
+    }
+  ],
+  "pageErrors": [],
+  "mockRequests": [
+    {
+      "method": "GET",
+      "path": "/api/gemini/models?pageSize=100"
+    },
+    {
+      "method": "POST",
+      "path": "/api/gemini/generateContent"
+    },
+    {
+      "method": "GET",
+      "path": "/api/gemini/models?pageSize=100"
+    }
+  ]
+}

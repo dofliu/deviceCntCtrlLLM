@@ -1,0 +1,132 @@
+{
+  "version": "0.5.0",
+  "mechanics": {
+    "highGraspRejected": true,
+    "farGraspRejected": true,
+    "nearLowGraspAttaches": true,
+    "heldObjectFollowsActualTip": true,
+    "wrongReleaseDoesNotSnap": true,
+    "releasedObjectRemainsStationary": true,
+    "actualTransportAndRelease": true
+  },
+  "driver": {
+    "dryRunsDoNotAlterJointsOrObject": true,
+    "auxRequiresValidatedDriver": true,
+    "liftAndGripThroughGeneratedDriver": true,
+    "malformedAuxCommandsRejected": true,
+    "ackDoesNotRevealGraspSuccess": true,
+    "changedAuxCommandRejected": true,
+    "forgedAuxAckRejected": true,
+    "postActuationDecodeFailurePreservesAck": true,
+    "failedDriverDisabled": true
+  },
+  "fullWorkflow": [
+    {
+      "seed": 42,
+      "transport": "serial",
+      "completed": true,
+      "xyActions": 16,
+      "auxiliaryActions": 8,
+      "totalActions": 24,
+      "decisions": 42,
+      "probes": 2,
+      "placementErrorPx": 6.393189924352163,
+      "releaseDriftPx": 2.017655633663835,
+      "gripperSeparationPx": 25.075534294630856,
+      "graspCount": 1,
+      "releaseCount": 1,
+      "actualCommandsAndAcksMatch": true,
+      "samePlantThroughOnboarding": true
+    },
+    {
+      "seed": 1,
+      "transport": "tcp",
+      "completed": true,
+      "xyActions": 19,
+      "auxiliaryActions": 8,
+      "totalActions": 27,
+      "decisions": 45,
+      "probes": 2,
+      "placementErrorPx": 5.561189583730919,
+      "releaseDriftPx": 1.7922547893071263,
+      "gripperSeparationPx": 25.046676349502125,
+      "graspCount": 1,
+      "releaseCount": 1,
+      "actualCommandsAndAcksMatch": true,
+      "samePlantThroughOnboarding": true
+    }
+  ],
+  "visualFailures": {
+    "jammedGraspRejectedFromImage": true,
+    "graspRetriesBoundedAtTwo": true,
+    "wrongReleaseRejectedFromNewImage": true,
+    "wrongReleaseErrorPx": 71.48800238415622,
+    "forgedProgressCannotReplaceVisualEvidence": true
+  },
+  "providerBoundary": {
+    "allThreePhaseContextsExcludePrivilegedState": true,
+    "framesContainPixelsOnly": true,
+    "providerOutagesNeverFallback": true,
+    "explicitLocalStubOnly": true,
+    "complete": {
+      "calls": 42,
+      "phases": [
+        "onboarding",
+        "mission",
+        "control"
+      ],
+      "failedAt": null,
+      "actions": 24
+    },
+    "failures": [
+      {
+        "calls": 1,
+        "phases": [
+          "onboarding"
+        ],
+        "failedAt": "onboarding",
+        "actions": 0
+      },
+      {
+        "calls": 9,
+        "phases": [
+          "onboarding",
+          "mission"
+        ],
+        "failedAt": "mission",
+        "actions": 0
+      },
+      {
+        "calls": 13,
+        "phases": [
+          "onboarding",
+          "mission",
+          "control"
+        ],
+        "failedAt": "control",
+        "actions": 2
+      }
+    ]
+  },
+  "auxiliaryFailureEvidence": [
+    {
+      "fault": "generated-decoder-failure",
+      "confirmedActions": 12,
+      "commandAttempts": 12,
+      "unconfirmed": 0,
+      "physicalLift": "down",
+      "halted": true
+    },
+    {
+      "fault": "corrupt-device-ack",
+      "confirmedActions": 11,
+      "commandAttempts": 12,
+      "unconfirmed": 1,
+      "physicalLift": "down",
+      "halted": true
+    }
+  ],
+  "liveModelCalls": 0,
+  "scope": "Independent local simulation audit, no model endpoint or physical hardware.",
+  "externalRequests": []
+}

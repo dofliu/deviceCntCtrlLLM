@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "mockOnly": true,
+  "liveModelCalls": 0,
+  "scope": "Real app rendering explicit engine-event fixtures; no engine correctness claim.",
+  "checks": [
+    "first rejection shows exact reason, retained progress and enabled correction",
+    "15 page/viewport combinations fit without outer scrolling",
+    "terminal rejection stops controls and distinguishes successful onboarding",
+    "history review shows original rejection without enabling execution",
+    "checkpoint pauses rejected decision; autoplay continues after correction",
+    "provider authentication stop does not offer correction retries"
+  ],
+  "externalRequests": [],
+  "pageErrors": []
+}

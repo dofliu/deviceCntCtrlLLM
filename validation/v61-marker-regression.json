@@ -1,0 +1,321 @@
+{
+  "passed": true,
+  "checks": [
+    "recorded third-trial pose reconstructed by real mechanics and the three recorded retreat commands",
+    "stationary platform: old bounding box fails under AA approximation while circle fit remains within unchanged 2 px gate",
+    "production release and final placement validator accepts corrected camera evidence; all 13 checks true",
+    "partial occlusion plus blended off-circle purple pixels cannot shift the accepted center",
+    "actual 4 px platform motion still fails the original 2 px drift gate",
+    "short arc and missing surface evidence return null and fail production placement verification",
+    "required but absent platform marker cannot silently downgrade inspection to a tabletop task or trigger motion",
+    "both existing low/high-platform wrong-height negatives still fail release-height verification"
+  ],
+  "scope": "Pure Node focused pixel detector and placement-validator regression. Real plant release/final frames plus software AA approximation; explicit synthetic evidence negatives. No browser, real API, network, or full multi-trial suite.",
+  "limitation": "Software supersampling reproduces the bounding-box failure mechanism, not the exact browser raster. Previous grasp, co-motion, and clearance prerequisites are fixtures in isolated placement checks, not fresh end-to-end certifications.",
+  "recordedUserEvidence": {
+    "source": {
+      "library_file_id": "libfile_e3675a2f43588191a4c8af9ae581f7f4",
+      "file_id": "file_00000000446481fa97bc4dffd3912828",
+      "file_name": "unknown-device-v6-experiment.json",
+      "version": "0.6.0",
+      "model": "claude-haiku-5-5",
+      "eventIndex": 470
+    },
+    "oldRelease": [
+      445.5,
+      192.5
+    ],
+    "oldFinal": [
+      439,
+      196
+    ],
+    "oldDrift": 7.3824115301167
+  },
+  "raster": [
+    {
+      "scale": 1,
+      "oldRelease": [
+        446,
+        192.5
+      ],
+      "oldFinal": [
+        446,
+        192.5
+      ],
+      "oldDrift": 0,
+      "newRelease": [
+        445.7720708084732,
+        193.47095394611586
+      ],
+      "newFinal": [
+        445.7958503954476,
+        193.42347727657852
+      ],
+      "newDrift": 0.05309899158204444,
+      "releaseQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 227,
+        "inlierCount": 227,
+        "inlierFraction": 1,
+        "coverageBins": 14,
+        "totalBins": 16,
+        "largestGapDeg": 45,
+        "radiusPx": 18.104133508442867,
+        "residualRmsPx": 0.8649282589901672
+      },
+      "finalQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 247,
+        "inlierCount": 247,
+        "inlierFraction": 1,
+        "coverageBins": 14,
+        "totalBins": 16,
+        "largestGapDeg": 45,
+        "radiusPx": 18.060444644464148,
+        "residualRmsPx": 0.8611995465919979
+      },
+      "surfaceTruth": [
+        446.22749805895495,
+        193.94908713530995
+      ]
+    },
+    {
+      "scale": 2,
+      "oldRelease": [
+        445.5,
+        192.5
+      ],
+      "oldFinal": [
+        445.5,
+        192.5
+      ],
+      "oldDrift": 0,
+      "newRelease": [
+        445.7582378013567,
+        193.38008784340687
+      ],
+      "newFinal": [
+        445.7623056840625,
+        193.40721769821033
+      ],
+      "newDrift": 0.027433131271602056,
+      "releaseQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 170,
+        "inlierCount": 170,
+        "inlierFraction": 1,
+        "coverageBins": 14,
+        "totalBins": 16,
+        "largestGapDeg": 45,
+        "radiusPx": 17.990894629867906,
+        "residualRmsPx": 0.6693368458788709
+      },
+      "finalQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 190,
+        "inlierCount": 190,
+        "inlierFraction": 1,
+        "coverageBins": 13,
+        "totalBins": 16,
+        "largestGapDeg": 67.5,
+        "radiusPx": 18.0042621119103,
+        "residualRmsPx": 0.6683390312736122
+      },
+      "surfaceTruth": [
+        446.22749805895495,
+        193.94908713530995
+      ]
+    },
+    {
+      "scale": 3,
+      "oldRelease": [
+        445.5,
+        192.5
+      ],
+      "oldFinal": [
+        440.5,
+        199
+      ],
+      "oldDrift": 8.200609733428362,
+      "newRelease": [
+        445.7037329374141,
+        193.43110725507253
+      ],
+      "newFinal": [
+        445.7359727470641,
+        193.452402012516
+      ],
+      "newDrift": 0.0386377020647739,
+      "releaseQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 170,
+        "inlierCount": 170,
+        "inlierFraction": 1,
+        "coverageBins": 14,
+        "totalBins": 16,
+        "largestGapDeg": 45,
+        "radiusPx": 18.01436508000948,
+        "residualRmsPx": 0.6698736882694312
+      },
+      "finalQuality": {
+        "accepted": true,
+        "reason": "circle-fit",
+        "pixelCount": 197,
+        "inlierCount": 193,
+        "inlierFraction": 0.9796954314720813,
+        "coverageBins": 13,
+        "totalBins": 16,
+        "largestGapDeg": 67.5,
+        "radiusPx": 18.014288827007874,
+        "residualRmsPx": 0.6811091447882974
+      },
+      "surfaceTruth": [
+        446.22749805895495,
+        193.94908713530992
+      ]
+    }
+  ],
+  "placement": {
+    "done": true,
+    "failure": null,
+    "completed": true,
+    "checks": {
+      "objectVisible": true,
+      "destinationVisible": true,
+      "insideDestination": true,
+      "objectStayedAfterRelease": true,
+      "gripperVisiblyAway": true,
+      "liftCommandConfirmed": true,
+      "openCommandConfirmed": true,
+      "graspImageVerified": true,
+      "transportCoMotionVerified": true,
+      "clearanceReached": true,
+      "surfaceMarkerVisible": true,
+      "releaseHeightMatched": true,
+      "platformStayedAfterRelease": true
+    },
+    "placementError": 3.3896651208410056
+  },
+  "synthetic": {
+    "oldDrift": 6.670832032063167,
+    "newDrift": 0.07555892635270628,
+    "quality": {
+      "accepted": true,
+      "reason": "circle-fit",
+      "pixelCount": 286,
+      "inlierCount": 280,
+      "inlierFraction": 0.9790209790209791,
+      "coverageBins": 14,
+      "totalBins": 16,
+      "largestGapDeg": 45,
+      "radiusPx": 17.998440609882955,
+      "residualRmsPx": 0.8646909712437666
+    }
+  },
+  "movedPlatform": {
+    "done": true,
+    "failure": "放置驗證未通過：平台標記的影像位移 4.00 px 超過 2 px；需檢查遮蔽、相機或平台是否移動。已保留通過項目與實際量測。",
+    "completed": false,
+    "checks": {
+      "objectVisible": true,
+      "destinationVisible": true,
+      "insideDestination": true,
+      "objectStayedAfterRelease": true,
+      "gripperVisiblyAway": true,
+      "liftCommandConfirmed": true,
+      "openCommandConfirmed": true,
+      "graspImageVerified": true,
+      "transportCoMotionVerified": true,
+      "clearanceReached": true,
+      "surfaceMarkerVisible": true,
+      "releaseHeightMatched": true,
+      "platformStayedAfterRelease": false
+    },
+    "placementError": 4
+  },
+  "rejected": [
+    {
+      "mode": "shortArc",
+      "quality": {
+        "accepted": false,
+        "reason": "insufficient-arc",
+        "pixelCount": 104,
+        "inlierCount": 104,
+        "inlierFraction": 1,
+        "coverageBins": 6,
+        "totalBins": 16,
+        "largestGapDeg": 225,
+        "radiusPx": 17.2637298397926,
+        "residualRmsPx": 0.884371550362435
+      },
+      "checks": {
+        "objectVisible": true,
+        "destinationVisible": true,
+        "insideDestination": true,
+        "objectStayedAfterRelease": true,
+        "gripperVisiblyAway": true,
+        "liftCommandConfirmed": true,
+        "openCommandConfirmed": true,
+        "graspImageVerified": true,
+        "transportCoMotionVerified": true,
+        "clearanceReached": true,
+        "surfaceMarkerVisible": false,
+        "releaseHeightMatched": true,
+        "platformStayedAfterRelease": false
+      }
+    },
+    {
+      "mode": "missing",
+      "quality": {
+        "accepted": false,
+        "reason": "not-visible",
+        "pixelCount": 0,
+        "inlierCount": 0,
+        "inlierFraction": 0,
+        "coverageBins": 0,
+        "totalBins": 16,
+        "largestGapDeg": 360,
+        "radiusPx": null,
+        "residualRmsPx": null
+      },
+      "checks": {
+        "objectVisible": true,
+        "destinationVisible": true,
+        "insideDestination": true,
+        "objectStayedAfterRelease": true,
+        "gripperVisiblyAway": true,
+        "liftCommandConfirmed": true,
+        "openCommandConfirmed": true,
+        "graspImageVerified": true,
+        "transportCoMotionVerified": true,
+        "clearanceReached": true,
+        "surfaceMarkerVisible": false,
+        "releaseHeightMatched": true,
+        "platformStayedAfterRelease": false
+      }
+    }
+  ],
+  "requiredMissingMarker": {
+    "surfaceRequired": true,
+    "phase": "inspect_scene",
+    "inspectionAccepted": false,
+    "actions": 0
+  },
+  "wrongHeight": [
+    {
+      "platformHeight": 0.35,
+      "placementError": 5.290520781074008,
+      "releaseHeightMatched": false
+    },
+    {
+      "platformHeight": 0.65,
+      "placementError": 10.663263095390931,
+      "releaseHeightMatched": false
+    }
+  ]
+}

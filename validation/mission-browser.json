@@ -1,0 +1,2604 @@
+[
+  {
+    "seed": 42,
+    "steps": 84,
+    "done": true,
+    "failure": null,
+    "task": {
+      "phase": "complete",
+      "label": "取放任務完成",
+      "objectDetected": true,
+      "atObject": true,
+      "graspVerified": true,
+      "coMotionVerified": true,
+      "atDestination": true,
+      "released": true,
+      "cleared": true,
+      "completed": true,
+      "attempts": 1,
+      "placementError": 6.393189924352163
+    },
+    "actions": 24,
+    "xy": 16,
+    "auxiliary": 8,
+    "truth": {
+      "object": [
+        154.90809632719169,
+        -12.71238020818815
+      ],
+      "destination": [
+        159.16196675544836,
+        -11.455539347803793
+      ],
+      "lift": "up",
+      "gripper": "open",
+      "held": false,
+      "objectHeight": 0,
+      "graspCount": 1,
+      "releaseCount": 1,
+      "placed": true
+    },
+    "preReadyChanges": [],
+    "trace": [
+      {
+        "kind": "intro",
+        "phase": "inspect_scene",
+        "tool": null,
+        "title": "先認識設備、建立連線，再讓它動",
+        "explanation": "目前沒有通訊連線，也沒有已通過測試的控制程式。先區分影像假設、手冊規格與握手確認；所有步驟都會留下實際工具結果。這裡使用模擬設備與模擬主機介面。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "inspect_device",
+        "title": "代理提案：觀察設備與提出規格假設",
+        "explanation": "離線展示使用預設外觀判讀；先留下可被後續證據修正的假設。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "inspect_device",
+        "title": "工具結果：觀察設備與提出規格假設",
+        "explanation": "已記錄外觀假設，尚未當作精確規格。型號與通訊能力必須由手冊及握手查證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "list_interfaces",
+        "title": "代理提案：列出可用通訊介面",
+        "explanation": "需要取得模擬主機提供的介面清單，才能選擇連線位置。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "list_interfaces",
+        "title": "工具結果：列出可用通訊介面",
+        "explanation": "模擬主機回覆 2 個通訊端點。這是模擬介面清單。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "read_manual",
+        "title": "代理提案：查閱模擬設備手冊",
+        "explanation": "依設備標籤查閱這個模擬設備的文件，取得正確通訊格式。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "read_manual",
+        "title": "工具結果：查閱模擬設備手冊",
+        "explanation": "已查閱 VLAB-P2 模擬手冊，取得傳輸設定、協定與程式介面。連桿尺寸與運動增益仍未知。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "connect",
+        "title": "代理提案：建立通訊連線",
+        "explanation": "以實際介面清單的型號與手冊傳輸設定配對。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "connect",
+        "title": "工具結果：建立通訊連線",
+        "explanation": "傳輸設定已驗證，模擬連線已建立。尚未確認設備身分，也尚未允許動作。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "handshake",
+        "title": "代理提案：確認設備身分與能力",
+        "explanation": "連線建立不代表已接到正確手臂；需要交換身分與能力封包。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "handshake",
+        "title": "工具結果：確認設備身分與能力",
+        "explanation": "實際握手回覆已確認設備型號、協定與 2 個控制通道；沒有送出位移命令。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "write_driver",
+        "title": "代理提案：撰寫與編譯控制程式",
+        "explanation": "離線策略使用手冊提供的 JavaScript 範本，在隔離執行環境中編譯。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "write_driver",
+        "title": "工具結果：撰寫與編譯控制程式",
+        "explanation": "手冊 JavaScript 範本已在隔離環境中編譯；離線模式並未宣稱由語言模型寫程式。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "test_driver",
+        "title": "代理提案：測試控制程式",
+        "explanation": "程式已編譯，仍須驗證封包、回覆、限制與錯誤處理。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "test_driver",
+        "title": "工具結果：測試控制程式",
+        "explanation": "驅動程式測試通過。測試未移動手臂，後續真實模擬動作會重用這份程式。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "start_control",
+        "title": "代理提案：啟用視覺控制",
+        "explanation": "外觀假設、介面、手冊、握手與驅動測試均已具備，現在可啟用受限動作。"
+      },
+      {
+        "kind": "control-ready",
+        "phase": "inspect_scene",
+        "tool": "start_control",
+        "title": "工具結果：啟用視覺控制",
+        "explanation": "前置工作完成。控制器尚不知道運動映射；接下來透過剛才產生與測試的通訊程式試動、觀察與自我校正。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "inspect_scene",
+        "title": "代理提案：辨識物件與放置區",
+        "explanation": "依目前影像與已確認的命令狀態，執行「辨識 A 點物件與 B 區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "prepare_lift",
+        "tool": "inspect_scene",
+        "title": "工具結果：辨識物件與放置區",
+        "explanation": "已從 RGBA 影像定位夾具、橘色物件與藍色 B 區；尚未假設物件已被夾住。"
+      },
+      {
+        "kind": "decision",
+        "phase": "prepare_lift",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「確認夾具升起」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "prepare_grip",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "prepare_grip",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「確認夾爪張開」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "approach",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：張開。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「自我校正並靠近物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "approach",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定物件位置。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "代理提案：小幅試動",
+        "explanation": "通道 A 的有效激發量較少，選擇一次小幅試動補足量測。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "工具結果：小幅試動",
+        "explanation": "已完成第 1 次實際動作。已執行動作，影像誤差 76.49 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "代理提案：小幅試動",
+        "explanation": "通道 B 的有效激發量較少，選擇一次小幅試動補足量測。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "工具結果：小幅試動",
+        "explanation": "已完成第 2 次實際動作。已執行動作，影像誤差 79.04 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "fit_model",
+        "title": "代理提案：建立映射",
+        "explanation": "兩個獨立輸入通道已有實際位移樣本，可估計局部映射。"
+      },
+      {
+        "kind": "model-learned",
+        "phase": "approach",
+        "tool": "fit_model",
+        "title": "工具結果：建立映射",
+        "explanation": "已以 2 筆實際位移樣本建立局部映射。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 79.0 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 3 次實際動作。已執行動作，影像誤差 66.05 px。 預測誤差 1.08 px；本次門檻 8.66 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 66.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 4 次實際動作。已執行動作，影像誤差 52.26 px。 預測誤差 2.18 px；本次門檻 9.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 52.3 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 5 次實際動作。已執行動作，影像誤差 36.64 px。 預測誤差 3.70 px；本次門檻 10.18 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 36.6 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 6 次實際動作。已執行動作，影像誤差 23.44 px。 預測誤差 4.43 px；本次門檻 8.29 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 23.4 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 7 次實際動作。已執行動作，影像誤差 17.76 px。 預測誤差 2.35 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 17.8 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 8 次實際動作。已執行動作，影像誤差 11.14 px。 預測誤差 1.72 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 11.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 9 次實際動作。已執行動作，影像誤差 3.94 px。 預測誤差 0.83 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 3.94 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "object-reached",
+        "phase": "lower_pick",
+        "tool": "verify",
+        "title": "已對準 A 點物件",
+        "explanation": "夾具已依影像對準物件；尚未取物，接下來下降並合攏夾爪。"
+      },
+      {
+        "kind": "decision",
+        "phase": "lower_pick",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「下降至取物高度」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "close",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：下降。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "close",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「合攏夾爪」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "raise_pick",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：合攏。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "raise_pick",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「抬起物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "verify_grasp",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "verify_grasp",
+        "tool": "verify_grasp",
+        "title": "代理提案：驗證物件已抬起",
+        "explanation": "依目前影像與已確認的命令狀態，執行「用影像驗證取物」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "transport",
+        "tool": "verify_grasp",
+        "title": "工具結果：驗證物件已抬起",
+        "explanation": "影像確認橘色物件向上移動且位於夾具上方；搬運過程將繼續比對物件與夾具的共同位移。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「搬運至 B 區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "transport",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定B 區中心。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 64.9 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 10 次實際動作。已執行動作，影像誤差 54.04 px。 預測誤差 3.39 px；本次門檻 6.05 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 54.0 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 11 次實際動作。已執行動作，影像誤差 40.42 px。 預測誤差 1.83 px；本次門檻 7.79 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 40.4 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 12 次實際動作。已執行動作，影像誤差 26.77 px。 預測誤差 1.05 px；本次門檻 8.75 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 26.8 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 13 次實際動作。已執行動作，影像誤差 17.57 px。 預測誤差 1.91 px；本次門檻 8.64 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 17.6 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 14 次實際動作。已執行動作，影像誤差 6.73 px。 預測誤差 2.44 px；本次門檻 7.33 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 6.73 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "destination-reached",
+        "phase": "lower_place",
+        "tool": "verify",
+        "title": "已到達 B 區上方",
+        "explanation": "已搬運到 B 區上方；尚未放置，接下來下降並張開夾爪。"
+      },
+      {
+        "kind": "decision",
+        "phase": "lower_place",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「下降至放置高度」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "release",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：下降。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "release",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「張開夾爪放下物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "raise_clearance",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：張開。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "raise_clearance",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「升起空夾具」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "clearance",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「退出放置區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "clearance",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定退出位置。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 26.3 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 15 次實際動作。已執行動作，影像誤差 16.19 px。 預測誤差 1.17 px；本次門檻 8.45 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 16.2 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 16 次實際動作。已執行動作，影像誤差 1.99 px。 預測誤差 0.97 px；本次門檻 7.44 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 1.99 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "clearance-reached",
+        "phase": "verify_place",
+        "tool": "verify",
+        "title": "夾具已退出放置區",
+        "explanation": "夾具已離開放置位置；接下來重新拍攝，確認物件仍留在 B 區。"
+      },
+      {
+        "kind": "decision",
+        "phase": "verify_place",
+        "tool": "verify_place",
+        "title": "代理提案：驗證放置與退出",
+        "explanation": "依目前影像與已確認的命令狀態，執行「驗證物件留在 B 區」。"
+      },
+      {
+        "kind": "pick-place-complete",
+        "phase": "complete",
+        "tool": "verify_place",
+        "title": "從零到取放：完成影像驗證",
+        "explanation": "取放已由新影像驗證：物件距 B 區中心 6.39 px，夾具已退出 25.1 px，放開後物件位移 2.02 px。"
+      }
+    ],
+    "traffic": [
+      {
+        "sequence": 1,
+        "direction": "event",
+        "wire": "OPEN SIM-COM7",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 2,
+        "direction": "TX",
+        "wire": "{\"op\":\"hello\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 3,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"model\":\"VLAB-P2\",\"protocol\":\"vlab-p2-json/1\",\"firmware\":\"sim-2.0\",\"channels\":2,\"maxStep\":0.1,\"capabilities\":{\"xy\":\"relative-unknown-mapping\",\"lift\":[\"up\",\"down\"],\"grip\":[\"open\",\"closed\"]},\"simulated\":true}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 4,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.02,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 5,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.02,0],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 6,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,-0.025]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 7,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,-0.025],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 8,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 9,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,0],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 10,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.1,-0.1]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 11,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.1,-0.1],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 12,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 13,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 14,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 15,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 16,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 17,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 18,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"closed\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 19,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"closed\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 20,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.2,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 21,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"LIMIT: two finite channels in [-0.1,0.1] are required.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 22,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 23,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"FRAME: expected one JSON line, ending in LF.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 24,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}\n{\"op\":\"step\",\"channels\":[0,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 25,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"FRAME: expected one JSON line, ending in LF.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 26,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"sideways\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 27,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"COMMAND: invalid lift/grip state.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 28,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\",\"extra\":1}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 29,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"COMMAND: invalid lift/grip state.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 30,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 31,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 32,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 33,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 34,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.045,0]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 35,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.045,0],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 36,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0.045]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 37,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,0.045],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 38,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,-0.017601385747306197]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 39,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,-0.017601385747306197],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 40,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,-0.02970726944143826]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 41,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,-0.02970726944143826],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 42,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,-0.06073011177557813]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 43,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,-0.06073011177557813],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 44,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.05378057278967073,-0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 45,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.05378057278967073,-0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 46,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.0077609443832385135,-0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 47,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.0077609443832385135,-0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 48,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.013005547924481957,-0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 49,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.013005547924481957,-0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 50,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.02707436880618905,-0.08999999999999998]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 51,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.02707436880618905,-0.08999999999999998],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 52,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 53,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 54,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"closed\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 55,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"closed\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 56,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 57,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 58,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.06088844205075745]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 59,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.06088844205075745],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 60,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.029929049966910093]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 61,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.029929049966910093],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 62,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.019844869641195636]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 63,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.019844869641195636],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 64,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.03003532430024383]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 65,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.03003532430024383],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 66,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.07117166541947784]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 67,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.07117166541947784],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 68,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 69,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 70,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 71,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 72,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 73,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 74,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,0.0383017754751773]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 75,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,0.0383017754751773],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 76,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,0.06742185814831052]}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      },
+      {
+        "sequence": 77,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,0.06742185814831052],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-serial-arm",
+        "transport": "serial"
+      }
+    ]
+  },
+  {
+    "seed": 1,
+    "steps": 90,
+    "done": true,
+    "failure": null,
+    "task": {
+      "phase": "complete",
+      "label": "取放任務完成",
+      "objectDetected": true,
+      "atObject": true,
+      "graspVerified": true,
+      "coMotionVerified": true,
+      "atDestination": true,
+      "released": true,
+      "cleared": true,
+      "completed": true,
+      "attempts": 1,
+      "placementError": 5.561189583730919
+    },
+    "actions": 27,
+    "xy": 19,
+    "auxiliary": 8,
+    "truth": {
+      "object": [
+        15.347694369095912,
+        -128.88146154523554
+      ],
+      "destination": [
+        13.422441455094692,
+        -130.26695831117362
+      ],
+      "lift": "up",
+      "gripper": "open",
+      "held": false,
+      "objectHeight": 0,
+      "graspCount": 1,
+      "releaseCount": 1,
+      "placed": true
+    },
+    "preReadyChanges": [],
+    "trace": [
+      {
+        "kind": "intro",
+        "phase": "inspect_scene",
+        "tool": null,
+        "title": "先認識設備、建立連線，再讓它動",
+        "explanation": "目前沒有通訊連線，也沒有已通過測試的控制程式。先區分影像假設、手冊規格與握手確認；所有步驟都會留下實際工具結果。這裡使用模擬設備與模擬主機介面。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "inspect_device",
+        "title": "代理提案：觀察設備與提出規格假設",
+        "explanation": "離線展示使用預設外觀判讀；先留下可被後續證據修正的假設。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "inspect_device",
+        "title": "工具結果：觀察設備與提出規格假設",
+        "explanation": "已記錄外觀假設，尚未當作精確規格。型號與通訊能力必須由手冊及握手查證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "list_interfaces",
+        "title": "代理提案：列出可用通訊介面",
+        "explanation": "需要取得模擬主機提供的介面清單，才能選擇連線位置。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "list_interfaces",
+        "title": "工具結果：列出可用通訊介面",
+        "explanation": "模擬主機回覆 2 個通訊端點。這是模擬介面清單。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "read_manual",
+        "title": "代理提案：查閱模擬設備手冊",
+        "explanation": "依設備標籤查閱這個模擬設備的文件，取得正確通訊格式。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "read_manual",
+        "title": "工具結果：查閱模擬設備手冊",
+        "explanation": "已查閱 VLAB-P2 模擬手冊，取得傳輸設定、協定與程式介面。連桿尺寸與運動增益仍未知。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "connect",
+        "title": "代理提案：建立通訊連線",
+        "explanation": "以實際介面清單的型號與手冊傳輸設定配對。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "connect",
+        "title": "工具結果：建立通訊連線",
+        "explanation": "傳輸設定已驗證，模擬連線已建立。尚未確認設備身分，也尚未允許動作。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "handshake",
+        "title": "代理提案：確認設備身分與能力",
+        "explanation": "連線建立不代表已接到正確手臂；需要交換身分與能力封包。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "handshake",
+        "title": "工具結果：確認設備身分與能力",
+        "explanation": "實際握手回覆已確認設備型號、協定與 2 個控制通道；沒有送出位移命令。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "write_driver",
+        "title": "代理提案：撰寫與編譯控制程式",
+        "explanation": "離線策略使用手冊提供的 JavaScript 範本，在隔離執行環境中編譯。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "write_driver",
+        "title": "工具結果：撰寫與編譯控制程式",
+        "explanation": "手冊 JavaScript 範本已在隔離環境中編譯；離線模式並未宣稱由語言模型寫程式。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "test_driver",
+        "title": "代理提案：測試控制程式",
+        "explanation": "程式已編譯，仍須驗證封包、回覆、限制與錯誤處理。"
+      },
+      {
+        "kind": "onboarding-result",
+        "phase": "inspect_scene",
+        "tool": "test_driver",
+        "title": "工具結果：測試控制程式",
+        "explanation": "驅動程式測試通過。測試未移動手臂，後續真實模擬動作會重用這份程式。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "start_control",
+        "title": "代理提案：啟用視覺控制",
+        "explanation": "外觀假設、介面、手冊、握手與驅動測試均已具備，現在可啟用受限動作。"
+      },
+      {
+        "kind": "control-ready",
+        "phase": "inspect_scene",
+        "tool": "start_control",
+        "title": "工具結果：啟用視覺控制",
+        "explanation": "前置工作完成。控制器尚不知道運動映射；接下來透過剛才產生與測試的通訊程式試動、觀察與自我校正。"
+      },
+      {
+        "kind": "decision",
+        "phase": "inspect_scene",
+        "tool": "inspect_scene",
+        "title": "代理提案：辨識物件與放置區",
+        "explanation": "依目前影像與已確認的命令狀態，執行「辨識 A 點物件與 B 區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "prepare_lift",
+        "tool": "inspect_scene",
+        "title": "工具結果：辨識物件與放置區",
+        "explanation": "已從 RGBA 影像定位夾具、橘色物件與藍色 B 區；尚未假設物件已被夾住。"
+      },
+      {
+        "kind": "decision",
+        "phase": "prepare_lift",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「確認夾具升起」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "prepare_grip",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "prepare_grip",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「確認夾爪張開」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "approach",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：張開。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「自我校正並靠近物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "approach",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定物件位置。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "代理提案：小幅試動",
+        "explanation": "通道 A 的有效激發量較少，選擇一次小幅試動補足量測。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "工具結果：小幅試動",
+        "explanation": "已完成第 1 次實際動作。已執行動作，影像誤差 68.96 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "代理提案：小幅試動",
+        "explanation": "通道 B 的有效激發量較少，選擇一次小幅試動補足量測。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "probe",
+        "title": "工具結果：小幅試動",
+        "explanation": "已完成第 2 次實際動作。已執行動作，影像誤差 63.89 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "fit_model",
+        "title": "代理提案：建立映射",
+        "explanation": "兩個獨立輸入通道已有實際位移樣本，可估計局部映射。"
+      },
+      {
+        "kind": "model-learned",
+        "phase": "approach",
+        "tool": "fit_model",
+        "title": "工具結果：建立映射",
+        "explanation": "已以 2 筆實際位移樣本建立局部映射。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 63.9 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 3 次實際動作。已執行動作，影像誤差 51.28 px。 預測誤差 1.19 px；本次門檻 8.34 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 51.3 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 4 次實際動作。已執行動作，影像誤差 39.52 px。 預測誤差 2.53 px；本次門檻 7.24 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 39.5 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 5 次實際動作。已執行動作，影像誤差 30.38 px。 預測誤差 2.47 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 30.4 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 6 次實際動作。已執行動作，影像誤差 24.08 px。 預測誤差 1.56 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 24.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 7 次實際動作。已執行動作，影像誤差 19.09 px。 預測誤差 1.34 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 19.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 8 次實際動作。已執行動作，影像誤差 14.12 px。 預測誤差 0.28 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 14.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "approach",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 9 次實際動作。已執行動作，影像誤差 6.34 px。 預測誤差 0.66 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "approach",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 6.34 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "object-reached",
+        "phase": "lower_pick",
+        "tool": "verify",
+        "title": "已對準 A 點物件",
+        "explanation": "夾具已依影像對準物件；尚未取物，接下來下降並合攏夾爪。"
+      },
+      {
+        "kind": "decision",
+        "phase": "lower_pick",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「下降至取物高度」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "close",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：下降。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "close",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「合攏夾爪」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "raise_pick",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：合攏。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "raise_pick",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「抬起物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "verify_grasp",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "verify_grasp",
+        "tool": "verify_grasp",
+        "title": "代理提案：驗證物件已抬起",
+        "explanation": "依目前影像與已確認的命令狀態，執行「用影像驗證取物」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "transport",
+        "tool": "verify_grasp",
+        "title": "工具結果：驗證物件已抬起",
+        "explanation": "影像確認橘色物件向上移動且位於夾具上方；搬運過程將繼續比對物件與夾具的共同位移。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「搬運至 B 區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "transport",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定B 區中心。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 71.2 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 10 次實際動作。已執行動作，影像誤差 62.87 px。 預測誤差 3.47 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 62.9 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 11 次實際動作。已執行動作，影像誤差 52.03 px。 預測誤差 3.18 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 52.0 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 12 次實際動作。已執行動作，影像誤差 41.05 px。 預測誤差 3.32 px；本次門檻 6.73 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 41.0 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 13 次實際動作。已執行動作，影像誤差 32.49 px。 預測誤差 3.62 px；本次門檻 7.25 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 32.5 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 14 次實際動作。已執行動作，影像誤差 22.69 px。 預測誤差 4.61 px；本次門檻 7.80 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 22.7 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 15 次實際動作。已執行動作，影像誤差 17.75 px。 預測誤差 8.01 px；本次門檻 9.22 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 17.8 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 16 次實際動作。已執行動作，影像誤差 10.07 px。 預測誤差 5.66 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 10.1 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "transport",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 17 次實際動作。已執行動作，影像誤差 2.95 px。 預測誤差 1.16 px；本次門檻 6.00 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "transport",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 2.95 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "destination-reached",
+        "phase": "lower_place",
+        "tool": "verify",
+        "title": "已到達 B 區上方",
+        "explanation": "已搬運到 B 區上方；尚未放置，接下來下降並張開夾爪。"
+      },
+      {
+        "kind": "decision",
+        "phase": "lower_place",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「下降至放置高度」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "release",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：下降。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "release",
+        "tool": "grip",
+        "title": "代理提案：控制夾爪",
+        "explanation": "依目前影像與已確認的命令狀態，執行「張開夾爪放下物件」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "raise_clearance",
+        "tool": "grip",
+        "title": "工具結果：控制夾爪",
+        "explanation": "設備已確認夾爪命令：張開。回覆本身不代表取放成功。"
+      },
+      {
+        "kind": "decision",
+        "phase": "raise_clearance",
+        "tool": "lift",
+        "title": "代理提案：控制升降",
+        "explanation": "依目前影像與已確認的命令狀態，執行「升起空夾具」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "clearance",
+        "tool": "lift",
+        "title": "工具結果：控制升降",
+        "explanation": "設備已確認升降命令：升起。是否持有物件仍由相機驗證。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "select_goal",
+        "title": "代理提案：指定影像目標",
+        "explanation": "依目前影像與已確認的命令狀態，執行「退出放置區」。"
+      },
+      {
+        "kind": "mission-result",
+        "phase": "clearance",
+        "tool": "select_goal",
+        "title": "工具結果：指定影像目標",
+        "explanation": "已依相機量測指定退出位置。平面控制器將自行試動、建立映射並逐步靠近。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 26.3 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 18 次實際動作。已執行動作，影像誤差 13.71 px。 預測誤差 2.21 px；本次門檻 8.12 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "代理提案：移向目標",
+        "explanation": "已有局部映射，依目前 13.7 px 的位置誤差計算有限幅度動作。"
+      },
+      {
+        "kind": "action-result",
+        "phase": "clearance",
+        "tool": "move",
+        "title": "工具結果：移向目標",
+        "explanation": "已完成第 19 次實際動作。已執行動作，影像誤差 1.35 px。 預測誤差 0.95 px；本次門檻 6.41 px。"
+      },
+      {
+        "kind": "decision",
+        "phase": "clearance",
+        "tool": "verify",
+        "title": "代理提案：重新拍攝驗證",
+        "explanation": "目前量測誤差 1.35 px，要求重新拍攝驗證。"
+      },
+      {
+        "kind": "clearance-reached",
+        "phase": "verify_place",
+        "tool": "verify",
+        "title": "夾具已退出放置區",
+        "explanation": "夾具已離開放置位置；接下來重新拍攝，確認物件仍留在 B 區。"
+      },
+      {
+        "kind": "decision",
+        "phase": "verify_place",
+        "tool": "verify_place",
+        "title": "代理提案：驗證放置與退出",
+        "explanation": "依目前影像與已確認的命令狀態，執行「驗證物件留在 B 區」。"
+      },
+      {
+        "kind": "pick-place-complete",
+        "phase": "complete",
+        "tool": "verify_place",
+        "title": "從零到取放：完成影像驗證",
+        "explanation": "取放已由新影像驗證：物件距 B 區中心 5.56 px，夾具已退出 25.0 px，放開後物件位移 1.79 px。"
+      }
+    ],
+    "traffic": [
+      {
+        "sequence": 1,
+        "direction": "event",
+        "wire": "OPEN SIM-NET-ARM:7402",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 2,
+        "direction": "TX",
+        "wire": "{\"op\":\"hello\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 3,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"model\":\"VLAB-P2\",\"protocol\":\"vlab-p2-json/1\",\"firmware\":\"sim-2.0\",\"channels\":2,\"maxStep\":0.1,\"capabilities\":{\"xy\":\"relative-unknown-mapping\",\"lift\":[\"up\",\"down\"],\"grip\":[\"open\",\"closed\"]},\"simulated\":true}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 4,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.02,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 5,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.02,0],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 6,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,-0.025]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 7,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,-0.025],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 8,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 9,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,0],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 10,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.1,-0.1]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 11,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.1,-0.1],\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 12,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 13,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 14,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 15,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 16,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 17,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 18,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"closed\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 19,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"closed\"},\"limited\":false}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 20,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.2,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 21,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"LIMIT: two finite channels in [-0.1,0.1] are required.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 22,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 23,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"FRAME: expected one JSON line, ending in LF.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 24,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0]}\n{\"op\":\"step\",\"channels\":[0,0]}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 25,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"FRAME: expected one JSON line, ending in LF.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 26,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"sideways\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 27,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"COMMAND: invalid lift/grip state.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 28,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\",\"extra\":1}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 29,
+        "direction": "RX",
+        "wire": "{\"ok\":false,\"error\":\"COMMAND: invalid lift/grip state.\"}\n",
+        "dryRun": true,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 30,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 31,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 32,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 33,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 34,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.045,0]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 35,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.045,0],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 36,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0,0.045]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 37,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0,0.045],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 38,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,0.07165526692013792]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 39,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,0.07165526692013792],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 40,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,0.057352227836420897]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 41,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,0.057352227836420897],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 42,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,0.0315423799665695]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 43,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,0.0315423799665695],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 44,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,0.009916259155968941]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 45,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,0.009916259155968941],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 46,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.0014491340436010556]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 47,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.0014491340436010556],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 48,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.012862625954723414]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 49,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.012862625954723414],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 50,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.01538765540622122]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 51,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.01538765540622122],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 52,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 53,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 54,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"closed\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 55,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"closed\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 56,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 57,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 58,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.09,0.07359718798644141]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 59,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.09,0.07359718798644141],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 60,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.08639648893586949,0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 61,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.08639648893586949,0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 62,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.06353106811797132,0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 63,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.06353106811797132,0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 64,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.035661769103209506,0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 65,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.035661769103209506,0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 66,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.009164104922101736,0.09000000000000001]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 67,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.009164104922101736,0.09000000000000001],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 68,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.05380285481804545,0.09]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 69,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.05380285481804545,0.09],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 70,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.09,-0.03080649282110908]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 71,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.09,-0.03080649282110908],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 72,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.058051260076440216,-0.052654706676843556]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 73,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.058051260076440216,-0.052654706676843556],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 74,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"down\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 75,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"down\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 76,
+        "direction": "TX",
+        "wire": "{\"op\":\"grip\",\"state\":\"open\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 77,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"grip\",\"state\":\"open\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 78,
+        "direction": "TX",
+        "wire": "{\"op\":\"lift\",\"position\":\"up\"}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 79,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":{\"op\":\"lift\",\"position\":\"up\"},\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 80,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[-0.0062924909407363555,-0.09000000000000001]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 81,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[-0.0062924909407363555,-0.09000000000000001],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 82,
+        "direction": "TX",
+        "wire": "{\"op\":\"step\",\"channels\":[0.01846524844186404,-0.060006627276526364]}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      },
+      {
+        "sequence": 83,
+        "direction": "RX",
+        "wire": "{\"ok\":true,\"accepted\":[0.01846524844186404,-0.060006627276526364],\"limited\":false}\n",
+        "dryRun": false,
+        "endpointId": "sim-tcp-arm",
+        "transport": "tcp"
+      }
+    ]
+  }
+]

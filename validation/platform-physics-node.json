@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "scope": "Production plant and device-link physics with evaluator-driven positioning; not AI planning or browser rendering validation.",
+  "firstTrial": {
+    "type": "five-trial-series",
+    "trialIndex": 0,
+    "trialNumber": 1,
+    "totalTrials": 5,
+    "label": "遠距桌面取放",
+    "destinationHeight": 0,
+    "liftSafeHeight": 1,
+    "heightUnits": "relative-to-safe-lift",
+    "initialDistancePx": 173.74618199444512,
+    "transferDistancePx": 201.2772949643218,
+    "platformMode": "compliant-surface-stop"
+  },
+  "checks": [
+    "Five reachable, separated scenes preserve equipment, camera, and current joints between trials; first pose is lower-left",
+    "All five trials genuinely grasp, lift, contact the supporting surface, and leave the object at its platform height after release",
+    "Release outside the elevated platform falls onto the table and cannot count as placed",
+    "An XY-aligned closed gripper at a mismatched height cannot grasp a table object",
+    "The link rejects a low-height platform collision atomically with unchanged joints; raising permits the move"
+  ]
+}

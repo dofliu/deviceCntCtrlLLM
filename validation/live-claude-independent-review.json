@@ -1,0 +1,40 @@
+{
+  "status": "incomplete-live-run",
+  "reviewMode": "Independent read-only review of preserved progress and live harness. No additional API calls.",
+  "inputReport": "live-claude-authorized-progress.json",
+  "model": "claude-haiku-5-5",
+  "realAPIHarness": true,
+  "completedDecisionCount": 5,
+  "preservedEventCount": 10,
+  "completedTools": [
+    "inspect_device",
+    "list_interfaces",
+    "read_manual",
+    "connect",
+    "handshake"
+  ],
+  "lastCompletedEvent": {
+    "eventIndex": 10,
+    "kind": "onboarding-result",
+    "tool": "handshake",
+    "recordedModelCalls": 5
+  },
+  "confirmedActuationCount": 0,
+  "pickPlaceCompleted": false,
+  "driverGenerationObserved": false,
+  "driverTestObserved": false,
+  "controlStartObserved": false,
+  "fullReportAvailable": false,
+  "checks": {
+    "onlyOnboardingProgress": true,
+    "decisionCallsIncreaseOneAtATime": true,
+    "noSuccessClaimInProgress": true,
+    "harnessUsesRealBridgeAndClaudeStrategy": true,
+    "noOfflineFallbackInInspectedHarness": true
+  },
+  "limits": [
+    "Preserved progress proves five completed model decisions; a later in-flight API attempt is not counted or excluded by this file.",
+    "No complete report exists, so generated-driver use, motion TX/ACK correspondence and final visual placement cannot be assessed for this live run.",
+    "The independent offline audit remains separate; it does not establish live Claude end-to-end completion."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "realAPI": false,
+  "liveModelCalls": 0,
+  "credentialRead": false,
+  "scope": "Production providers and all three experiment engines, with local fetch fixtures. An explicit adaptive oracle supplies valid decisions; this does not measure model intelligence.",
+  "passed": false,
+  "status": "partially_verified_blocked_by_automatic_review",
+  "plannedCases": 8,
+  "verifiedCases": 1,
+  "unverifiedCases": 7,
+  "evidenceSource": "First case JSON observed directly in test process stdout before the review rejection; subsequent case completion was not observed. This partial record replaces an earlier failed-run report that still had an empty cases array.",
+  "blocker": "After the first passing case, automatic approval review rejected polling the local test process because the environment triggered an outbound Visual Studio telemetry request with an unspecified payload. No retry or workaround was attempted. The remaining cases are not claimed as passed.",
+  "cases": [
+    {
+      "provider": "claude",
+      "mode": "recover",
+      "faultPhase": "control",
+      "mockOnly": true,
+      "passed": true,
+      "completed": true,
+      "injectedFaults": 2,
+      "mockRequests": 44,
+      "acceptedDecisions": 42,
+      "feedbackChecks": 2,
+      "feedbackResetChecks": 26,
+      "rejectionChecks": [
+        {
+          "attempt": 1,
+          "willRetry": true,
+          "phase": "control",
+          "actions": 4,
+          "probeCount": 2,
+          "hasJacobian": true,
+          "preserved": true,
+          "noActuation": true
+        },
+        {
+          "attempt": 1,
+          "willRetry": true,
+          "phase": "control",
+          "actions": 5,
+          "probeCount": 2,
+          "hasJacobian": true,
+          "preserved": true,
+          "noActuation": true
+        }
+      ],
+      "actions": 24,
+      "xyActions": 16,
+      "auxiliaryActions": 8,
+      "modelCallBudgetIncludesRetries": true,
+      "noFallback": true,
+      "privilegedInputsExcluded": true,
+      "phases": ["onboarding", "mission", "control"]
+    }
+  ]
+}

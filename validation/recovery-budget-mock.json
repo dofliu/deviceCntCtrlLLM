@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "externalRequests": [],
+  "pageErrors": [],
+  "results": [
+    {
+      "strategy": "claude",
+      "passed": true,
+      "mockOnly": true,
+      "liveAPICalls": 0,
+      "wireCalls": 1,
+      "decideCalls": 2,
+      "rejectedResponses": 1,
+      "reportedModelCalls": 1,
+      "failureCode": "CALL_BUDGET",
+      "usage": {
+        "input_tokens": 7,
+        "output_tokens": 3
+      },
+      "noAction": true,
+      "noFallback": true,
+      "noCallsAfterStop": true
+    },
+    {
+      "strategy": "gemini",
+      "passed": true,
+      "mockOnly": true,
+      "liveAPICalls": 0,
+      "wireCalls": 1,
+      "decideCalls": 2,
+      "rejectedResponses": 1,
+      "reportedModelCalls": 1,
+      "failureCode": "CALL_BUDGET",
+      "usage": {
+        "promptTokenCount": 7,
+        "candidatesTokenCount": 3,
+        "totalTokenCount": 10
+      },
+      "noAction": true,
+      "noFallback": true,
+      "noCallsAfterStop": true
+    }
+  ]
+}

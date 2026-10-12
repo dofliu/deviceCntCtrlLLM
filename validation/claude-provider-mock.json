@@ -1,0 +1,18 @@
+{
+  "scope": "mock-only; no live Claude request",
+  "passed": true,
+  "checks": [
+    "real Messages API shape, image, one-tool request, allowlist, private key",
+    "call budget and disposal",
+    "complete manual preserved and privileged front fields omitted",
+    "mission image evidence, actuator acknowledgements, strict tool enum/shape, no hidden state or offline policy",
+    "complete XY/lift/grip manual and handshake capabilities preserved",
+    "reject multiple/text/truncated/unavailable/out-of-range calls; accept manual tool",
+    "missing optional expected is preserved as absent in onboarding/probe/mission with one request; command limits, required reason, extra fields and supplied expected remain strict",
+    "typed rejection diagnostics identify exact contract branch; usage retained; no raw fields, driver, thoughts, key or hidden retries",
+    "sanitized corrective feedback reaches onboarding, XY control and mission without replaying rejected model output",
+    "credential echo redaction and no thinking export",
+    "sanitized HTTP/network failures, timeout and user cancellation",
+    "account model pagination and loopback bridge without credential transfer"
+  ]
+}

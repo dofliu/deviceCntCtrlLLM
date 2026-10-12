@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-11",
+  "credentialName": "gemini_api_key",
+  "credentialNameCaseInsensitiveOnWindows": true,
+  "availability": [
+    {"scope": "process", "present": false},
+    {"scope": "user", "present": false},
+    {"scope": "machine", "present": false}
+  ],
+  "bridgeCheck": {"credentialName": "gemini_api_key", "available": false, "generationRequests": 0, "error": {"code": "MISSING_AUTHORIZED_KEY"}},
+  "modelsRequests": 0,
+  "generationRequests": 0,
+  "realAPITested": false,
+  "fullPickPlaceCompletedByRealGemini": false,
+  "status": "blocked-missing-authorized-key",
+  "scope": "This execution environment only; no unrelated credentials or secret files searched.",
+  "localNextStep": "Run start-gemini.cmd on the user's computer; it reads the same environment variable or privately prompts for a key."
+}

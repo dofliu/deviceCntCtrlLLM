@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-11",
+  "model": "claude-haiku-5-5",
+  "credentialName": "ANTHROPIC_API_KEY",
+  "credentialPresent": true,
+  "credentialScope": "Windows Machine",
+  "modelsHTTPStatus": 200,
+  "realAPI": true,
+  "fullPickPlaceCompleted": false,
+  "status": "interrupted-by-automatic-review-after-connection-authorization",
+  "connectionExplicitlyAuthorized": true,
+  "completedDecisionsInPreservedAttempt": 5,
+  "observedTools": [
+    "inspect_device",
+    "list_interfaces",
+    "read_manual",
+    "connect",
+    "handshake"
+  ],
+  "lastPreservedEventIndex": 10,
+  "actionsInPreservedAttempt": 0,
+  "latestProgressFile": "live-claude-authorized-progress.json",
+  "reviewBlockedDestination": "Visual Studio telemetry (unrelated to Anthropic)",
+  "reviewReason": "Connection explicitly approved, but reviewer requires authorization of the unspecified telemetry payload that may contain run or environment data.",
+  "actualTelemetryPayloadKnown": false,
+  "pendingRequestOutcomeKnown": false,
+  "totalBilledRequestsKnown": false,
+  "testProcessNoLongerRunning": true,
+  "fullRunClaim": false,
+  "mitigationsAttempted": [
+    "No shell login profile",
+    "Telemetry opt-out environment flags",
+    "Chromium background networking disabled",
+    "Browser external DNS blocked",
+    "Browser HTTP routes limited to loopback bridge",
+    "Bridge fixed to api.anthropic.com with redirects disabled"
+  ],
+  "automaticReviewInterruptions": 3,
+  "previousStatusBeforeConnectionAuthorization": {
+    "date": "2026-10-11",
+    "model": "claude-haiku-5-5",
+    "credentialName": "ANTHROPIC_API_KEY",
+    "credentialPresent": true,
+    "credentialScope": "Windows Machine",
+    "modelsHTTPStatus": 200,
+    "realAPI": true,
+    "fullPickPlaceCompleted": false,
+    "status": "interrupted-by-automatic-review",
+    "completedDecisionsInPreservedAttempt": 3,
+    "observedTools": [
+      "inspect_device",
+      "list_interfaces",
+      "read_manual"
+    ],
+    "lastPreservedEventIndex": 6,
+    "actionsInPreservedAttempt": 0,
+    "reviewBlockedDestination": "Visual Studio telemetry (unrelated to Anthropic)",
+    "reviewReason": "Unapproved destination with unspecified payload that could export run or environment data.",
+    "mitigationsAttempted": [
+      "No shell login profile",
+      "Telemetry opt-out environment flags",
+      "Chromium background networking disabled",
+      "Browser external DNS blocked",
+      "Browser HTTP routes limited to loopback bridge",
+      "Bridge fixed to api.anthropic.com with redirects disabled"
+    ],
+    "automaticReviewInterruptions": 2,
+    "fullRunClaim": false
+  }
+}

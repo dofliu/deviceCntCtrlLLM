@@ -1,0 +1,8 @@
+{
+  "version": "0.6.3",
+  "scope": "Focused in-memory bridge error/limit fixtures; no socket, browser, credentials or live API.",
+  "testsRun": 12,
+  "failures": 0,
+  "errors": 0,
+  "passed": true
+}

@@ -1,0 +1,86 @@
+{
+  "schema": "v62-driver-runtime-regression/1",
+  "passed": true,
+  "testCount": 10,
+  "scope": "Focused deterministic VM tests of production driver runtime, generated broker/worker, and device link; no browser, model API, network, credentials, or full mission suite.",
+  "limitations": [
+    "Does not reproduce the unknown real-browser scheduling cause of the V6.1 five-second timeout.",
+    "Does not certify browser CSP/Worker isolation or completion of five pick-and-place trials."
+  ],
+  "tests": [
+    {
+      "name": "production sample driver validates XY, lift, grip without actuation",
+      "passed": true,
+      "wallMilliseconds": 367,
+      "dryRunChecks": 6,
+      "actualCommandCount": 3
+    },
+    {
+      "name": "startup and execution receive separate bounded deadlines",
+      "passed": true,
+      "wallMilliseconds": 128,
+      "startupMs": 90,
+      "executionMs": 70,
+      "perPhaseDeadlineMs": 100,
+      "actualCommandCount": 1
+    },
+    {
+      "name": "one encode startup failure retries with exactly one physical command",
+      "passed": true,
+      "wallMilliseconds": 99,
+      "encodeAttempts": 2,
+      "actualCommandCount": 1
+    },
+    {
+      "name": "two encode startup failures exhaust recovery without transmission",
+      "passed": true,
+      "wallMilliseconds": 58,
+      "encodeAttempts": 2,
+      "actualCommandCount": 0
+    },
+    {
+      "name": "encode execution timeout never retries or transmits",
+      "passed": true,
+      "wallMilliseconds": 58,
+      "encodeAttempts": 1,
+      "actualCommandCount": 0
+    },
+    {
+      "name": "decode timeout preserves actual ACK, invalidates driver, and never resends",
+      "passed": true,
+      "wallMilliseconds": 64,
+      "decodeAttempts": 1,
+      "actualCommandCount": 1,
+      "actualAckPreserved": true
+    },
+    {
+      "name": "late result cannot complete a newer request or send stale movement",
+      "passed": true,
+      "wallMilliseconds": 64,
+      "lateResultAtMs": 160,
+      "secondRequestCompletedAtMs": 180,
+      "actualCommandCount": 1
+    },
+    {
+      "name": "dispose during startup cancels pending work and prohibits recovery",
+      "passed": true,
+      "wallMilliseconds": 82,
+      "encodeAttempts": 1,
+      "actualCommandCount": 0
+    },
+    {
+      "name": "dispose after successful encoding prevents the pending physical transmission",
+      "passed": true,
+      "wallMilliseconds": 337,
+      "encodeResultReceived": true,
+      "actualCommandCount": 0
+    },
+    {
+      "name": "malformed ACK dry run fails when rejection is actually a runtime timeout",
+      "passed": true,
+      "wallMilliseconds": 141,
+      "dryRunPassed": false,
+      "actualCommandCount": 0
+    }
+  ]
+}

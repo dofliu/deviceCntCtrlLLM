@@ -1,0 +1,30 @@
+# Credentials (bridges use process environment variables, not dotenv)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Local runtime / dependencies
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.DS_Store
+Thumbs.db
+.library*/
+
+# Generated releases, experiment exports and local large data
+unknown-device-v*.html
+unknown-device-*-experiment.json
+*.zip
+*.log
+dist/
+artifacts/
+data/raw/
+playwright-report/
+test-results/
+validation/*.png

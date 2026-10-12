@@ -1,0 +1,252 @@
+{
+  "passed": true,
+  "uiAutoRun": {
+    "task": {
+      "phase": "complete",
+      "label": "取放任務完成",
+      "objectDetected": true,
+      "atObject": true,
+      "graspVerified": true,
+      "coMotionVerified": true,
+      "atDestination": true,
+      "released": true,
+      "cleared": true,
+      "completed": true,
+      "attempts": 1,
+      "placementError": 6.393189924352163
+    },
+    "failure": null,
+    "actions": 24,
+    "history": 85
+  },
+  "replayDoesNotMutate": true,
+  "defaultCheckpointPause": false,
+  "viewports": [
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "overview",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "bodyWidth": 1440,
+      "bodyHeight": 900,
+      "playBottom": 865,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "evidence",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "bodyWidth": 1440,
+      "bodyHeight": 900,
+      "playBottom": 865,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "driver",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "bodyWidth": 1440,
+      "bodyHeight": 900,
+      "playBottom": 865,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "records",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "bodyWidth": 1440,
+      "bodyHeight": 900,
+      "playBottom": 865,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1440,
+        900
+      ],
+      "tab": "settings",
+      "width": 1440,
+      "height": 900,
+      "scrollWidth": 1440,
+      "scrollHeight": 900,
+      "bodyWidth": 1440,
+      "bodyHeight": 900,
+      "playBottom": 865,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "overview",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "scrollHeight": 768,
+      "bodyWidth": 1366,
+      "bodyHeight": 768,
+      "playBottom": 733,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "evidence",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "scrollHeight": 768,
+      "bodyWidth": 1366,
+      "bodyHeight": 768,
+      "playBottom": 733,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "driver",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "scrollHeight": 768,
+      "bodyWidth": 1366,
+      "bodyHeight": 768,
+      "playBottom": 733,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "records",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "scrollHeight": 768,
+      "bodyWidth": 1366,
+      "bodyHeight": 768,
+      "playBottom": 733,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        1366,
+        768
+      ],
+      "tab": "settings",
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "scrollHeight": 768,
+      "bodyWidth": 1366,
+      "bodyHeight": 768,
+      "playBottom": 733,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "overview",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "bodyWidth": 390,
+      "bodyHeight": 844,
+      "playBottom": 781,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "evidence",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "bodyWidth": 390,
+      "bodyHeight": 844,
+      "playBottom": 781,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "driver",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "bodyWidth": 390,
+      "bodyHeight": 844,
+      "playBottom": 781,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "records",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "bodyWidth": 390,
+      "bodyHeight": 844,
+      "playBottom": 781,
+      "tabCount": 1
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "tab": "settings",
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "scrollHeight": 844,
+      "bodyWidth": 390,
+      "bodyHeight": 844,
+      "playBottom": 781,
+      "tabCount": 1
+    }
+  ],
+  "pageErrors": []
+}
