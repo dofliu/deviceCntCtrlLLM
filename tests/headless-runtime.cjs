@@ -162,7 +162,7 @@ function createRuntime({ extraSources = [] } = {}) {
     addEventListener(name, listener) { if (name === 'message') listeners.add(listener); },
     removeEventListener(name, listener) { if (name === 'message') listeners.delete(listener); }
   });
-  for (const file of ['plant.js', 'claude-provider.js', 'controller.js', 'agent-core.js', 'device-link.js', 'driver-runtime.js', 'engine.js', 'onboarding.js', 'pick-place.js', ...extraSources])
+  for (const file of ['plant.js', 'claude-provider.js', 'controller.js', 'agent-core.js', 'protocols.js', 'device-link.js', 'driver-runtime.js', 'driver-synthesizer.js', 'controller-module.js', 'engine.js', 'onboarding.js', 'pick-place.js', ...extraSources])
     vm.runInContext(fs.readFileSync(path.join(root, 'src', file), 'utf8'), context, { filename: file, timeout: 1000 });
   return { global: context, close() { for (const worker of workers) worker.terminate(); listeners.clear(); blobs.clear(); } };
 }

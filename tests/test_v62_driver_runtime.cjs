@@ -114,7 +114,7 @@ function harness(options = {}) {
     crypto: {getRandomValues(array) { for (let i = 0; i < array.length; i++) array[i] = ++sequence; return array; }},
     addEventListener(name, listener) { if (name === 'message') listeners.add(listener); },
     removeEventListener(name, listener) { if (name === 'message') listeners.delete(listener); }});
-  for (const file of ['device-link.js', 'driver-runtime.js'])
+  for (const file of ['protocols.js', 'device-link.js', 'driver-runtime.js'])
     vm.runInContext(fs.readFileSync(path.join(root, 'src', file), 'utf8'), context, {filename: file, timeout: 500});
   const plant = {
     act(command) { plantCommands.push(plain(command)); return {applied: plain(command), limited: false}; },

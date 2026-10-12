@@ -1,9 +1,23 @@
-# DOFLAB 陌生設備接手與連續取放實驗 V6.3
+# DOFLAB 陌生設備接手與連續取放實驗 V7.0
 
-> **V6.3 開發移交：最終回歸未確認。** 先讀 `docs/CODEX_HANDOFF.md` 與 `docs/VALIDATION_STATUS.md`。先前部分聚焦測試通過，但最後三項修正的測試結果遭執行環境審核攔下；本次沒有新的瀏覽器、真實 API 或五回合成功結果。
+> **V7.0 開發版本。** 新增第二種模擬設備與通訊協定、手冊可不提供驅動範本、可選擇產生 XY 控制程式。驗證以離線 Node、無頭 Chromium 與模擬 API 為主；**尚未以真實 Claude／Gemini 執行 V7 新功能**。先讀 `docs/CODEX_HANDOFF.md` 與 `docs/VALIDATION_STATUS.md`。
 
+直接開啟 `unknown-device-v7.0.html`，按「開始完整實驗」。預設與 V6.3 相同：VLAB-P2、提供手冊範本、內建 XY 控制器、離線規則代理、五回合；不會自行呼叫模型。新選項在「連線設定」頁。
 
-直接開啟 `unknown-device-v6.3.html`，按「開始完整實驗」。預設離線規則代理、五回合測試；不會自行呼叫模型。介面保持分頁，詳細紀錄在面板內捲動。
+## V7.0 新增
+
+1. **第二種設備與通訊（VLAB-G3）**：直角座標龍門，兩個未知直線軸（軸向對應、正負方向、增益與行程皆隱藏），搭配與 P2 相同的已知升降／夾爪介面。通訊為二進位框架：`0xA5 | LEN | payload | XOR 檢查碼`，以小寫十六進位字串表示位元組；XY 為 int16 big-endian、刻度 10000。設備回覆錯誤碼（FRAME、CHECKSUM、NOT_READY、LIMIT、OPCODE、ARGUMENT、COLLISION）。主機端以受信任的協定設定檔（`src/protocols.js`）獨立驗證產生的驅動程式，不採信驅動程式自己的回報；定點協定的 XY 指令會先量化到 0.0001，ACK 必須完全一致。
+2. **手冊不提供驅動範本**：設定「不提供範本」時，手冊移除 `sampleDriver`／`sampleDriverSource`，改提供機器可讀的 `protocolSpec`。Claude／Gemini 只能依協定說明與規格自行撰寫 encode/decode。離線模式改用**規則式規格產生器**（`src/driver-synthesizer.js`）依 `protocolSpec` 產生驅動；這是確定性的程式產生，不是語言模型，報告標示為 `offline-spec-synthesizer`。
+3. **產生 XY 控制程式**：設定「產生控制程式」時，驅動測試通過後新增 `write_controller`／`test_controller` 兩個工具。控制程式是無狀態的 `control(state)`，只依相機像素與已確認的 applied／影像位移歷史決定下一步，在與驅動相同的隔離沙箱執行。必須先在 6 組合成設備（旋轉、通道交換、反向、位置相依非線性、行程邊界、到達後反向）全部到達，才允許 `start_control`；執行中若輸出越界或例外，主機不送出該動作並停止。離線模式提交的是**預寫參考模組**（`offline-reference-module`），不是模型產生的程式。
+
+切換設備、範本或控制模式都在「連線設定」頁，套用後重新開始。`window.experimentLab.configure({device:'VLAB-G3', manualTemplate:false, controllerMode:'generated'})` 可供自動測試使用。
+
+### 能力界線（V7.0）
+
+- 兩種設備都是模擬。G3 與 P2 共用相同的升降、夾爪、平台與相機標記；跨設備只改變機構與協定，並非任意未知設備。
+- 規格產生器只支援 `json-line` 與 `binary-frame` 兩個框架家族，依賴手冊提供的機器可讀規格；這是無範本**流程**的離線基準，不是「AI 從零寫出驅動」的證據。
+- 控制程式的隔離測試是主機端合成模型，不是被評估的設備；影像偵測、任務前提與取放驗證器仍由專案預先實作。
+- 尚未用真實模型產生 V7 的驅動或控制程式；這些結果須另行授權實驗、單獨記錄。
 
 ## V6.3 模型等待與限流恢復
 
@@ -46,11 +60,11 @@ V6.1 的第五回合已知失敗是本機驅動等待逾時，不能據此判定
 
 - Claude：執行 `start-lab.cmd`，預設使用 `ANTHROPIC_API_KEY`。若要用先前的名稱，可執行 `python claude_bridge.py --key-env ANTHROPIC_API_KEY_Extra --open-browser`。
 - Gemini：執行 `start-gemini.cmd`，使用 `gemini_api_key`；找不到時以隱藏輸入提示提供。
-- 啟動器先建置同版本 HTML。開啟後確認標題是 **V6.3**，在設定頁取得可用模型、選定模型及請求間隔、套用，然後開始實驗。
+- 啟動器先建置同版本 HTML。開啟後確認標題是 **V7.0**，在設定頁取得可用模型、選定模型及請求間隔、套用，然後開始實驗。
 - 五回合前端預設總呼叫上限 500；單回合預設 80，可設定 1–500。橋接程序 CLI 預設上限為 500，`--max-calls` 可降低。前端及橋接會各自檢查上限，以先達到者為準；橋接計數涵蓋同一次啟動中所有實驗，重新整理頁面不會重設它。
 - 上限是最多請求數，不是完成所需的保證。格式修正與限流重試也計數，達上限保留結果並停止；不會偷偷換成離線策略。
 
-新版橋接可使用 `python claude_bridge.py --html unknown-device-v6.3.html --max-calls 500 --open-browser`。請下載本版內附原始碼、關閉舊橋接，再重新啟動；新版橋接會保留經過篩選的等待提示供前端判斷。詳細連線見 `docs/claude.md`、`docs/gemini.md`。
+新版橋接可使用 `python claude_bridge.py --html unknown-device-v7.0.html --max-calls 500 --open-browser`。請下載本版內附原始碼、關閉舊橋接，再重新啟動；新版橋接會保留經過篩選的等待提示供前端判斷。詳細連線見 `docs/claude.md`、`docs/gemini.md`。
 
 ## 高度與程式生成的能力界線
 
@@ -66,6 +80,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 2. AI 產生運動控制器：模型讀取通訊與試動資料，生成受限控制模組，先通過隔離測試與獨立驗證，再執行。需與既有數值控制基線比較成功率、命令數及失敗恢復，不以程式碼生成成功代替取放成功。
 
 ## 驗證與歷史
+
+**V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
 
 **2026-10-12 雲端離線重跑**（`validation/v63-rerun-2026-10-12-cloud.json`）：V6.3 六項聚焦測試與最後三項修正皆通過；其他離線單元測試通過（Gemini 橋接一項過時預期已對齊 V6.3）。離線五回合整合 `test_v6_suite.cjs` 未通過：seed 1 第 4 回合低台放置高度偏差 2.52 px > 2.5 px。0.35 低台存在系統偏差，待查；門檻未放寬。無瀏覽器或真實模型結果。
 

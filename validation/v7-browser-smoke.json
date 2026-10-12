@@ -1,0 +1,93 @@
+{
+  "version": "0.7.0",
+  "passed": true,
+  "browser": "headless Chromium via Playwright",
+  "modelCalls": 0,
+  "scope": "Single-trial offline runs of the built HTML in a real browser (sandbox iframe, CSP, Workers). Offline policy, template/spec-synthesized drivers and the offline reference controller; not model-generated code or a five-trial browser run.",
+  "rows": [
+    {
+      "device": "VLAB-G3",
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 7,
+      "done": true,
+      "failure": null,
+      "completed": 1,
+      "experiment": {
+        "device": "VLAB-G3",
+        "protocol": "vlab-g3-bin/1",
+        "manualTemplate": false,
+        "controllerMode": "generated"
+      },
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "offline-reference-module",
+      "controllerTestsPassed": true,
+      "actions": 36,
+      "templateInManual": false,
+      "protocol": "vlab-g3-bin/1",
+      "controllerPanelHidden": false,
+      "controllerBadge": "離線參考控制模組（預寫）",
+      "driverBadge": "離線規格產生器（規則式，非模型）",
+      "title": "從零接手到完成取放 V7.0 · DOFLAB",
+      "seconds": 19.469,
+      "consoleErrors": [],
+      "externalRequests": []
+    },
+    {
+      "device": "VLAB-P2",
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 42,
+      "done": true,
+      "failure": null,
+      "completed": 1,
+      "experiment": {
+        "device": "VLAB-P2",
+        "protocol": "vlab-p2-json/1",
+        "manualTemplate": false,
+        "controllerMode": "generated"
+      },
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "offline-reference-module",
+      "controllerTestsPassed": true,
+      "actions": 61,
+      "templateInManual": false,
+      "protocol": "vlab-p2-json/1",
+      "controllerPanelHidden": false,
+      "controllerBadge": "離線參考控制模組（預寫）",
+      "driverBadge": "離線規格產生器（規則式，非模型）",
+      "title": "從零接手到完成取放 V7.0 · DOFLAB",
+      "seconds": 27.096,
+      "consoleErrors": [],
+      "externalRequests": []
+    },
+    {
+      "device": "VLAB-G3",
+      "manualTemplate": true,
+      "controllerMode": "builtin",
+      "seed": 42,
+      "done": true,
+      "failure": null,
+      "completed": 1,
+      "experiment": {
+        "device": "VLAB-G3",
+        "protocol": "vlab-g3-bin/1",
+        "manualTemplate": true,
+        "controllerMode": "builtin"
+      },
+      "driverSource": "manual-template",
+      "controllerSource": "builtin-numerical-controller",
+      "controllerTestsPassed": null,
+      "actions": 35,
+      "templateInManual": true,
+      "protocol": "vlab-g3-bin/1",
+      "controllerPanelHidden": true,
+      "controllerBadge": "尚未產生控制程式",
+      "driverBadge": "離線代理採用的通訊範本",
+      "title": "從零接手到完成取放 V7.0 · DOFLAB",
+      "seconds": 20.352,
+      "consoleErrors": [],
+      "externalRequests": []
+    }
+  ]
+}

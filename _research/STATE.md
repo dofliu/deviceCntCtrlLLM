@@ -7,7 +7,7 @@
 - 題目候選：以視覺與通訊證據驅動的陌生設備自主啟用與選擇性重校正。
 - 目標期刊、作者名單：未決定。
 - 目前階段：01 貢獻定位；尚未凍結正式實驗協定。
-- 專案：virtual-device-v5，開發版本 V6.3。已初始化為 Git repo 並同步至遠端 https://github.com/dofliu/deviceCntCtrlLLM。
+- 專案：virtual-device-v5，開發版本 V7.0（報告 0.7.0）。已初始化為 Git repo 並同步至遠端 https://github.com/dofliu/deviceCntCtrlLLM。
 
 ## 輸入版本與證據
 - unknown-device-v6.1.html，SHA256: cdccbc76ca55a63765199bc5b3599ef4d666c18166982810f9c367169c5416d0
@@ -25,9 +25,9 @@
 | 貢獻、協定及 repo 移轉建議 | CONTRIBUTION.md、PROTOCOL.md、REPO_PLAN.md | 草擬 |
 
 ## 已知限制
-- XY 數值控制器、任務先決條件及影像驗證器由專案預寫。
-- 通訊手冊含完整 sampleDriver / sampleDriverSource，LLM 可取得範本；現有生成結果不構成「無範本獨立生成」證據。
-- 只有 VLAB-P2 模擬協定；serial/tcp 標籤切換不是跨協定家族的泛化。
+- 任務先決條件及影像驗證器由專案預寫。V7 起 XY 控制可改為通過隔離測試的 control(state) 模組，但離線模式提交的是預寫參考模組；尚無模型產生的控制程式結果。
+- V7 起手冊範本可關閉（只提供 protocolSpec）。離線無範本驅動來自規則式規格產生器，不是模型；真實模型的無範本生成尚未執行，因此仍無「無範本獨立生成」證據。
+- V7 有兩種模擬設備與協定家族：VLAB-P2（2R、JSON 單行）與 VLAB-G3（龍門、十六進位二進位框架）。兩者共用升降／夾爪／相機標記，仍不是任意未知設備的泛化。
 - 2R 平面機構與已知離散升降；沒有任意未知 Z、6 軸姿態、跨工作站或真實硬體驗證。
 - 模擬器的真值只能供獨立評估使用；3D 展示不能作為代理觀測或成功判定的捷徑。
 - seed 42 已反覆除錯，須永久歸為 development/regression。
@@ -61,3 +61,5 @@
 2026-10-12（雲端離線重跑）：在 Linux 雲端環境執行 V6.3 聚焦測試與其他離線測試，結果存 validation/v63-rerun-2026-10-12-cloud.json；還原被腳本改寫的歷史結果檔。更新 tests/test_gemini_bridge.py 中與 V6.3 429 分類設計衝突的過時預期。離線五回合整合未通過（seed 1 第 4 回合放置高度），未修改門檻；未呼叫模型、未執行瀏覽器。
 
 2026-10-12（低台偏差修正）：定位 seed 1 低台放置高度失敗為影像遮蔽偏差，修正 src/pick-place.js 的放手高度證據與 src/agent-core.js 的受限試動方向；新增 tests/test_v63_release_probe_regression.cjs。全部 19 項離線測試通過，結果見 validation/v63-offline-suite-2026-10-12-fix.json。未呼叫模型、未執行瀏覽器。
+
+2026-10-12（V7.0 開發）：依使用者要求一次完成三項：(1) 第二種設備 VLAB-G3 與二進位框架協定、主機端受信任協定設定檔；(2) 手冊可不提供驅動範本，離線以規則式規格產生器產生驅動；(3) 可產生 XY 控制程式，須先通過 6 組合成設備隔離測試才可控制。結果見 validation/v7-*.json。全部為離線 Node、無頭 Chromium 與模擬 API；未呼叫真實模型。研究上下一步是以真實模型在「無範本＋產生控制程式」條件下重測，並與離線基準（規格產生器、參考模組、內建控制器）比較。

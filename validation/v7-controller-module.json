@@ -1,0 +1,15 @@
+{
+  "version": "0.7.0",
+  "passed": true,
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "scope": "Controller sandbox, synthetic isolation gate, onboarding gate and runtime contract. Not a model-written controller or complete pick/place run.",
+  "checks": [
+    "controller modules compile in the same opaque sandbox and must define control(state); driver runtimes cannot run control()",
+    "offline reference module reaches every synthetic case (rotation, swap, reversal, nonlinearity, travel limit, mid-run reversal)",
+    "isolation gate rejects out-of-range, throwing, NaN, always-verify and fixed-mapping controllers",
+    "onboarding: a failing controller keeps start_control closed with no actuation; provenance labels offline reference and synthesized code",
+    "a controller output that violates the contract at run time stops the episode without sending that action"
+  ]
+}

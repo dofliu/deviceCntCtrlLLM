@@ -19,10 +19,12 @@
       used = true;
       try {
         const {source,operation,payload} = event.data;
-        const factory = new Function('"use strict";\\n' + source + '\\n;return {encode:typeof encode==="function"?encode:null,decode:typeof decode==="function"?decode:null};');
+        const required = event.data.required === 'controller' ? ['control'] : ['encode','decode'];
+        const factory = new Function('"use strict";\\n' + source + '\\n;return {encode:typeof encode==="function"?encode:null,decode:typeof decode==="function"?decode:null,control:typeof control==="function"?control:null};');
         const driver = factory();
-        if (!driver.encode || !driver.decode) throw new Error('Source must define encode(command) and decode(rawReply).');
-        const result = operation === 'compile' ? {functions:['encode','decode']} : await driver[operation](payload);
+        if (required.some(name => !driver[name])) throw new Error(required[0] === 'control' ? 'Source must define control(state).' : 'Source must define encode(command) and decode(rawReply).');
+        if (operation !== 'compile' && !required.includes(operation)) throw new Error('Unsupported module operation.');
+        const result = operation === 'compile' ? {functions:required} : await driver[operation](payload);
         send({type:'result',ok:true,result});
       } catch(error) { send({type:'result',ok:false,error:String(error && error.message || 'Driver error').slice(0,300)}); }
     };
@@ -45,7 +47,7 @@
           const item=workers.get(msg.id);
           if(!item||item.phase!=='ready')return;
           item.phase='execution';
-          try{item.worker.postMessage({source:msg.source,operation:msg.operation,payload:msg.payload});}
+          try{item.worker.postMessage({source:msg.source,operation:msg.operation,payload:msg.payload,required:msg.required});}
           catch(error){if(release(msg.id,item))reply(msg.id,{error:String(error.message||'Worker dispatch failed').slice(0,300)});}
           return;
         }
@@ -75,9 +77,13 @@
   class DriverRuntime {
     #frame = null; #token; #pending = new Map(); #sequence = 0; #ready; #source = ''; #sourceHash = null;
     #passed = false; #link = null; #disposed = false; #handler; #timeout; #startupTimeout; #tests = null;
-    #readyTimer = null; #rejectReady = null;
+    #readyTimer = null; #rejectReady = null; #kind = 'driver';
     #stats = {requests:0,retries:0,failures:0,programErrors:0,recent:[]};
-    constructor({timeoutMs=5000,startupTimeoutMs=5000} = {}) {
+    // kind 'driver' hosts encode/decode; kind 'controller' hosts a stateless
+    // generated control(state) module in the same isolation and time limits.
+    constructor({timeoutMs=5000,startupTimeoutMs=5000,kind='driver'} = {}) {
+      if(!['driver','controller'].includes(kind))throw new Error('Unknown isolated module kind.');
+      this.#kind=kind;
       // Fresh workers preserve stateless generated-code isolation. These are
       // separate wall-clock WAIT limits, not measured generated-code CPU time.
       this.#timeout = Math.max(80,Math.min(10000,Number(timeoutMs)||5000));
@@ -102,7 +108,7 @@
             clearTimeout(item.timer);item.startupElapsedMs=Math.max(0,this.#now()-item.started);
             item.phase='execution';item.phaseStarted=this.#now();
             item.timer=setTimeout(()=>this.#expire(item),this.#timeout);
-            try{this.#frame.contentWindow.postMessage({driverSandbox:this.#token,type:'execute',id:item.id,operation:item.operation,payload:item.payload,source:item.source},'*');}
+            try{this.#frame.contentWindow.postMessage({driverSandbox:this.#token,type:'execute',id:item.id,operation:item.operation,payload:item.payload,source:item.source,required:this.#kind},'*');}
             catch(error){this.#finish(item,'DRIVER_RUNTIME_ERROR',String(error.message||'Worker dispatch failed').slice(0,300));}
             return;
           }
@@ -170,81 +176,92 @@
       if(typeof source!=='string' || source.length<1 || source.length>30000)throw new Error('Driver source must contain 1–30000 characters.');
       await this.#request('compile',null,source);
       this.#source=source;this.#sourceHash=hash(source);
-      return {ok:true,sourceHash:this.#sourceHash,isolation:'opaque-sandbox-iframe/terminable-worker',network:'CSP connect-src none',functions:['encode','decode']};
+      return {ok:true,sourceHash:this.#sourceHash,isolation:'opaque-sandbox-iframe/terminable-worker',network:'CSP connect-src none',functions:this.#kind==='controller'?['control']:['encode','decode']};
     }
-    async #encode(command) {
+    // Generated controller call: pure computation, no link access.
+    async control(state) {
+      if(this.#kind!=='controller')throw new Error('control() is only available in a controller runtime.');
+      if(!this.#source)throw new Error('Compile the controller first.');
+      return this.#request('control',copy(state));
+    }
+    #profile(link) {
+      // The host verifies frames with a trusted profile chosen by the open
+      // connection, never by anything the generated driver reports.
+      const name=link?.protocol;
+      if(!global.VlabProtocols)throw new Error('PROTOCOL: host protocol profiles are unavailable.');
+      return global.VlabProtocols.get(name);
+    }
+    async #encode(command, profile) {
       if(!validCommand(command))throw new Error('COMMAND_LIMIT: expected two bounded XY inputs or a valid lift/grip command.');
       if(!this.#source)throw new Error('Compile the driver first.');
       const wire=await this.#request('encode',copy(command));
-      if(typeof wire!=='string' || wire.length>1024 || !wire.endsWith('\n') || /[\r\n]/.test(wire.slice(0,-1)))throw new Error('DRIVER_FRAME: encode must return one LF-terminated JSON frame.');
+      if(typeof wire!=='string' || wire.length>profile.maxWire)throw new Error(`DRIVER_FRAME: encode must return one ${profile.family} frame string.`);
       let packet;
-      try{packet=JSON.parse(wire);}catch{throw new Error('DRIVER_FRAME: invalid JSON.');}
-      const matches = Array.isArray(command)
-        ? packet && !Array.isArray(packet) && Object.keys(packet).sort().join(',') === 'channels,op' && packet.op === 'step' && validCommand(packet.channels) && same(packet.channels,command)
-        : same(packet,command);
-      if(!matches)throw new Error('DRIVER_COMMAND: encoded command must exactly match the bounded requested command.');
+      try{packet=profile.commandFromWire(wire);}catch(error){throw new Error('DRIVER_FRAME: '+String(error.message||'invalid frame').slice(0,200));}
+      if(!same(packet,command))throw new Error('DRIVER_COMMAND: encoded command must exactly match the bounded requested command.');
       return wire;
     }
-    #validateReply(rawReply, command) {
-      if(typeof rawReply!=='string' || rawReply.length>2048)throw new Error('ACK_FRAME: invalid acknowledgement frame.');
+    #validateReply(rawReply, command, profile) {
       let raw;
-      try{raw=JSON.parse(rawReply);}catch{throw new Error('ACK_FRAME: acknowledgement is not JSON.');}
+      try{raw=profile.parseReply(rawReply);}catch(error){throw new Error('ACK_FRAME: '+String(error.message||'invalid acknowledgement').slice(0,200));}
       if(raw?.ok!==true || !(validXY(raw.accepted)||validAuxiliary(raw.accepted)) || typeof raw.limited!=='boolean')throw new Error('ACK_REJECTED: '+String(raw?.error||'invalid acknowledgement').slice(0,160));
       if(command && Array.isArray(command) && (!Array.isArray(raw.accepted) || raw.accepted.some((v,i)=>Math.abs(v)>Math.abs(command[i])+1e-10 || (v*command[i]<-1e-12))))throw new Error('ACK_MISMATCH: applied movement exceeds or reverses the command.');
       if(command && !Array.isArray(command) && !same(raw.accepted,command))throw new Error('ACK_MISMATCH: auxiliary acknowledgement differs from command.');
       if(command && !raw.limited && !same(raw.accepted,command))throw new Error('ACK_MISMATCH: unlimited acknowledgement differs from command.');
       return raw;
     }
-    async #decode(rawReply, command) {
-      const raw=this.#validateReply(rawReply,command);
+    async #decode(rawReply, command, profile) {
+      const raw=this.#validateReply(rawReply,command,profile);
       const decoded=await this.#request('decode',rawReply);
       if(!decoded || !(validXY(decoded.applied)||validAuxiliary(decoded.applied)) || !same(decoded.applied,raw.accepted) || decoded.limited!==raw.limited)throw new Error('DRIVER_ACK: decode disagrees with the device acknowledgement.');
       return {applied:copy(decoded.applied),limited:decoded.limited};
     }
     async test(link) {
+      if(this.#kind!=='driver')throw new Error('Device driver tests require a driver runtime.');
       this.#passed=false;this.#link=null;
       if(!this.#source)throw new Error('Compile the driver first.');
       if(!link?.ready)throw new Error('Complete the device handshake before testing the driver.');
-      const tests=[];
+      const profile=this.#profile(link),fixtures=profile.fixtures,tests=[];
       const check=async(name,operation)=>{try{await operation();tests.push({name,passed:true,detail:'通過；未使設備動作。'});}catch(error){tests.push({name,passed:false,detail:String(error.message).slice(0,300),driverErrorCode:error.code||null,driverDiagnostic:error.diagnostic?copy(error.diagnostic):null});}};
       await check('雙通道、零值與上下限的編碼及回覆往返',async()=>{
         for(const command of [[0.02,0],[0,-0.025],[0,0],[0.1,-0.1]]){
-          const wire=await this.#encode(command),reply=await link.exchange(wire,{dryRun:true});
-          const result=await this.#decode(reply,command);
+          const wire=await this.#encode(command,profile),reply=await link.exchange(wire,{dryRun:true});
+          const result=await this.#decode(reply,command,profile);
           if(!same(result.applied,command)||result.limited)throw new Error('Dry-run round trip differs from the request.');
         }
       });
       await check('升降與夾爪四種命令的實際編解碼',async()=>{
         for(const command of [{op:'lift',position:'up'},{op:'lift',position:'down'},{op:'grip',state:'open'},{op:'grip',state:'closed'}]) {
-          const wire=await this.#encode(command),reply=await link.exchange(wire,{dryRun:true});
-          const result=await this.#decode(reply,command);
+          const wire=await this.#encode(command,profile),reply=await link.exchange(wire,{dryRun:true});
+          const result=await this.#decode(reply,command,profile);
           if(!same(result.applied,command)||result.limited)throw new Error('Auxiliary dry-run round trip differs from the request.');
         }
       });
-      await check('設備受限回覆的解析',async()=>{await this.#decode('{"ok":true,"accepted":[0.01,0],"limited":true}\n',[0.02,0]);});
+      await check('設備受限回覆的解析',async()=>{await this.#decode(fixtures.limited.reply,fixtures.limited.command,profile);});
       await check('驅動程式拒絕失敗或毀損回覆',async()=>{
-        for(const raw of ['not-json\n','{"ok":false,"error":"REJECTED"}\n','{"ok":true,"accepted":["bad",0],"limited":false}\n','{"ok":true,"accepted":{"op":"lift","position":"sideways"},"limited":false}\n']){
+        for(const raw of fixtures.malformedReplies){
           let rejected=false;try{await this.#request('decode',raw);}catch(error){if(error.code!=='DRIVER_PROGRAM_ERROR')throw error;rejected=true;}
           if(!rejected)throw new Error('decode must reject malformed/error device replies.');
         }
       });
       await check('主機側限制阻擋超量及非有限輸入',async()=>{
         for(const command of [[0.11,0],[NaN,0],[0,Infinity],[0],{op:'lift',position:'sideways'},{op:'grip',state:'closed',extra:1}]){
-          let rejected=false;try{await this.#encode(command);}catch{rejected=true;}
+          let rejected=false;try{await this.#encode(command,profile);}catch{rejected=true;}
           if(!rejected)throw new Error('Unbounded command passed host validation.');
         }
       });
       await check('設備側限制與框架檢查',async()=>{
-        for(const wire of ['{"op":"step","channels":[0.2,0]}\n','{"op":"step","channels":[0,0]}','{"op":"step","channels":[0,0]}\n{"op":"step","channels":[0,0]}\n','{"op":"lift","position":"sideways"}\n','{"op":"grip","state":"open","extra":1}\n']){
-          const response=JSON.parse(await link.exchange(wire,{dryRun:true}));
+        for(const wire of fixtures.invalidFrames){
+          const response=profile.parseReply(await link.exchange(wire,{dryRun:true}));
           if(response.ok!==false)throw new Error('Device accepted invalid wire frame.');
         }
       });
       this.#passed=tests.every(test=>test.passed);this.#link=this.#passed?link:null;
-      this.#tests={passed:this.#passed,tests,sourceHash:this.#sourceHash,dryRun:true,isolation:'opaque sandbox iframe + terminable worker',network:'CSP connect-src none'};
+      this.#tests={passed:this.#passed,tests,sourceHash:this.#sourceHash,protocol:profile.name,dryRun:true,isolation:'opaque sandbox iframe + terminable worker',network:'CSP connect-src none'};
       return JSON.parse(JSON.stringify(this.#tests));
     }
     async act(command,link) {
+      if(this.#kind!=='driver'){const error=new Error('DRIVER_NOT_VALIDATED: a controller runtime cannot send device commands.');error.code='DRIVER_NOT_VALIDATED';error.wireSent=false;throw error;}
       const sourceHash=this.#sourceHash;
       const ensureReady=()=>{
         let code,message;
@@ -254,20 +271,24 @@
         if(code){const error=new Error(code+': '+message);error.code=code;error.wireSent=false;throw error;}
       };
       ensureReady();
-      const wire=await this.#encode(command);
+      const profile=this.#profile(link);
+      // Fixed-point devices accept only their stated resolution. The host
+      // quantizes before encoding so the generated frame and ACK must match exactly.
+      command=global.VlabProtocols.quantize(command,profile);
+      const wire=await this.#encode(command,profile);
       // Disposal or revalidation may occur while pure encoding awaits a worker.
       // Recheck immediately before exchange; never discard an ACK after sending.
       ensureReady();
       const reply=await link.exchange(wire,{dryRun:false});
       let raw;
-      try { raw=this.#validateReply(reply,command); }
+      try { raw=this.#validateReply(reply,command,profile); }
       catch(error) {
         this.#passed=false;
         error.wireSent=true;error.command=copy(command);error.wire=wire;error.reply=reply;
         throw error;
       }
       try {
-        const acknowledgement=await this.#decode(reply,command);
+        const acknowledgement=await this.#decode(reply,command,profile);
         return {...acknowledgement,wire,reply,sourceHash:this.#sourceHash};
       } catch(error) {
         // The physical command has already executed. Do not erase that motion

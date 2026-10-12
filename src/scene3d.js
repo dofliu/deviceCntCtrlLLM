@@ -149,7 +149,7 @@
       }
       this.box(1.26, 0.018, 0.16, m.dark, this.station, -0.65, 0.002, 1.28);
       this.box(0.12, 0.02, 0.16, m.mint, this.station, -1.22, 0.004, 1.28);
-      this.label('VLAB-P2 / PICK & PLACE', this.station, -0.55, 0.20, 1.28, 1.4);
+      this.label('VLAB / PICK & PLACE', this.station, -0.55, 0.20, 1.28, 1.4);
       // A compact overhead camera fixture places the virtual image source in
       // context. It is illustrative; the actual image is the 2D camera panel.
       const post = new T.Group();
@@ -233,6 +233,36 @@
       this.label(jointChannel(1), this.link2, 0, 0.27, 0, 0.60);
     }
 
+    // Cartesian gantry: two fixed rails, a bridge on world-y and a carriage that
+    // carries the same discrete lift and gripper as the arm view.
+    makeGantry(geometry) {
+      if (this.arm) { this.station.remove(this.arm); this.disposeGroup(this.arm); }
+      const T = this.T, m = this.materials, [tx, ty] = geometry.lengths.map(v => (v + 18) * UNIT);
+      this.arm = new T.Group(); this.arm.position.y = 0.47; this.station.add(this.arm);
+      for (const z of [-ty, ty]) {
+        this.box(tx * 2, 0.08, 0.10, m.dark, this.arm, 0, 0, z);
+        this.box(tx * 2, 0.02, 0.05, m.mint, this.arm, 0, 0.05, z);
+        for (const x of [-tx, tx]) this.box(0.12, 0.5, 0.12, m.darkest, this.arm, x, -0.22, z);
+      }
+      this.bridge = new T.Group(); this.arm.add(this.bridge);
+      this.box(0.14, 0.10, ty * 2, m.dark, this.bridge, 0, 0.09, 0);
+      this.box(0.06, 0.02, ty * 2 - 0.1, m.cover, this.bridge, 0, 0.15, 0);
+      this.carriage = new T.Group(); this.bridge.add(this.carriage);
+      this.box(0.24, 0.12, 0.22, m.darkest, this.carriage, 0, 0.09, 0);
+      this.cylinder(0.076, 0.15, m.dark, this.carriage, 0, -0.015, 0);
+      this.liftRod = this.cylinder(0.027, 0.40, m.steel, this.carriage, 0, -0.20, 0);
+      this.gripper = new T.Group(); this.carriage.add(this.gripper); this.gripper.position.set(0, -.30, 0);
+      this.box(.16, .08, .18, m.dark, this.gripper, 0, .04, 0);
+      this.box(.11, .015, .13, m.mint, this.gripper, 0, .086, 0);
+      this.jawA = this.box(.10, .16, .035, m.steel, this.gripper, 0, -.065, .105);
+      this.jawB = this.box(.10, .16, .035, m.steel, this.gripper, 0, -.065, -.105);
+      this.box(.055, .015, .035, m.cyan, this.jawA, 0, -.076, 0);
+      this.box(.055, .015, .035, m.cyan, this.jawB, 0, -.076, 0);
+      const axisChannel = j => geometry.channelToJoint.indexOf(j) === 0 ? 'CH A' : 'CH B';
+      this.label(axisChannel(0), this.bridge, 0, 0.34, ty * 0.8, 0.60);
+      this.label(axisChannel(1), this.carriage, 0, 0.30, 0, 0.60);
+    }
+
     makeOverlays() {
       const T = this.T;
       this.pickObject=new T.Group();this.station.add(this.pickObject);
@@ -298,12 +328,19 @@
       if (this.disposed || !diagnostics || !diagnostics.geometry) return;
       this.diag = diagnostics;
       const g = diagnostics.geometry;
-      const key = JSON.stringify([g.lengths, g.channelToJoint]);
-      if (key !== this.armKey) { this.makeArm(g); this.armKey = key; }
-      // Three.js positive y rotation turns +x toward -z. Reverse it so the
-      // same planar q used by the plant turns +x toward positive image/world y.
-      this.link1.rotation.y = -g.jointAngles[0];
-      this.link2.rotation.y = -g.jointAngles[1];
+      const gantry = g.kinematics === 'gantry';
+      const key = JSON.stringify([g.kinematics || '2r', g.lengths, g.channelToJoint]);
+      if (key !== this.armKey) { if (gantry) this.makeGantry(g); else this.makeArm(g); this.armKey = key; }
+      if (this.base) this.base.visible = !gantry;
+      if (gantry) {
+        this.bridge.position.x = g.jointAngles[0] * UNIT;
+        this.carriage.position.z = g.jointAngles[1] * UNIT;
+      } else {
+        // Three.js positive y rotation turns +x toward -z. Reverse it so the
+        // same planar q used by the plant turns +x toward positive image/world y.
+        this.link1.rotation.y = -g.jointAngles[0];
+        this.link2.rotation.y = -g.jointAngles[1];
+      }
       const task=diagnostics.pickPlace;
       this.pickObject.visible=!!task;this.destination.visible=!!task;
       if(task){

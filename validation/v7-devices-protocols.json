@@ -1,0 +1,17 @@
+{
+  "version": "0.7.0",
+  "passed": true,
+  "pureNode": true,
+  "browserUsed": false,
+  "networkCalls": 0,
+  "scope": "Protocol profiles, simulated G3 device, driver gates, no-template manuals, spec synthesizer and provider context. Not a model, browser or complete pick/place run.",
+  "checks": [
+    "G3 hex frames: sync/length/XOR checksum, int16 fixed point, explicit device error codes, host quantization only for fixed-point protocols",
+    "reading the P2 manual on the G3 station yields a protocol the connection rejects; logger endpoints remain rejected",
+    "G3 template driver passes; wrong-protocol, byte-order and missing-checksum drivers are rejected by host dry-run tests",
+    "XY commands are quantized to 0.0001 before encoding; ACK equals the quantized command",
+    "no-template manuals omit every driver source; the offline spec synthesizer builds passing drivers for both framing families",
+    "gantry plant: hidden axis mapping/gains, travel-limit clamping, atomic low-height platform collision",
+    "model context forwards protocolSpec and template status, filters controller test details, and hides controller fields in built-in mode"
+  ]
+}
