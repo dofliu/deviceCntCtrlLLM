@@ -75,6 +75,9 @@ async function rejects(thunk,code){await assert.rejects(thunk,error=>error.name=
   const validInput={args:{},reason:'觀察畫面',expected:'取得新量測'};
   for(const [name,args,context] of [
     ['read_manual',{documentId:'VLAB-P2'},{phase:'onboarding',allowedTools:['read_manual']}],
+    ['read_manual',{documentId:'VLAB-G3'},{phase:'onboarding',allowedTools:['read_manual']}],
+    ['write_controller',{source:'function control(state){return {action:"verify"};}'},{phase:'onboarding',allowedTools:['write_controller'],controllerMode:'generated'}],
+    ['test_controller',{},{phase:'onboarding',allowedTools:['test_controller'],controllerMode:'generated'}],
     ['probe',{channel:0,direction:1,amplitude:.045},base],
     ['lift',{position:'up'},mission]
   ]) {

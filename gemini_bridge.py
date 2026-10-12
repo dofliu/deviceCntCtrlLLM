@@ -367,7 +367,7 @@ class BridgeHandler(BaseHTTPRequestHandler):
             return
         url = urlsplit(self.path)
         query = parse_qs(url.query, keep_blank_values=True)
-        if url.path in ("/", "/unknown-device-v6.3.html", "/unknown-device-v6.2.html", "/unknown-device-v6.1.html", "/unknown-device-v6.html", "/unknown-device-v5.3.html", "/unknown-device-v5.2.html", "/unknown-device-v5.html"):
+        if url.path in ("/", "/unknown-device-v7.0.html", "/unknown-device-v6.3.html", "/unknown-device-v6.2.html", "/unknown-device-v6.1.html", "/unknown-device-v6.html", "/unknown-device-v5.3.html", "/unknown-device-v5.2.html", "/unknown-device-v5.html"):
             if query and (set(query) - {"agent", "model"} or any(len(v) != 1 for v in query.values()) or query.get("agent") != ["gemini"] or ("model" in query and not valid_model(query["model"][0]))):
                 self.reject(400, "INVALID_PAGE_QUERY")
                 return
@@ -440,7 +440,7 @@ class BridgeHandler(BaseHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description="Local Gemini bridge for the virtual-device experiment.")
     parser.add_argument("--port", type=int, default=8767)
-    parser.add_argument("--html", type=Path, default=Path(__file__).resolve().with_name("unknown-device-v6.3.html"))
+    parser.add_argument("--html", type=Path, default=Path(__file__).resolve().with_name("unknown-device-v7.0.html"))
     parser.add_argument("--key-env", default=KEY_NAME, help="Only gemini_api_key (case insensitive) is authorized.")
     parser.add_argument("--max-calls", type=int, default=500)
     parser.add_argument("--open-browser", action="store_true")

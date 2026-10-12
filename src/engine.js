@@ -1,6 +1,6 @@
 (function(global){
   'use strict';
-  const VERSION='0.6.3',TOLERANCE=7;
+  const VERSION='0.7.0',TOLERANCE=7;
   const clone=x=>x==null?x:JSON.parse(JSON.stringify(x));
   const RECOVERABLE_DECISIONS=new Set(['INVALID_DECISION','INVALID_ARGUMENTS','INVALID_TOOL_RESPONSE']);
   const USAGE_FIELDS=['input_tokens','output_tokens','cache_creation_input_tokens','cache_read_input_tokens','promptTokenCount','candidatesTokenCount','totalTokenCount','thoughtsTokenCount','cachedContentTokenCount'];
@@ -69,9 +69,13 @@
   }
 
   class AutonomousEngine {
-    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,plant=null,actuator=null,frameGetter=null,preserveTarget=false}={}) {
+    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,plant=null,actuator=null,frameGetter=null,preserveTarget=false,controller=null}={}) {
       if(!['adaptive','baseline','gemini','claude'].includes(strategy))throw new Error('未知策略。');
       this._injectedPlant=plant;this._actuator=actuator;this._frameGetter=frameGetter;this._preserveTarget=Boolean(preserveTarget);
+      // Optional tested controller module {decide(state),origin,sourceHash}. When
+      // present it replaces per-step XY tool decisions; actuation, ACK handling,
+      // camera verification and budgets stay on the host.
+      this._controller=controller&&typeof controller.decide==='function'?controller:null;this._controllerHistory=[];
       this.seed=Number(seed)>>>0;this.strategy=strategy;this.provider=provider;this.challenge=Boolean(challenge);this.recordFrames=Boolean(recordFrames);
       this.maxActions=Math.max(1,Math.min(1000,Math.floor(Number(maxActions)||180)));
       this.maxDecisions=Math.max(1,Math.min(2000,Math.floor(Number(maxDecisions)||300)));
@@ -132,6 +136,7 @@
       this._busy=true;const epoch=this._epoch;
       try {
         if(this._mode==='challenge')return await this._applyChallenge(epoch);
+        if(this._controller)return await this._controllerNext(epoch);
         if(this._proposal)return await this._execute(epoch);
         if(this._episodeDecisions>=this.maxDecisions)return this._failure('已達本目標的決策次數上限，仍未驗證到達。');
         let decision;
@@ -149,6 +154,62 @@
         return this._emit({stage:this._stage(tool),kind:'decision',title:`代理提案：${labels[tool]}`,explanation:prepared.decision.reason,nextLabel:`下一步：執行「${labels[tool]}」`,decision:prepared.decision,command:prepared.command,predicted:prepared.predicted,jacobian:prepared.jacobian,controllerPhase:tool});
       }catch(error){if(epoch!==this._epoch||this._disposed)return this.snapshot();return this._failure(`決策或工具未通過執行檢查：${String(error.message).slice(0,200)}`,error.diagnostic?{toolResult:{ok:false,driverErrorCode:error.code,driverDiagnostic:clone(error.diagnostic),wireSent:false}}:{});}
       finally{if(epoch===this._epoch)this._busy=false;}
+    }
+    async _controllerNext(epoch){
+      if(this._episodeDecisions>=this.maxDecisions)return this._failure('已達本目標的決策次數上限，仍未驗證到達。');
+      this._frame=(this._frameGetter?this._frameGetter():this._plant.frame());
+      this._ctx=await this._agent.call('refresh',this._payload());
+      if(epoch!==this._epoch||this._disposed)return this.snapshot();
+      const obs=this._ctx.observation,beforeFrame=this._frame,beforeTip=clone(obs?.tip||null);
+      if(!obs?.tip||!obs?.target)return this._failure('影像缺少可辨識的末端或目標，產生的控制程式不會在缺乏量測時動作。');
+      const state=global.VlabControllerModule.state({tip:obs.tip,target:obs.target,history:this._controllerHistory,step:this._episodeActions,maxActions:this.maxActions});
+      let decision;
+      try{decision=global.VlabControllerModule.validateDecision(await this._controller.decide(state));}
+      catch(error){
+        if(epoch!==this._epoch||this._disposed)return this.snapshot();
+        return this._failure(`產生的控制程式未提供可執行決策：${String(error.message||error).slice(0,220)}。沒有送出動作。`,{toolResult:{ok:false,controllerError:String(error.message||error).slice(0,300),wireSent:false}});
+      }
+      if(epoch!==this._epoch||this._disposed)return this.snapshot();
+      this._decisionCount++;this._episodeDecisions++;
+      const d={tool:decision.action==='move'?'move':decision.action,args:decision.action==='move'?{u:decision.u.slice()}:{},reason:`控制程式（${this._controller.origin||'generated'}）輸出 ${decision.action}`,expected:'',source:'controller-module'};
+      if(decision.action==='stop')return this._failure(`控制程式選擇停止：${decision.reason||'未提供原因'}`,{decision:d});
+      if(decision.action==='verify'){
+        const result=await this._agent.call('execute',{decision:{tool:'verify',args:{},reason:'controller verify',expected:''},frame:this._payload()});
+        if(epoch!==this._epoch||this._disposed)return this.snapshot();
+        this._ctx=result.context;
+        if(result.ok){
+          if(!this._checkpoints.firstReach)this._checkpoints.firstReach={error:result.observation.error,actions:this._episodeActions,decisions:this._episodeDecisions};
+          else this._checkpoints.recovered={error:result.observation.error,actions:this._episodeActions,decisions:this._episodeDecisions};
+          this._mode='done';
+          return this._emit({stage:'complete',kind:'first-reach',title:'任務已由相機重新拍攝驗證',explanation:`控制程式要求驗證；新影像誤差 ${f(result.observation.error)} px，本目標 ${this._episodeActions} 次動作。`,decision:d,toolResult:{ok:true,summary:result.summary},done:true,nextLabel:'重新開始',controllerPhase:'verify'});
+        }
+        return this._emit({stage:'reach',kind:'verification-result',title:'控制程式要求驗證，但尚未到達',explanation:result.summary,decision:d,toolResult:{ok:false,summary:result.summary},controllerPhase:'verify'});
+      }
+      if(this._episodeActions>=this.maxActions)return this._failure('已達本目標的動作次數上限。',{decision:d});
+      const command=decision.u.map(v=>Math.max(-.1,Math.min(.1,v)));
+      let ack;
+      try{ack=this._actuator?await this._actuator(command):this._plant.act(command);}
+      catch(error){
+        if(epoch!==this._epoch||this._disposed)return this.snapshot();
+        if(!error.wireSent)return this._failure(`動作未送出：${String(error.message||error).slice(0,220)}`,{decision:d,toolResult:{ok:false,driverError:String(error.message||error).slice(0,300),driverErrorCode:error.code||null,wireSent:false}});
+        this._sentCount++;this._unconfirmedCount++;this._mode='done';
+        const message='命令已送出，但設備回覆無法確認實際接受的輸入。已停止控制，不把這次當作已確認的動作。';
+        return this._emit({stage:'reach',kind:'action-failure',title:'命令已送出，執行狀態未確認',explanation:message,done:true,failure:message,decision:d,command,toolResult:{ok:false,summary:message,acknowledgementUnknown:true,driverError:String(error.message||error).slice(0,300),driverErrorCode:error.code||null,wireSent:true},nextLabel:'重新開始'});
+      }
+      if(epoch!==this._epoch||this._disposed)return this.snapshot();
+      this._actionCount++;this._episodeActions++;this._sentCount++;
+      this._frame=(this._frameGetter?this._frameGetter():this._plant.frame());
+      const result=await this._agent.call('outcome',{frame:this._payload(),applied:ack.applied,command,tool:'move',limited:ack.limited,strategy:'controller-module'});
+      if(epoch!==this._epoch||this._disposed)return this.snapshot();
+      this._ctx=result.context;
+      const after=result.observation?.tip;
+      if(beforeTip&&after)this._controllerHistory.push({command:command.slice(),applied:ack.applied.slice(),delta:[after[0]-beforeTip[0],after[1]-beforeTip[1]],limited:Boolean(ack.limited)});
+      if(this._controllerHistory.length>global.VlabControllerModule.HISTORY)this._controllerHistory.shift();
+      if(ack.driverError){
+        this._mode='done';const message='設備已執行命令，但產生的驅動程式無法解碼這次回覆。已記錄真實位移並停止控制。';
+        return this._emit({stage:'reach',kind:'action-failure',title:'動作已發生，回覆解碼失敗',explanation:message,done:true,failure:message,decision:d,toolResult:{ok:false,summary:message,driverError:ack.driverError,driverErrorCode:ack.driverErrorCode,driverDiagnostic:clone(ack.driverDiagnostic||null),wireSent:true},command,applied:ack.applied,limited:ack.limited,beforeFrame,beforeTip,afterTip:after||null,nextLabel:'重新開始'});
+      }
+      return this._emit({stage:'reach',kind:'action-result',title:'工具結果：控制程式移動',explanation:`已完成第 ${this._actionCount} 次實際動作；影像誤差 ${f(result.observation?.error)} px。`,decision:d,toolResult:{ok:true,summary:result.lastOutcome?.summary||''},observation:result.observation,command,applied:ack.applied,limited:ack.limited,beforeFrame,beforeTip,afterTip:after||null,controllerPhase:'move'});
     }
     _stage(tool){return this._changed?'recover':['probe','reset_model'].includes(tool)?'probe':tool==='fit_model'?'model':['move','verify'].includes(tool)?'reach':'intro';}
     async _execute(epoch){

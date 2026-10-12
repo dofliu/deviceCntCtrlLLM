@@ -117,7 +117,7 @@ function makeEngine(getDecision){
     {kind:'decision',decision:{...provided,source:'adaptive'}}],
     _truth:[],_state:{done:false},_onboarding:{},_completed:new Set(),_frontDecisions:3,_frontCalls:2,_controlCalls:0});
   const report=front.report();
-  assert.equal(report.version,'0.6.3');
+  assert.equal(report.version,'0.7.0');
   assert.deepEqual(plain(report.provenance.modelExpectationText),{provided:1,omitted:1});
   assert.equal(report.trace[0].decision.expectedProvided,false);
   assert.equal(report.trace[2].decision.expectedProvided,true);

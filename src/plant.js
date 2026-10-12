@@ -15,9 +15,13 @@
     #object; #destination; #lift = 'up'; #grip = 'open'; #attached = false;
     #objectHeight = 0; #graspCount = 0; #releaseCount = 0;
     #scenario = null; #destinationHeight = 0; #liftHeight = 1;
-    #platformRadius = 24;
+    #platformRadius = 24; #kinematics = '2r'; #travel = null;
 
-    constructor({ seed = 42, width = 640, height = 480 } = {}) {
+    // kinematics '2r' is the original two-link arm; 'gantry' is a Cartesian
+    // two-axis carriage with travel limits. Both hide mapping, signs and gains.
+    constructor({ seed = 42, width = 640, height = 480, kinematics = '2r' } = {}) {
+      if (!['2r', 'gantry'].includes(kinematics)) throw new Error('PLANT: unknown kinematics.');
+      this.#kinematics = kinematics;
       this.#width = Math.max(160, Math.round(width));
       this.#height = Math.max(120, Math.round(height));
       this.#canvas = document.createElement('canvas');
@@ -38,10 +42,18 @@
       };
       const between = (low, high) => low + this.#random() * (high - low);
       const fit = Math.min(this.#width / 640, this.#height / 480);
-      this.#lengths = [between(82, 104), between(66, 82)];
-      this.#q = [between(-2.1, -0.3), between(1.0, 1.9)];
-      this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
-      this.#gains = [0, 1].map(() => between(1.05, 1.4) * (this.#random() < 0.5 ? -1 : 1));
+      if (this.#kinematics === 'gantry') {
+        this.#travel = [between(125, 140), between(110, 122)];
+        this.#lengths = this.#travel.slice();
+        this.#q = [between(-60, 60), between(-50, 50)];
+        this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
+        this.#gains = [0, 1].map(() => between(125, 165) * (this.#random() < 0.5 ? -1 : 1));
+      } else {
+        this.#lengths = [between(82, 104), between(66, 82)];
+        this.#q = [between(-2.1, -0.3), between(1.0, 1.9)];
+        this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
+        this.#gains = [0, 1].map(() => between(1.05, 1.4) * (this.#random() < 0.5 ? -1 : 1));
+      }
       this.#camera = {
         angle: between(-0.4, 0.4),
         scale: between(0.92, 1.03) * fit,
@@ -76,13 +88,16 @@
       if (this.#attached) throw new Error('TRIAL: release the held object before changing the scene.');
       const pairs = [[-135,-25],[30,-90],[-145,-15],[35,155],[100,-30]];
       const heights = [0,.35,.65,.35,0];
-      const radius = (this.#lengths[0] + this.#lengths[1]) * .77;
+      const radius = this.#kinematics === 'gantry' ? Math.min(...this.#travel) * .84 : (this.#lengths[0] + this.#lengths[1]) * .77;
       const jitter = Math.sin(this.#seed * .173 + index * 2.1) * 3;
       const pointAt = degrees => {
         const angle = (degrees + jitter) * Math.PI / 180 - this.#camera.angle;
         return [Math.cos(angle) * radius, Math.sin(angle) * radius];
       };
-      if (initialPose) {
+      if (initialPose && this.#kinematics === 'gantry') {
+        this.#q = pointAt(135);
+        this.#lift = 'up'; this.#liftHeight = 1; this.#grip = 'open';
+      } else if (initialPose) {
         const start = pointAt(135), [l1,l2] = this.#lengths;
         const q2 = Math.acos(clamp((radius * radius - l1*l1 - l2*l2)/(2*l1*l2),-1,1));
         this.#q = [wrap(Math.atan2(start[1],start[0])-Math.atan2(l2*Math.sin(q2),l1+l2*Math.cos(q2))),q2];
@@ -122,7 +137,13 @@
         const joint = this.#mapping[channel];
         const before = nextQ[joint];
         const desired = before + amount * this.#gains[channel];
-        if (joint === 0) {
+        if (this.#kinematics === 'gantry') {
+          nextQ[joint] = clamp(desired, -this.#travel[joint], this.#travel[joint]);
+          if (Math.abs(nextQ[joint] - desired) > 1e-12) {
+            amount = (nextQ[joint] - before) / this.#gains[channel];
+            limited = true;
+          }
+        } else if (joint === 0) {
           nextQ[0] = wrap(desired);
         } else {
           nextQ[1] = clamp(desired, 0.25, 2.85);
@@ -137,7 +158,7 @@
       // A rejected low-height move must never partly move and then report an
       // error. Joint-zero interpolation uses its short wrapped displacement.
       if (this.#scenario && this.#liftHeight < this.#destinationHeight - 1e-9) {
-        const delta = [wrap(nextQ[0]-this.#q[0]),nextQ[1]-this.#q[1]];
+        const delta = [this.#kinematics === 'gantry' ? nextQ[0]-this.#q[0] : wrap(nextQ[0]-this.#q[0]),nextQ[1]-this.#q[1]];
         const clearance = this.#platformRadius + (this.#attached ? 8 : 0);
         for (let sample=0; sample<=16; sample++) {
           const point = this.#point(this.#q.map((value,j)=>value+delta[j]*sample/16));
@@ -182,6 +203,7 @@
     operate(command) { return this.#manipulate(command); }
 
     #point(q = this.#q) {
+      if (this.#kinematics === 'gantry') return [q[0], q[1]];
       return [
         this.#lengths[0] * Math.cos(q[0]) + this.#lengths[1] * Math.cos(q[0] + q[1]),
         this.#lengths[0] * Math.sin(q[0]) + this.#lengths[1] * Math.sin(q[0] + q[1])
@@ -211,8 +233,9 @@
       // to the controller. Goals are useful local-to-medium reaches, not a
       // fixed animation trajectory, and exclude poorly conditioned extremes.
       for (let attempt = 0; attempt < 40; attempt++) {
-        const q = [this.#q[0] + (this.#random() * 2 - 1) * 0.95,
-          0.65 + this.#random() * 1.6];
+        const q = this.#kinematics === 'gantry'
+          ? [(this.#random() * 2 - 1) * this.#travel[0] * .85, (this.#random() * 2 - 1) * this.#travel[1] * .85]
+          : [this.#q[0] + (this.#random() * 2 - 1) * 0.95, 0.65 + this.#random() * 1.6];
         candidate = this.#point(q);
         const distance = Math.hypot(candidate[0] - tip[0], candidate[1] - tip[1]);
         if (distance > 45 && distance < 175) break;
@@ -281,17 +304,29 @@
       // Unpainted endpoint underlay is deliberately neutral. In the marker-loss
       // experiment only the colored marker disappears, so the allowed simple
       // vision algorithm must report missing evidence instead of inferring it.
-      disk(base, 23 * fit, '#233c4b');
-      disk(base, 16 * fit, '#0b1923');
-      line(base, elbow, 16 * fit, '#314758');
-      line(base, elbow, 10 * fit, '#a0afbb');
-      line(elbow, tip, 14 * fit, '#314758');
-      line(elbow, tip, 8 * fit, '#8294a4');
-      disk(base, 9 * fit, '#d0d6dc');
-      disk(base, 3 * fit, '#263a4b');
-      disk(elbow, 10 * fit, '#263a4b');
-      disk(elbow, 6 * fit, '#c1cad1');
-      disk(tip, 9 * fit, '#152838');
+      if (this.#kinematics === 'gantry') {
+        // Two fixed rails along world x and a bridge that follows the carriage.
+        // Neutral greys only: the colour detector must not see these parts.
+        const [tx, ty] = this.#travel.map(v => v + 18), point = this.#point();
+        for (const y of [-ty, ty]) line(this.#project([-tx, y]), this.#project([tx, y]), 10 * fit, '#314758');
+        for (const y of [-ty, ty]) line(this.#project([-tx, y]), this.#project([tx, y]), 4 * fit, '#a0afbb');
+        line(this.#project([point[0], -ty]), this.#project([point[0], ty]), 14 * fit, '#314758');
+        line(this.#project([point[0], -ty]), this.#project([point[0], ty]), 7 * fit, '#8294a4');
+        disk(tip, 11 * fit, '#263a4b');
+        disk(tip, 9 * fit, '#152838');
+      } else {
+        disk(base, 23 * fit, '#233c4b');
+        disk(base, 16 * fit, '#0b1923');
+        line(base, elbow, 16 * fit, '#314758');
+        line(base, elbow, 10 * fit, '#a0afbb');
+        line(elbow, tip, 14 * fit, '#314758');
+        line(elbow, tip, 8 * fit, '#8294a4');
+        disk(base, 9 * fit, '#d0d6dc');
+        disk(base, 3 * fit, '#263a4b');
+        disk(elbow, 10 * fit, '#263a4b');
+        disk(elbow, 6 * fit, '#c1cad1');
+        disk(tip, 9 * fit, '#152838');
+      }
 
       // A fixed placement zone and an independently simulated object are
       // visible before any decision. Blue/orange occur only on these markers.
@@ -374,9 +409,9 @@
           placed:!this.#attached && Math.abs(this.#objectHeight-this.#destinationHeight) < 1e-9 &&
             Math.hypot(this.#object[0]-this.#destination[0],this.#object[1]-this.#destination[1]) <= 12
         },
-        description: `裝置 #${this.#seed} · 二連桿平面機構 · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
+        description: `裝置 #${this.#seed} · ${this.#kinematics === 'gantry' ? '直角座標龍門機構' : '二連桿平面機構'} · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
         // Debug/evaluation only. Never include this object in worker messages.
-        geometry: { lengths: this.#lengths.slice(), jointAngles: this.#q.slice(),
+        geometry: { kinematics: this.#kinematics, lengths: this.#lengths.slice(), jointAngles: this.#q.slice(),
           channelToJoint: this.#mapping.slice(), channelGains: this.#gains.slice(),
           camera: { ...this.#camera }, object:this.#object.slice(), destination:this.#destination.slice(),destinationHeight:this.#destinationHeight,platformRadius:this.#platformRadius }
       };

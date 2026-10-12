@@ -77,7 +77,7 @@ function makeFront(runtime){
     assert.deepEqual(plain(state.toolResult.driverDiagnostic),detail);
     assert.equal(state.actionCount,0);assert.equal(state.commandAttemptCount,0);assert.equal(state.unconfirmedActuationCount,0);
     assert.equal(run.core.actions,0);assert.deepEqual(run.counts(),{calls:1,transmissions:0});
-    const report=run.engine.report();assert.equal(report.version,'0.6.3');
+    const report=run.engine.report();assert.equal(report.version,'0.7.0');
     assert.deepEqual(plain(report.trace.at(-1).toolResult.driverDiagnostic),detail);
     await run.engine.next();assert.deepEqual(run.counts(),{calls:1,transmissions:0});assert.equal(run.provider.calls,1);
     if(phase==='startup')preTxState=state;
@@ -130,7 +130,7 @@ function makeFront(runtime){
   assert.deepEqual(plain(combined.driverRuntime),{requests:5,retries:1,failures:2,programErrors:0,last:decodeDetail});
   assert.equal(Object.hasOwn(combined.driverRuntime,'recent'),false);
   assert.equal(Object.hasOwn(combined.events.at(-1).driverRuntime,'recent'),false);
-  const report=front.report();assert.equal(report.version,'0.6.3');assert.deepEqual(plain(report.driverRuntime),runtime);
+  const report=front.report();assert.equal(report.version,'0.7.0');assert.deepEqual(plain(report.driverRuntime),runtime);
   report.driverRuntime.recent[0].phase='mutated-report';assert.equal(runtime.recent[0].phase,'startup');
   const vision=makeFront(runtime),visionState=vision._appendControl({...preTxState,toolResult:{ok:false,failedChecks:['platformDrift']}});
   assert.equal(visionState.onboarding.ready,true);assert.equal(visionState.onboarding.status,'ready');

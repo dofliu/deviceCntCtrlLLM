@@ -231,7 +231,7 @@ class BridgeHandler(BaseHTTPRequestHandler):
         if not self.same_origin():
             return
         url = urlsplit(self.path)
-        if url.path in ("/", "/unknown-device-v6.3.html", "/unknown-device-v6.2.html", "/unknown-device-v6.1.html", "/unknown-device-v6.html", "/unknown-device-v5.3.html", "/unknown-device-v5.2.html", "/unknown-device-v5.html"):
+        if url.path in ("/", "/unknown-device-v7.0.html", "/unknown-device-v6.3.html", "/unknown-device-v6.2.html", "/unknown-device-v6.1.html", "/unknown-device-v6.html", "/unknown-device-v5.3.html", "/unknown-device-v5.2.html", "/unknown-device-v5.html"):
             query = parse_qs(url.query, keep_blank_values=True)
             if query and (set(query) - {"agent", "model"}
                           or any(len(values) != 1 for values in query.values())
@@ -309,7 +309,7 @@ class BridgeHandler(BaseHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description="Serve the virtual-device experiment and its local Claude bridge.")
     parser.add_argument("--port", type=int, default=8766)
-    parser.add_argument("--html", type=Path, default=Path(__file__).resolve().with_name("unknown-device-v6.3.html"))
+    parser.add_argument("--html", type=Path, default=Path(__file__).resolve().with_name("unknown-device-v7.0.html"))
     parser.add_argument("--key-env", choices=AUTHORIZED_KEY_NAMES, default=KEY_NAME)
     parser.add_argument("--open-browser", action="store_true", help="Open the same-origin experiment page after starting the local server.")
     parser.add_argument("--max-calls", type=int, default=500)
@@ -317,7 +317,7 @@ def main():
     if not 1 <= args.port <= 65535 or not 1 <= args.max_calls <= 500:
         parser.error("Invalid port or max-calls (1..500).")
     if not args.html.is_file():
-        parser.error("HTML not found. Place unknown-device-v6.3.html next to this script, or pass --html.")
+        parser.error("HTML not found. Place unknown-device-v7.0.html next to this script, or pass --html.")
     key = read_authorized_key(args.key_env)
     with BridgeServer(args.port, args.html.resolve(), key, args.max_calls, key_name=args.key_env) as server:
         print(f"Open {server.origin}/")

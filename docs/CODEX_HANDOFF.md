@@ -1,6 +1,6 @@
-# V6.3 → Codex / Git repo 移交
+# V7.0 → Codex / Git repo 移交
 
-移交日期：2026-10-12（Asia/Taipei）。版本：V6.3 / 0.6.3。
+更新日期：2026-10-12（Asia/Taipei）。版本：V7.0 / 0.7.0（V6.3 移交內容保留於下方）。
 這是開發版本快照；已初始化 Git repo 並同步推送至 GitHub (https://github.com/dofliu/deviceCntCtrlLLM)，未新增完整五回合驗收結果。
 
 ## 目標與目前能力
@@ -33,10 +33,21 @@
 | `src/onboarding.js`、`src/pick-place.js`、`src/engine.js` | 接手設備、連續任務、預算與狀態管理 |
 | `src/claude-provider.js`、`src/gemini-provider.js` | 模型介面、請求間隔、429 冷卻與診斷 |
 | `claude_bridge.py`、`gemini_bridge.py` | 本機 API 橋接、呼叫上限、錯誤摘要 |
+| `src/protocols.js` | 受信任的主機端協定設定檔（JSON 單行、十六進位二進位框架）：框架驗證、ACK 解析、測試固件、機器可讀規格 |
+| `src/driver-synthesizer.js` | 離線規則式規格產生器：依 `protocolSpec` 產生 encode/decode（無範本模式的離線基準） |
+| `src/controller-module.js` | XY 控制程式契約、輸出驗證、6 組合成設備隔離測試、離線參考模組 |
 | `tests/`、`validation/` | 測試程式與既有結果；結果各自有版本／範圍 |
 | `_research/` | 貢獻、文獻、實驗草案、宣稱界線及研究狀態 |
 
 共享模型排程器目前定義在 `claude-provider.js` 並由 Gemini 使用；維持目前模板的載入順序。
+
+## V7.0 新增
+
+- 第二種設備 VLAB-G3（龍門、二進位框架）；`SimulatedDeviceLink({model})`、`VirtualPlant({kinematics:'gantry'})`。手冊庫同時含兩份手冊，讀錯手冊會在連線時因協定不符被拒。
+- `DriverRuntime` 依連線協定選擇主機端設定檔驗證；同一沙箱以 `kind:'controller'` 執行 `control(state)`。
+- 實驗選項 `device`、`manualTemplate`、`controllerMode`（UI 設定頁與 `experimentLab.configure`）。
+- 新工具 `write_controller`、`test_controller`（只在 generated 模式出現）；Claude／Gemini 的工具結構、上下文白名單與說明已更新，僅以模擬 API 測試。
+- 新測試：`test_v7_devices_protocols.cjs`、`test_v7_controller_module.cjs`、`test_v7_offline_matrix.cjs`、`browser_v7_smoke.cjs`（需 Node Playwright 與 Chromium）。
 
 ## V6.3 新增
 

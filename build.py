@@ -1,4 +1,4 @@
-"""Build V6.3: a standalone paged pick-and-place lab with embedded source."""
+"""Build V7.0: a standalone paged pick-and-place lab with embedded source."""
 from pathlib import Path
 import base64,io,re,zipfile
 
@@ -26,8 +26,8 @@ def source_files():
 
 entries={'STYLES':'src/styles.css','THREE':'vendor/three.min.js','PLANT':'src/plant.js',
  'CONTROLLER':'src/controller.js','AGENT':'src/agent-core.js',
- 'CLAUDE_PROVIDER':'src/claude-provider.js','GEMINI_PROVIDER':'src/gemini-provider.js','DEVICE_LINK':'src/device-link.js',
- 'DRIVER_RUNTIME':'src/driver-runtime.js','ENGINE':'src/engine.js','ONBOARDING':'src/onboarding.js','PICK_PLACE':'src/pick-place.js',
+ 'CLAUDE_PROVIDER':'src/claude-provider.js','GEMINI_PROVIDER':'src/gemini-provider.js','PROTOCOLS':'src/protocols.js','DEVICE_LINK':'src/device-link.js',
+ 'DRIVER_RUNTIME':'src/driver-runtime.js','DRIVER_SYNTH':'src/driver-synthesizer.js','CONTROLLER_MODULE':'src/controller-module.js','ENGINE':'src/engine.js','ONBOARDING':'src/onboarding.js','PICK_PLACE':'src/pick-place.js',
  'SCENE':'src/scene3d.js','BENCHMARK':'src/benchmark.js','APP':'src/app.js'}
 html=(ROOT/'src/index.template.html').read_text(encoding='utf-8')
 for key,name in entries.items():
@@ -40,8 +40,8 @@ buffer=io.BytesIO()
 with zipfile.ZipFile(buffer,'w',zipfile.ZIP_DEFLATED) as z:
     for file in source_files():
         rel=file.relative_to(ROOT)
-        z.write(file,Path('virtual-device-v6.3')/rel)
+        z.write(file,Path('virtual-device-v7.0')/rel)
 source=base64.b64encode(buffer.getvalue()).decode('ascii')
 html=html.replace('</body>',f'<script id="source-archive" type="application/octet-stream">{source}</script>\n</body>')
-out=ROOT/'unknown-device-v6.3.html';out.write_text(html,encoding='utf-8')
+out=ROOT/'unknown-device-v7.0.html';out.write_text(html,encoding='utf-8')
 print(f'{out} ({out.stat().st_size} bytes)')

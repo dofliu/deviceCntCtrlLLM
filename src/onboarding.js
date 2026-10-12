@@ -1,41 +1,56 @@
 (function(global){
   'use strict';
   const copy=x=>x==null?x:JSON.parse(JSON.stringify(x));
-  const TOOLS=['inspect_device','list_interfaces','read_manual','connect','handshake','write_driver','test_driver','start_control','stop'];
-  const LABELS={inspect_device:'觀察設備與提出規格假設',list_interfaces:'列出可用通訊介面',read_manual:'查閱模擬設備手冊',connect:'建立通訊連線',handshake:'確認設備身分與能力',write_driver:'撰寫與編譯控制程式',test_driver:'測試控制程式',start_control:'啟用視覺控制',stop:'停止實驗'};
+  const TOOLS=['inspect_device','list_interfaces','read_manual','connect','handshake','write_driver','test_driver','write_controller','test_controller','start_control','stop'];
+  const LABELS={inspect_device:'觀察設備與提出規格假設',list_interfaces:'列出可用通訊介面',read_manual:'查閱模擬設備手冊',connect:'建立通訊連線',handshake:'確認設備身分與能力',write_driver:'撰寫與編譯通訊驅動',test_driver:'測試通訊驅動',write_controller:'撰寫與編譯 XY 控制程式',test_controller:'隔離測試 XY 控制程式',start_control:'啟用視覺控制',stop:'停止實驗'};
+  // Simulated host manual library. The experiment chooses one physical model;
+  // the agent must still pick the matching document from the camera nameplate.
+  const DOCUMENTS=['VLAB-P2','VLAB-G3'];
+  const DEVICE_PRESETS={'VLAB-P2':{kinematics:'2r',deviceClass:'平面雙連桿手臂'},'VLAB-G3':{kinematics:'gantry',deviceClass:'雙軸直角座標龍門'}};
+  const CONTROLLER_MODES=['builtin','generated'];
   const USAGE=['input_tokens','output_tokens','cache_creation_input_tokens','cache_read_input_tokens','promptTokenCount','candidatesTokenCount','totalTokenCount','thoughtsTokenCount','cachedContentTokenCount'];
   function validateFrontDecision(value,allowed){
     if(!value||!TOOLS.includes(value.tool)||!allowed.includes(value.tool)||!value.args||typeof value.args!=='object'||Array.isArray(value.args))throw new Error('工具不在目前允許清單，或參數格式不正確。');
     const d={tool:value.tool,args:copy(value.args),reason:String(value.reason||'').slice(0,600),expected:String(value.expected||'').slice(0,400),expectedProvided:Boolean(value.expectedProvided!==false&&typeof value.expected==='string'&&value.expected.trim()),source:['claude','gemini'].includes(value.source)?value.source:'adaptive'};
     if(['claude','gemini'].includes(d.source)){d.model=String(value.model||'').slice(0,120);d.usage={};for(const k of USAGE)if(Number.isFinite(value.usage?.[k]))d.usage[k]=value.usage[k];}
-    const a=d.args,fields={inspect_device:['deviceClass','visibleAxes','modelLabel','uncertainties'],read_manual:['documentId'],connect:['endpointId','transport','baudRate','protocol'],write_driver:['source']}[d.tool]||[];
+    const a=d.args,fields={inspect_device:['deviceClass','visibleAxes','modelLabel','uncertainties'],read_manual:['documentId'],connect:['endpointId','transport','baudRate','protocol'],write_driver:['source'],write_controller:['source']}[d.tool]||[];
     if(Object.keys(a).some(k=>!fields.includes(k)))throw new Error('工具包含未定義的參數。');
     if(d.tool==='inspect_device'){
       if(!Number.isInteger(a.visibleAxes)||a.visibleAxes<0||a.visibleAxes>12||['deviceClass','modelLabel','uncertainties'].some(k=>typeof a[k]!=='string'||a[k].length>1200))throw new Error('外觀假設格式不正確。');
     }
-    if(d.tool==='read_manual'&&a.documentId!=='VLAB-P2')throw new Error('目前只提供 VLAB-P2 模擬手冊。');
+    if(d.tool==='read_manual'&&!DOCUMENTS.includes(a.documentId))throw new Error('模擬手冊庫只有 '+DOCUMENTS.join('、')+'。');
     if(d.tool==='connect'&&(typeof a.endpointId!=='string'||!['serial','tcp'].includes(a.transport)||!Number.isFinite(a.baudRate)||typeof a.protocol!=='string'))throw new Error('通訊參數格式不正確。');
-    if(d.tool==='write_driver'&&(typeof a.source!=='string'||!a.source.trim()||a.source.length>30000))throw new Error('控制程式須為 1 至 30,000 字元的 JavaScript。');
+    if(['write_driver','write_controller'].includes(d.tool)&&(typeof a.source!=='string'||!a.source.trim()||a.source.length>30000))throw new Error('控制程式須為 1 至 30,000 字元的 JavaScript。');
     return d;
   }
   class FullExperimentEngine {
-    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null}={}){
+    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null,device='VLAB-P2',manualTemplate=true,controllerMode='builtin'}={}){
       if(!['adaptive','claude','gemini','baseline'].includes(strategy))throw new Error('完整流程支援離線策略、Claude 或 Gemini。');
       Object.assign(this,{seed:Number(seed)>>>0,strategy,provider,challenge:Boolean(challenge),recordFrames:Boolean(recordFrames),maxActions,maxDecisions,maxFrontDecisions,controlFactory});
+      this._setExperimentOptions({device,manualTemplate,controllerMode});
       this._state=null;this._history=[];this._events=[];this._truth=[];this._busy=false;this._disposed=false;this._epoch=0;this._control=null;this._runtime=null;
+    }
+    _setExperimentOptions({device=this.device,manualTemplate=this.manualTemplate,controllerMode=this.controllerMode}={}){
+      if(!DEVICE_PRESETS[device])throw new Error('未知的模擬設備型號。');
+      if(!CONTROLLER_MODES.includes(controllerMode))throw new Error('XY 控制模式必須是 builtin 或 generated。');
+      this.device=device;this.manualTemplate=manualTemplate!==false;this.controllerMode=controllerMode;
     }
     get historyLength(){return this._history.length;}
     async initialize(){return this._state?this.snapshot():this.reset(this.seed);}
     async reset(seed=this.seed,options={}){
-      this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();
+      this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();this._controllerRuntime?.dispose();
+      this._setExperimentOptions({device:options.device??this.device,manualTemplate:options.manualTemplate??this.manualTemplate,controllerMode:options.controllerMode??this.controllerMode});
       if(options.strategy){if(!['adaptive','claude','gemini','baseline'].includes(options.strategy))throw new Error('完整流程支援離線策略、Claude 或 Gemini。');this.strategy=options.strategy;}
       if('provider'in options)this.provider=options.provider;if('challenge'in options)this.challenge=Boolean(options.challenge);
       if(['claude','gemini'].includes(this.strategy)&&!this.provider)throw new Error('請先設定所選供應商的模型與連線。');
       this.seed=Number(seed)>>>0;this._disposed=false;this._busy=false;this._control=null;this._proposal=null;
-      this._plant=new VirtualPlant({seed:this.seed,width:640,height:480});this._link=new SimulatedDeviceLink({plant:this._plant,seed:this.seed});this._runtime=new DriverRuntime();
+      this._plant=new VirtualPlant({seed:this.seed,width:640,height:480,kinematics:DEVICE_PRESETS[this.device].kinematics});
+      this._link=new SimulatedDeviceLink({plant:this._plant,seed:this.seed,model:this.device,includeTemplate:this.manualTemplate});this._runtime=new DriverRuntime();
+      this._controllerRuntime=this.controllerMode==='generated'?new DriverRuntime({kind:'controller'}):null;
       this._history=[];this._events=[];this._truth=[];this._frontDecisions=0;this._frontCalls=0;this._controlCalls=0;this._decisionRecovery=new VlabDecisionRecovery();
       this._completed=new Set();this._lastResult=null;this._controlOffset=null;
-      this._onboarding={phase:'inspect_device',status:'idle',hypothesis:null,inventory:null,manual:null,connection:null,handshake:null,driverSource:null,driverTests:null,compileResult:null,traffic:[],ready:false,steps:[],completed:[],sourceLabel:['claude','gemini'].includes(this.strategy)?`${this.strategy==='gemini'?'Gemini':'Claude'} 依影像與工具回覆選擇步驟`:'離線規則策略；外觀判讀與程式使用預設範本'};
+      this._onboarding={phase:'inspect_device',status:'idle',hypothesis:null,inventory:null,manual:null,connection:null,handshake:null,driverSource:null,driverTests:null,compileResult:null,traffic:[],ready:false,steps:[],completed:[],
+        device:this.device,manualTemplate:this.manualTemplate,controllerMode:this.controllerMode,controllerSource:null,controllerCompile:null,controllerTests:null,controllerSourceOrigin:null,sourceLabel:['claude','gemini'].includes(this.strategy)?`${this.strategy==='gemini'?'Gemini':'Claude'} 依影像與工具回覆選擇步驟`:`離線規則策略；外觀判讀使用預設規則，驅動${this.manualTemplate?'採用手冊範本':'由規則式規格產生器產生'}${this.controllerMode==='generated'?'，XY 控制使用預寫參考模組':''}`};
       this._pngCache=new WeakMap();this._pngCanvas=document.createElement('canvas');this._pngContext=this._pngCanvas.getContext('2d');
       this._configureInitialScenario?.();
       return this._emit({kind:'intro',title:'先認識設備、建立連線，再讓它動',explanation:'目前沒有通訊連線，也沒有已通過測試的控制程式。先區分影像假設、手冊規格與握手確認；所有步驟都會留下實際工具結果。這裡使用模擬設備與模擬主機介面。',nextLabel:'下一步：選擇第一個工具'});
@@ -48,27 +63,40 @@
       if(this._onboarding.connection)tools.push('handshake');
       if(this._onboarding.handshake?.ok&&c.has('read_manual'))tools.push('write_driver');
       if(this._onboarding.compileResult?.ok&&this._onboarding.handshake?.ok)tools.push('test_driver');
-      if(this._onboarding.driverTests?.passed&&this._onboarding.handshake?.ok&&c.has('inspect_device'))tools.push('start_control');
+      const o=this._onboarding,generated=this.controllerMode==='generated';
+      if(generated&&o.driverTests?.passed&&o.handshake?.ok)tools.push('write_controller');
+      if(generated&&o.controllerCompile?.ok&&o.driverTests?.passed)tools.push('test_controller');
+      if(o.driverTests?.passed&&o.handshake?.ok&&c.has('inspect_device')&&(!generated||o.controllerTests?.passed))tools.push('start_control');
       return tools;
     }
     _context(){
       const o=this._onboarding;
-      return this._decisionRecovery.context({phase:'onboarding',scope:'simulated-device',allowedTools:this._allowed(),hypothesis:copy(o.hypothesis),inventory:copy(o.inventory),manual:copy(o.manual),connection:copy(o.connection),handshake:copy(o.handshake),driverSource:o.driverSource,driverTests:copy(o.driverTests),traffic:copy(this._traffic().slice(-12)),completed:[...this._completed],lastResult:copy(this._lastResult),budgets:{decisionsUsed:this._frontDecisions,maxDecisions:this.maxFrontDecisions}});
+      return this._decisionRecovery.context({phase:'onboarding',scope:'simulated-device',allowedTools:this._allowed(),hypothesis:copy(o.hypothesis),inventory:copy(o.inventory),manual:copy(o.manual),connection:copy(o.connection),handshake:copy(o.handshake),driverSource:o.driverSource,driverTests:copy(o.driverTests),
+        ...(this.controllerMode==='generated'?{controllerMode:'generated',controllerContract:VlabControllerModule.CONTRACT,controllerSource:o.controllerSource,controllerTests:copy(o.controllerTests)}:{}),traffic:copy(this._traffic().slice(-12)),completed:[...this._completed],lastResult:copy(this._lastResult),budgets:{decisionsUsed:this._frontDecisions,maxDecisions:this.maxFrontDecisions}});
     }
     _offlineDecision(){
       const c=this._completed,o=this._onboarding;
       const d=(tool,args,reason,expected)=>({tool,args,reason,expected,source:'adaptive'});
-      if(!c.has('inspect_device'))return d('inspect_device',{deviceClass:'平面雙連桿手臂',visibleAxes:2,modelLabel:'VLAB-P2',uncertainties:'此為離線範本假設；尚未從手冊或握手確認。外觀無法確認連桿長度、減速比、通訊設定或運動增益。'},'離線展示使用預設外觀判讀；先留下可被後續證據修正的假設。','區分可見外觀與尚待查證的規格。');
+      if(!c.has('inspect_device'))return d('inspect_device',{deviceClass:DEVICE_PRESETS[this.device].deviceClass,visibleAxes:2,modelLabel:this.device,uncertainties:'此為離線範本假設；尚未從手冊或握手確認。外觀無法確認連桿長度、減速比、通訊設定或運動增益。'},'離線展示使用預設外觀判讀；先留下可被後續證據修正的假設。','區分可見外觀與尚待查證的規格。');
       if(!c.has('list_interfaces'))return d('list_interfaces',{},'需要取得模擬主機提供的介面清單，才能選擇連線位置。','取得觀察到的端點資訊；不掃描這台電腦。');
-      if(!c.has('read_manual'))return d('read_manual',{documentId:'VLAB-P2'},'依設備標籤查閱這個模擬設備的文件，取得正確通訊格式。','確認通道數、傳輸設定與封包格式；仍不知道運動映射。');
+      if(!c.has('read_manual'))return d('read_manual',{documentId:o.hypothesis?.modelLabel||this.device},'依設備標籤查閱這個模擬設備的文件，取得正確通訊格式。','確認通道數、傳輸設定與封包格式；仍不知道運動映射。');
       if(!o.connection){
-        const profile=o.manual.connection,endpoint=o.inventory.find(x=>x.deviceModel==='VLAB-P2'&&x.transport===profile.transport);
+        const profile=o.manual.connection,endpoint=o.inventory.find(x=>x.deviceModel===o.manual.model&&x.transport===profile.transport);
         if(!endpoint)return d('stop',{},'觀察到的端點清單找不到符合手冊的設備。','不猜測連線位置，保留缺失證據。');
         return d('connect',{endpointId:endpoint.endpointId,transport:profile.transport,baudRate:profile.baudRate,protocol:profile.protocol},'以實際介面清單的型號與手冊傳輸設定配對。','打開相符的模擬連線；不送出動作。');
       }
       if(!o.handshake?.ok)return d('handshake',{},'連線建立不代表已接到正確手臂；需要交換身分與能力封包。','確認型號、協定版本與可用通道。');
-      if(!o.compileResult?.ok||o.driverTests?.passed===false)return d('write_driver',{source:o.manual.sampleDriverSource||o.manual.sampleDriver},'離線策略使用手冊提供的 JavaScript 範本，在隔離執行環境中編譯。','得到可編碼命令與解碼回覆的程式；尚不啟用動作。');
+      if(!o.compileResult?.ok||o.driverTests?.passed===false){
+        const template=o.manual.sampleDriverSource||o.manual.sampleDriver;
+        if(template)return d('write_driver',{source:template},'離線策略使用手冊提供的 JavaScript 範本，在隔離執行環境中編譯。','得到可編碼命令與解碼回覆的程式；尚不啟用動作。');
+        let source;try{source=VlabDriverSynthesizer.fromSpec(o.manual.protocolSpec);}catch(error){return d('stop',{},'手冊沒有範本，離線規格產生器也無法處理這份 protocolSpec：'+String(error.message||error).slice(0,160),'停止並保留缺少的規格證據。');}
+        return d('write_driver',{source},'手冊沒有驅動範本；離線規格產生器依 protocolSpec 產生 encode/decode（規則式程式產生，非語言模型）。','得到可編碼命令與解碼回覆的程式；仍須通過乾跑測試。');
+      }
       if(!o.driverTests?.passed)return d('test_driver',{},'程式已編譯，仍須驗證封包、回覆、限制與錯誤處理。','以不移動設備的測試確認驅動程式可用。');
+      if(this.controllerMode==='generated'&&!o.controllerTests?.passed){
+        if(!o.controllerCompile?.ok||o.controllerTests?.passed===false)return d('write_controller',{source:VlabControllerModule.REFERENCE_SOURCE},'離線策略提交預寫的參考 XY 控制模組（非語言模型產生），經同一隔離與測試流程。','編譯成 control(state) 模組；尚未用於設備。');
+        return d('test_controller',{},'控制模組已編譯；先在合成設備上做隔離測試，通過後才能控制模擬設備。','確認旋轉、交換、反向、非線性、行程限制與中途反向皆能到達。');
+      }
       return d('start_control',{},'外觀假設、介面、手冊、握手與驅動測試均已具備，現在可啟用受限動作。','後續每個動作都由剛才編譯與測試的程式送到模擬設備。');
     }
     _png(frame){
@@ -147,24 +175,38 @@
         }else if(d.tool==='list_interfaces'){
           result=await this._link.inventory();o.inventory=copy(result);summary=`模擬主機回覆 ${result.length} 個通訊端點。這是模擬介面清單。`;
         }else if(d.tool==='read_manual'){
-          result=await this._link.manual(d.args.documentId);o.manual=copy(result);summary='已查閱 VLAB-P2 模擬手冊，取得傳輸設定、協定與程式介面。連桿尺寸與運動增益仍未知。';
+          result=await this._link.manual(d.args.documentId);o.manual=copy(result);summary=`已查閱 ${result.model} 模擬手冊，取得傳輸設定、協定與程式介面${result.templateIncluded===false?'（本次手冊不含驅動範本）':''}。機構尺寸與運動增益仍未知。`;
         }else if(d.tool==='connect'){
           result=await this._link.connect(d.args);if(result?.ok===false)throw new Error(result.error||'連線被拒絕。');
           o.connection=copy(result);o.handshake=null;o.driverTests=null;this._completed.delete('handshake');this._completed.delete('test_driver');summary='傳輸設定已驗證，模擬連線已建立。尚未確認設備身分，也尚未允許動作。';
         }else if(d.tool==='handshake'){
-          result=await this._link.handshake();if(!result?.ok||result.model!=='VLAB-P2'||result.channels!==2)throw new Error('設備握手身分或通道能力不符。');
+          result=await this._link.handshake();if(!result?.ok||result.model!==(o.manual?.model||this.device)||result.channels!==2)throw new Error('設備握手身分或通道能力不符。');
           o.handshake=copy(result);summary='實際握手回覆已確認設備型號、協定與 2 個控制通道；沒有送出位移命令。';
         }else if(d.tool==='write_driver'){
           o.driverSource=d.args.source;o.driverTests=null;o.compileResult=null;this._completed.delete('write_driver');this._completed.delete('test_driver');
           result=await this._runtime.compile(d.args.source);if(!result?.ok)throw new Error(result?.error||'驅動程式編譯失敗。');
-          o.compileResult=copy(result);o.driverSourceOrigin=['claude','gemini'].includes(d.source)?`${d.source}-generated`:'manual-template';summary=['claude','gemini'].includes(d.source)?`${d.source==='gemini'?'Gemini':'Claude'} 提供的 JavaScript 已在隔離環境中編譯；接著以乾跑測試檢查。`:'手冊 JavaScript 範本已在隔離環境中編譯；離線模式並未宣稱由語言模型寫程式。';
+          o.compileResult=copy(result);o.driverSourceOrigin=['claude','gemini'].includes(d.source)?`${d.source}-generated${o.manual?.templateIncluded===false?'-no-template':''}`:o.manual?.templateIncluded===false?'offline-spec-synthesizer':'manual-template';summary=['claude','gemini'].includes(d.source)?`${d.source==='gemini'?'Gemini':'Claude'} 提供的 JavaScript 已在隔離環境中編譯；接著以乾跑測試檢查。`:'手冊 JavaScript 範本已在隔離環境中編譯；離線模式並未宣稱由語言模型寫程式。';
+        }else if(d.tool==='write_controller'){
+          if(this.controllerMode!=='generated'||!this._controllerRuntime)throw new Error('本次實驗使用內建 XY 控制器。');
+          o.controllerSource=d.args.source;o.controllerTests=null;o.controllerCompile=null;this._completed.delete('write_controller');this._completed.delete('test_controller');
+          result=await this._controllerRuntime.compile(d.args.source);if(!result?.ok)throw new Error(result?.error||'控制程式編譯失敗。');
+          o.controllerCompile=copy(result);o.controllerSourceOrigin=['claude','gemini'].includes(d.source)?`${d.source}-generated`:'offline-reference-module';
+          summary=['claude','gemini'].includes(d.source)?`${d.source==='gemini'?'Gemini':'Claude'} 提供的 control(state) 已在隔離環境中編譯；接著以合成設備測試。`:'離線參考控制模組已在隔離環境中編譯；這是預寫基準，不是語言模型產生的程式。';
+        }else if(d.tool==='test_controller'){
+          if(!o.controllerCompile?.ok)throw new Error('請先編譯控制程式。');
+          const runtime=this._controllerRuntime;
+          result=await VlabControllerModule.isolationTest(state=>runtime.control(state));result.sourceHash=o.controllerCompile.sourceHash;
+          o.controllerTests=copy(result);ok=Boolean(result.passed);
+          summary=ok?`控制程式通過 ${result.cases.length} 組合成設備隔離測試；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${result.cases.filter(x=>!x.passed).map(x=>x.name).join('、')}。必須修正後重新測試。`;
         }else if(d.tool==='test_driver'){
           result=await this._runtime.test(this._link);o.driverTests=copy(result);ok=Boolean(result?.passed);
           summary=ok?'驅動程式測試通過。測試未移動手臂，後續真實模擬動作會重用這份程式。':'驅動程式測試未通過；保留測試結果，必須修正程式後重新驗證。';
         }else if(d.tool==='start_control'){
           if(!o.handshake?.ok||!o.driverTests?.passed||!o.compileResult?.ok)throw new Error('握手或驅動測試尚未通過，禁止啟用控制。');
+          if(this.controllerMode==='generated'&&(!o.controllerTests?.passed||o.controllerTests.sourceHash!==this._controllerRuntime?.sourceHash))throw new Error('控制程式尚未通過隔離測試，禁止啟用控制。');
+          const controllerRuntime=this._controllerRuntime,controller=this.controllerMode==='generated'?{origin:o.controllerSourceOrigin,sourceHash:o.controllerTests.sourceHash,decide:state=>controllerRuntime.control(state)}:null;
           const owner=this,provider=this.provider?{get calls(){return owner._frontCalls+owner._controlCalls;},get model(){return owner.provider.model;},abort(){owner.provider.abort?.();},async decide(context,frame){return owner._requestDecision({...context,phase:context.phase||'control'},frame,'control');}}:null;
-          const controlOptions={seed:this.seed,strategy:this.strategy,provider,challenge:this.challenge,recordFrames:false,maxActions:this.maxActions,maxDecisions:this.maxDecisions,plant:this._plant,frameGetter:()=>this._link.frame(),actuator:async command=>{if(!this._onboarding.ready)throw new Error('控制尚未啟用。');return this._runtime.act(command,this._link);},mechanicalActuator:async command=>{if(!this._onboarding.ready)throw new Error('控制尚未啟用。');return this._runtime.operate(command,this._link);}};
+          const controlOptions={seed:this.seed,strategy:this.strategy,provider,challenge:this.challenge,recordFrames:false,maxActions:this.maxActions,maxDecisions:this.maxDecisions,plant:this._plant,frameGetter:()=>this._link.frame(),actuator:async command=>{if(!this._onboarding.ready)throw new Error('控制尚未啟用。');return this._runtime.act(command,this._link);},mechanicalActuator:async command=>{if(!this._onboarding.ready)throw new Error('控制尚未啟用。');return this._runtime.operate(command,this._link);},controller};
           this._control=this.controlFactory?this.controlFactory(controlOptions):new AutonomousEngine(controlOptions);
           await this._control.initialize();if(epoch!==this._epoch||this._disposed)return this.snapshot();
           o.ready=true;o.status='ready';this._controlOffset=this._events.length+1;result={ok:true,driverSourceHash:o.driverTests.sourceHash||o.compileResult.sourceHash,actionCount:0};summary='前置工作完成。控制器尚不知道運動映射；接下來透過剛才產生與測試的通訊程式試動、觀察與自我校正。';
@@ -191,9 +233,9 @@
         const decision=event.decision,provided=decision.expectedProvided!==false&&typeof decision.expected==='string'&&Boolean(decision.expected.trim());
         modelExpectationText[provided?'provided':'omitted']++;
       }
-      return {version:'0.6.3',strategy:this.strategy,languageModel:['claude','gemini'].includes(this.strategy),model:['claude','gemini'].includes(this.strategy)?String(this.provider?.model||''):null,scope:'模擬設備：影像假設 → 介面與手冊 → 連線握手 → JavaScript 驅動 → 乾跑測試 → 平面視覺閉迴圈；沒有實體掃描或連線。',parameters:numerical?.parameters||{seed:this.seed,tolerancePx:7,inputLimit:.1,cameraPixels:[640,480]},scenario:numerical?.scenario||null,done:Boolean(this._state?.done),failure:this._state?.failure||null,checkpoints:copy(this._state?.checkpoints),actionCount:this._state?.actionCount||0,commandAttemptCount:this._state?.commandAttemptCount||0,unconfirmedActuationCount:this._state?.unconfirmedActuationCount||0,probeCount:this._state?.probeCount||0,recalibrations:this._state?.recalibrations||0,decisionCount:this._frontDecisions+(numerical?.decisionCount||0),modelCalls:this._frontCalls+this._controlCalls,provenance:{frontMode:['claude','gemini'].includes(this.strategy)?`${this.strategy}-tools`:'offline-preset-policy',driverSource:this._onboarding?.driverSourceOrigin||null,frontCalls:this._frontCalls,controlCalls:this._controlCalls,usage,modelExpectationText,allActuationThroughDriver:true},onboarding:this._frontState(),driverRuntime:copy(this._runtime?.diagnostics||null),modelRuntime:copy(this.provider?.requestDiagnostics||null),controllerInputs:['camera width/height/RGBA','observed simulated inventory/manual/handshake','generated driver results','acknowledged applied inputs','user goal update'],decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events),evaluatorTruth:copy(this._truth)};
+      return {version:'0.7.0',strategy:this.strategy,experiment:{device:this.device,protocol:this._onboarding?.manual?.connection?.protocol||null,manualTemplate:this.manualTemplate,controllerMode:this.controllerMode},languageModel:['claude','gemini'].includes(this.strategy),model:['claude','gemini'].includes(this.strategy)?String(this.provider?.model||''):null,scope:'模擬設備：影像假設 → 介面與手冊 → 連線握手 → JavaScript 驅動 → 乾跑測試 → 平面視覺閉迴圈；沒有實體掃描或連線。',parameters:numerical?.parameters||{seed:this.seed,tolerancePx:7,inputLimit:.1,cameraPixels:[640,480]},scenario:numerical?.scenario||null,done:Boolean(this._state?.done),failure:this._state?.failure||null,checkpoints:copy(this._state?.checkpoints),actionCount:this._state?.actionCount||0,commandAttemptCount:this._state?.commandAttemptCount||0,unconfirmedActuationCount:this._state?.unconfirmedActuationCount||0,probeCount:this._state?.probeCount||0,recalibrations:this._state?.recalibrations||0,decisionCount:this._frontDecisions+(numerical?.decisionCount||0),modelCalls:this._frontCalls+this._controlCalls,provenance:{frontMode:['claude','gemini'].includes(this.strategy)?`${this.strategy}-tools`:'offline-preset-policy',driverSource:this._onboarding?.driverSourceOrigin||null,controllerSource:this.controllerMode==='generated'?this._onboarding?.controllerSourceOrigin||null:'builtin-numerical-controller',controllerTests:copy(this._onboarding?.controllerTests||null),frontCalls:this._frontCalls,controlCalls:this._controlCalls,usage,modelExpectationText,allActuationThroughDriver:true},onboarding:this._frontState(),driverRuntime:copy(this._runtime?.diagnostics||null),modelRuntime:copy(this.provider?.requestDiagnostics||null),controllerInputs:['camera width/height/RGBA','observed simulated inventory/manual/handshake','generated driver results','acknowledged applied inputs','user goal update'],decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events),evaluatorTruth:copy(this._truth)};
     }
-    dispose(){this._disposed=true;this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();}
+    dispose(){this._disposed=true;this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();this._controllerRuntime?.dispose();}
   }
-  global.FullExperimentEngine=FullExperimentEngine;global.validateFrontDecision=validateFrontDecision;
+  global.FullExperimentEngine=FullExperimentEngine;global.VLAB_DOCUMENTS=DOCUMENTS;global.validateFrontDecision=validateFrontDecision;
 })(globalThis);

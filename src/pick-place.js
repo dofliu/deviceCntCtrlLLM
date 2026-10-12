@@ -240,7 +240,7 @@
             this._navigation=new AutonomousEngine({seed:this.seed,strategy:this.strategy,provider:this.provider,challenge:false,recordFrames:false,maxActions:this.maxActions,maxDecisions:this.maxDecisions,plant:this.plant,actuator:async command=>{
               if(this._trialCounts().actionCount>=this.maxActions)throw new Error('已達本回合取放動作上限；未送出額外命令。');
               return this.actuator(command);
-            },frameGetter:this.frameGetter,preserveTarget:true});
+            },frameGetter:this.frameGetter,preserveTarget:true,controller:this.controller||null});
             await this._navigation.initialize();
           }
           if(epoch!==this._epoch||this._disposed)return this.snapshot();
@@ -333,7 +333,7 @@
       if(!this._navActive)throw new Error('請在平面移動階段測試干擾。');
       return this._emit({...await this._navigation.perturb(kind),stage:'mission-navigation',done:false});
     }
-    report(){return {version:'0.6.3',...this._counts(),done:Boolean(this._state?.done),failure:this._state?.failure||null,parameters:{seed:this.seed,tolerancePx:7,placementTolerancePx:12,maxActions:this.maxActions,maxMissionDecisions:this.maxMissionDecisions,cameraPixels:[640,480]},scenario:{type:'pick-place',challenge:false},taskProgress:copy(this._task),missionObserved:copy(this._observed),actuator:copy(this._actuatorState),evidence:{grasp:copy(this._graspEvidence),coMotion:copy(this._coMotionEvidence),release:copy(this._releaseEvidence),surface:copy(this._releaseHeightEvidence)},decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events)};}
+    report(){return {version:'0.7.0',...this._counts(),done:Boolean(this._state?.done),failure:this._state?.failure||null,parameters:{seed:this.seed,tolerancePx:7,placementTolerancePx:12,maxActions:this.maxActions,maxMissionDecisions:this.maxMissionDecisions,cameraPixels:[640,480]},scenario:{type:'pick-place',challenge:false},taskProgress:copy(this._task),missionObserved:copy(this._observed),actuator:copy(this._actuatorState),evidence:{grasp:copy(this._graspEvidence),coMotion:copy(this._coMotionEvidence),release:copy(this._releaseEvidence),surface:copy(this._releaseHeightEvidence)},decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events)};}
     dispose(){this._disposed=true;this._epoch++;this.provider?.abort?.();this._navigation?.dispose();}
   }
   class PickPlaceExperimentEngine extends FullExperimentEngine {
@@ -415,7 +415,7 @@
     }
     report(){
       const report=super.report(),mission=this._control?.report();
-      return {...report,version:'0.6.3',scope:'模擬 2R 平面手臂搭配離散升降／夾爪介面：首次設備辨識、連線與驅動產生；同工作站後續回合重新握手、沿用驅動與映射，重新驗證取放。高度為模擬平台接觸；未包含跨工作站、真實硬體、6 軸姿態或完整接觸動力學。',taskProgress:copy(this._state?.taskProgress||initialProgress()),xyActionCount:mission?.xyActionCount||0,auxiliaryActionCount:mission?.auxiliaryActionCount||0,missionEvidence:copy(mission?.evidence||null),suiteProgress:this._suiteView(),trialScenario:copy(this._trialScenario),trials:copy(this._trialResults||[]),trialCounts:copy(this._control?._trialCounts?.()||{}),suiteParameters:{trialCount:this.trialCount,maxActionsPerTrial:this.maxActions,driverReuse:'same-link-runtime-and-source',modelReuse:'same-navigation-worker; image residuals can trigger recalibration',connectionIdentity:'same retained endpoint plus model/protocol/channels; no unique hardware ID'},trafficStorage:{complete:'onboarding.traffic',eventSnapshots:'latest 15 packets per event'}};
+      return {...report,version:'0.7.0',scope:`模擬 ${this.device==='VLAB-G3'?'VLAB-G3 直角座標龍門（十六進位二進位框架協定）':'VLAB-P2 2R 平面手臂（JSON 單行協定）'}搭配離散升降／夾爪介面${this.manualTemplate?'':'；手冊不含驅動範本'}${this.controllerMode==='generated'?'；XY 由通過隔離測試的控制程式執行':''}：首次設備辨識、連線與驅動產生；同工作站後續回合重新握手、沿用驅動與映射，重新驗證取放。高度為模擬平台接觸；未包含跨工作站、真實硬體、6 軸姿態或完整接觸動力學。`,taskProgress:copy(this._state?.taskProgress||initialProgress()),xyActionCount:mission?.xyActionCount||0,auxiliaryActionCount:mission?.auxiliaryActionCount||0,missionEvidence:copy(mission?.evidence||null),suiteProgress:this._suiteView(),trialScenario:copy(this._trialScenario),trials:copy(this._trialResults||[]),trialCounts:copy(this._control?._trialCounts?.()||{}),suiteParameters:{trialCount:this.trialCount,maxActionsPerTrial:this.maxActions,driverReuse:'same-link-runtime-and-source',modelReuse:'same-navigation-worker; image residuals can trigger recalibration',connectionIdentity:'same retained endpoint plus model/protocol/channels; no unique hardware ID'},trafficStorage:{complete:'onboarding.traffic',eventSnapshots:'latest 15 packets per event'}};
     }
   }
   global.inspectTaskFrame=inspectTaskFrame;global.validateMissionDecision=validateMissionDecision;

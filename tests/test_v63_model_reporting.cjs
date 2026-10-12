@@ -18,7 +18,7 @@ Object.assign(engine,{seed:42,strategy:'claude',provider:{model:'mock',requestDi
 const state=engine._emit({kind:'decision',decisionCount:1});
 assert.equal(state.modelRuntime.requests,3);assert.equal(state.modelRuntime.rateLimitRetries,1);
 assert.equal(state.modelRuntime.recent,undefined);assert.equal(state.modelRuntime.last.requestNumber,3);
-const report=engine.report();assert.equal(report.version,'0.6.3');assert.deepEqual(plain(report.modelRuntime),runtime);
+const report=engine.report();assert.equal(report.version,'0.7.0');assert.deepEqual(plain(report.modelRuntime),runtime);
 assert.equal(report.modelCalls,3);assert.equal(report.actionCount,0);
 report.modelRuntime.recent[0].waitMs=0;assert.equal(runtime.recent[0].waitMs,30000);
 assert.equal(engine._events[0].modelRuntime.waitMs,30000);
