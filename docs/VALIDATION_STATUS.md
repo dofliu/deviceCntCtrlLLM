@@ -31,6 +31,15 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 真實模型（使用者本機瀏覽器，2026-10-12）
+
+紀錄：`validation/live-claude-v7-ui-p2-2026-10-12.json`（完整匯出 2.9 MB 留在 repo 外，記 SHA-256）。
+
+- 條件：`claude-haiku-5-5`、**VLAB-P2**（非原定的 G3；UI 預設設備）、無範本、產生控制程式、seed 42（開發資料）。
+- 結果：0/5。前段 5 步（觀察、手冊、介面、連線、握手）完成；之後 35 次 `write_driver` 全部 `DRIVER_STARTUP_TIMEOUT`：沙箱 iframe 已就緒，但 Worker 5 秒內沒有回報 ready，模型原始碼從未送入，也沒有編譯或測試。40 次呼叫用完前段上限停止；0 次設備動作、0 次 429。
+- 判定：驅動執行環境／瀏覽器問題，不是模型決策失敗；也不構成無範本驅動成功或失敗的證據（模型 35 次都重送同一份原始碼）。
+- 雲端重現：同條件離線代理經 `claude_bridge.py`（http）與 `file://` 在無頭 Chromium 皆完成，144 次驅動請求 0 失敗；**未重現**，使用者瀏覽器的成因未知（匯出未記錄瀏覽器版本、分頁可見性等）。
+
 離線五回合總動作數（內建控制器 vs. 控制程式模組；同設備、同 seed）：
 
 | 設備 | seed | 內建 | 控制程式模組 | XY 動作（內建／模組） |

@@ -1,0 +1,92 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (unknown-device-v7.0-experiment.json); not run in this repo's cloud environment",
+  "recordedAt": "2026-10-12",
+  "exportSha256": "ebaa4b31238a76cd55b950217d3c56cd97b9567de273dd7eac78892ab9a7ecec",
+  "exportBytes": 3048156,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-P2",
+    "protocol": "vlab-p2-json/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 42,
+    "trials": 5,
+    "minIntervalMs": 6000
+  },
+  "note": "User intended a G3 run, but the export is VLAB-P2 (UI default device). seed 42 is development/regression data.",
+  "modelWindowUtc": [
+    "2026-10-12T16:19:29Z (request 21)",
+    "2026-10-12T16:23:31Z (request 40)"
+  ],
+  "done": true,
+  "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+  "completedTrials": 0,
+  "modelCalls": 40,
+  "rateLimitRetries": 0,
+  "decisionRejections": 0,
+  "usage": {
+    "input_tokens": 358573,
+    "output_tokens": 44981,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "actionCount": 0,
+  "commandAttemptCount": 0,
+  "onboarding": {
+    "completed": [
+      "inspect_device",
+      "read_manual",
+      "list_interfaces",
+      "connect",
+      "handshake"
+    ],
+    "phase": "write_driver",
+    "status": "failed",
+    "toolCounts": {
+      "inspect_device": 1,
+      "read_manual": 1,
+      "list_interfaces": 1,
+      "connect": 1,
+      "handshake": 1,
+      "write_driver": 35
+    },
+    "writeDriverFailures": 35,
+    "distinctDriverSourcesSubmitted": 1,
+    "driverSourceChars": 1837,
+    "driverCompiled": false,
+    "driverTests": null,
+    "controllerSource": null
+  },
+  "driverRuntime": {
+    "requests": 35,
+    "failures": 35,
+    "codes": {
+      "DRIVER_STARTUP_TIMEOUT": 35
+    },
+    "phase": "startup",
+    "deadlineMs": 5000,
+    "isolationReady": true,
+    "note": "Sandbox iframe became ready; the blob Worker never posted ready within 5 s, so the generated source was never sent. No onerror reported."
+  },
+  "classification": "driver-runtime / browser environment (worker startup), not a model decision failure. The model wrote one driver and resubmitted the same source 35 times; it was never compiled or tested, so this is not evidence for or against model-generated no-template drivers.",
+  "cloudReproduction": {
+    "date": "2026-10-12",
+    "env": "Linux headless Chromium (Playwright 1.56.1)",
+    "case": "VLAB-P2, no template, generated controller, seed 42, offline adaptive, 1 trial",
+    "servedVia": [
+      "claude_bridge.py over http://127.0.0.1 (placeholder key, no API call)",
+      "file://"
+    ],
+    "result": "both completed 1/1; 144 driver runtime requests, 0 failures",
+    "conclusion": "not reproduced; cause in the user's browser is still unknown"
+  },
+  "notRecorded": [
+    "browser name/version",
+    "tab visibility",
+    "DevTools/extension state"
+  ],
+  "fullExport": "kept outside the repo (2.9 MB, includes trace and evaluator truth)"
+}
