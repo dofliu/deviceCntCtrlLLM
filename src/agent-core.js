@@ -63,7 +63,9 @@
         if(coverage.every(c=>c>0)&&this.lastOutcome?.tool!=='fit_model')return d('fit_model',{},'兩個獨立輸入通道已有實際位移樣本，可估計局部映射。','用已確認執行的輸入與影像位移擬合 Jacobian。');
         const c=ctx.samples.excitation[0]<=ctx.samples.excitation[1]?0:1;
         const previous=this.samples.slice().reverse().find(s=>Math.abs(s.u[c])>.0001);
-        const direction=previous ? (previous.improvement>=0?Math.sign(previous.u[c]):-Math.sign(previous.u[c])) : 1;
+        const last=this.lastOutcome,blocked=last?.tool==='probe'&&last.limited&&Math.abs(last.command?.[c]||0)>.0001&&Math.abs(last.applied?.[c]||0)<=.0001;
+        // A probe clamped to zero at a joint limit adds no sample; reverse it instead of repeating the same blocked input.
+        const direction=blocked ? -Math.sign(last.command[c]) : previous ? (previous.improvement>=0?Math.sign(previous.u[c]):-Math.sign(previous.u[c])) : 1;
         return d('probe',{channel:c,direction,amplitude:.045},`通道 ${c===0?'A':'B'} 的有效激發量較少，選擇一次小幅試動補足量測。`,'量測這個輸入造成的末端位移，供映射估計使用。');
       }
       return d('move',{scale:.72},`已有局部映射，依目前 ${obs.error.toFixed(1)} px 的位置誤差計算有限幅度動作。`,'縮小目標誤差，並以新影像比較預測與實際位移。');
