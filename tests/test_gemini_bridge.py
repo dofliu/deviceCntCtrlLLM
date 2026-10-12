@@ -154,7 +154,7 @@ class BridgeTests(unittest.TestCase):
         cases = ((400, {"message": "API key not valid. " + FAKE_KEY}, "INVALID_API_KEY"),
                  (400, {"message": "Bad schema " + FAKE_KEY}, "INVALID_REQUEST_FORMAT"),
                  (403, {}, "PERMISSION_DENIED"), (404, {}, "MODEL_UNAVAILABLE"),
-                 (429, {"details": [{"retryDelay": "35.5s"}]}, "QUOTA_EXCEEDED"), (302, {}, "UPSTREAM_REDIRECT_REJECTED"))
+                 (429, {"details": [{"retryDelay": "35.5s"}]}, "RATE_LIMITED"), (302, {}, "UPSTREAM_REDIRECT_REJECTED"))
         for status, error, code in cases:
             http_error = HTTPError(bridge.UPSTREAM + "/models", status, "mock", {}, io.BytesIO(json.dumps({"error": error}).encode()))
             with patch.object(bridge, "build_opener") as build:
@@ -165,6 +165,7 @@ class BridgeTests(unittest.TestCase):
             self.assertNotIn(FAKE_KEY, json.dumps(result))
             if status == 429:
                 self.assertEqual(result["error"]["retryAfterSeconds"], 35.5)
+                self.assertTrue(result["error"]["retryable"])
         self.assertIsNone(bridge.NoRedirects().redirect_request(None, None, 302, None, {}, "https://foreign.invalid"))
 
     def test_09_constrained_generation_schema_and_observation(self):

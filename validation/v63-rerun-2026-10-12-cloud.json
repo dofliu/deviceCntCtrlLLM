@@ -1,0 +1,80 @@
+{
+  "version": "0.6.3",
+  "date": "2026-10-12",
+  "baseCommit": "eed156a",
+  "environment": {
+    "platform": "Linux cloud container (Claude Code remote session)",
+    "node": "v22.22.0",
+    "python": "3.13.16",
+    "browserLaunched": false,
+    "liveModelRequests": 0,
+    "credentialRead": false,
+    "telemetryBlock": "Not encountered; test output was read normally."
+  },
+  "scope": "Offline Node/Python focused tests and the pure-Node headless five-trial integration. No browser, CSP, real API or hardware. Historical validation/*.json files that these scripts rewrite were restored from git; this file is the record of this rerun.",
+  "focusedV63": {
+    "passed": true,
+    "tests": {
+      "tests/test_v63_provider_pacing.cjs": "passed (10 groups x claude/gemini)",
+      "tests/test_v63_bridge_limits.py": "passed (12 tests)",
+      "tests/test_v63_model_reporting.cjs": "passed (2 groups)",
+      "tests/test_claude_provider.cjs": "passed",
+      "tests/test_gemini_provider.cjs": "passed",
+      "tests/test_expected_contract.cjs": "passed"
+    },
+    "finalRevisionAssertionsConfirmed": [
+      "Immediate abort before dispatch produces zero fetches and zero calls",
+      "A one-call budget exhausted by a 429 stops before cooldown",
+      "Retry request evidence updates modelRequests.used to 0, 1, 2"
+    ]
+  },
+  "otherOffline": {
+    "tests/test_v62_driver_runtime.cjs": "passed",
+    "tests/test_v62_runtime_reporting.cjs": "passed",
+    "tests/test_v61_markers.cjs": "passed",
+    "tests/test_v61_budgets.cjs": "passed",
+    "tests/test_v6_action_budget.cjs": "passed",
+    "tests/test_v6_mechanics.cjs": "passed",
+    "tests/test_platform_physics.cjs": "passed",
+    "tests/test_recovery_policy.cjs": "passed",
+    "tests/test_claude_bridge.py": "passed",
+    "tests/test_v61_bridge_budgets.py": "passed",
+    "tests/test_gemini_bridge.py": "failed before test update, passed after: test_08 still expected QUOTA_EXCEEDED for a 429 with only retryDelay; V6.3 intentionally classifies it as retryable RATE_LIMITED (same behaviour asserted in test_v63_bridge_limits.py test_05). Expectation updated; no production code changed.",
+    "build.py": "passed; unknown-device-v6.3.html rebuilt (generated, not committed)"
+  },
+  "headlessFiveTrialSuite": {
+    "runner": "tests/test_v6_suite.cjs (offline adaptive policy, seeds 42 and 1)",
+    "passed": false,
+    "durationSeconds": 316,
+    "seeds": [
+      {
+        "seed": 42,
+        "completed": 5,
+        "failure": null,
+        "destinationHeights": [0, 0.35, 0.65, 0.35, 0],
+        "placementErrorPx": [3.98, 1.24, 3.72, 2.33, 4.56],
+        "releaseHeightOffsetDeltaPx": [-0.39, 1.55, -0.02, 2.44, -0.14],
+        "note": "seed 42 is development/regression data, not generalisation evidence"
+      },
+      {
+        "seed": 1,
+        "completed": 3,
+        "failedTrial": 4,
+        "destinationHeight": 0.35,
+        "failure": "放置驗證未通過：放置高度影像證據不符。已保留通過項目與實際量測。",
+        "failedChecks": ["releaseHeightMatched"],
+        "expectedOffsetPx": 6.361,
+        "observedOffsetPx": 8.883,
+        "deltaPx": 2.521,
+        "tolerancePx": 2.5,
+        "releaseHeightOffsetDeltaPx": [-0.07, 2.07, 0.06, 2.52]
+      }
+    ],
+    "observation": "At the 0.35 low platform, observed tip-object offset exceeds the surface-marker offset by +1.55 to +2.52 px in all four low-platform trials, while 0 and 0.65 stay within about 0.4 px. The systematic bias nearly consumes the 2.5 px tolerance. Root cause not yet determined (software raster vs. browser antialiasing, lift rendering at intermediate height, or marker estimation). Threshold was NOT changed."
+  },
+  "notRun": [
+    "Browser/Playwright UI tests (Playwright not installed; historical tests reference Windows Chrome paths)",
+    "Real Claude/Gemini five-trial experiment (needs user authorisation and budget)",
+    "Python workflow tests that depend on browser or live bridges"
+  ]
+}
