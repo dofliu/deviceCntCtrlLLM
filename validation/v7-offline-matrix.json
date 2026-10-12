@@ -42,7 +42,7 @@
         4.56
       ],
       "modelCalls": 0,
-      "seconds": 209.405
+      "seconds": 212.428
     },
     {
       "device": "VLAB-P2",
@@ -79,7 +79,7 @@
         2.43
       ],
       "modelCalls": 0,
-      "seconds": 125.384
+      "seconds": 144.653
     },
     {
       "device": "VLAB-P2",
@@ -116,7 +116,7 @@
         4.56
       ],
       "modelCalls": 0,
-      "seconds": 208.997
+      "seconds": 210.975
     },
     {
       "device": "VLAB-P2",
@@ -153,7 +153,7 @@
         2.43
       ],
       "modelCalls": 0,
-      "seconds": 125.997
+      "seconds": 108.208
     },
     {
       "device": "VLAB-G3",
@@ -190,7 +190,7 @@
         3.27
       ],
       "modelCalls": 0,
-      "seconds": 115.386
+      "seconds": 99.307
     },
     {
       "device": "VLAB-G3",
@@ -227,7 +227,7 @@
         3.42
       ],
       "modelCalls": 0,
-      "seconds": 107.977
+      "seconds": 99.191
     },
     {
       "device": "VLAB-G3",
@@ -264,7 +264,7 @@
         1.45
       ],
       "modelCalls": 0,
-      "seconds": 76.693
+      "seconds": 73.357
     },
     {
       "device": "VLAB-G3",
@@ -301,7 +301,7 @@
         2.66
       ],
       "modelCalls": 0,
-      "seconds": 84.246
+      "seconds": 78.43
     },
     {
       "device": "VLAB-G3",
@@ -338,7 +338,7 @@
         3.27
       ],
       "modelCalls": 0,
-      "seconds": 110.067
+      "seconds": 101.429
     },
     {
       "device": "VLAB-G3",
@@ -375,7 +375,7 @@
         3.42
       ],
       "modelCalls": 0,
-      "seconds": 107.741
+      "seconds": 102.656
     },
     {
       "device": "VLAB-G3",
@@ -412,7 +412,7 @@
         1.45
       ],
       "modelCalls": 0,
-      "seconds": 74.758
+      "seconds": 72.783
     },
     {
       "device": "VLAB-G3",
@@ -449,7 +449,7 @@
         2.66
       ],
       "modelCalls": 0,
-      "seconds": 72.308
+      "seconds": 70.36
     }
   ],
   "comparison": [
