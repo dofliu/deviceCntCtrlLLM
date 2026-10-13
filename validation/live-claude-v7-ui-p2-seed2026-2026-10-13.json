@@ -1,0 +1,358 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (P2-2026unknown-device-v7.0-experiment.json); not run in this repo's cloud environment",
+  "recordedAt": "2026-10-13",
+  "exportSha256": "5b995710626bd40f15962ed91f7e8a51134987249f0f00843ad9bb191cfacd23",
+  "exportBytes": 22674922,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-P2",
+    "protocol": "vlab-p2-json/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 2026,
+    "trials": 5,
+    "minIntervalMs": 6000
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "brands": [
+      "Chromium 154",
+      "Google Chrome 154",
+      "Not A(Brand 99"
+    ],
+    "platform": "Windows",
+    "hardwareConcurrency": 32,
+    "pageProtocol": "file:",
+    "visibilityState": "visible",
+    "hasFocus": true,
+    "crossOriginIsolated": false,
+    "visibilityChanges": [
+      {
+        "state": "hidden",
+        "frontDecisions": 9,
+        "modelCalls": 9,
+        "driverRequests": 43
+      },
+      {
+        "state": "visible",
+        "frontDecisions": 9,
+        "modelCalls": 9,
+        "driverRequests": 43
+      },
+      {
+        "state": "hidden",
+        "frontDecisions": 14,
+        "modelCalls": 84,
+        "driverRequests": 601
+      },
+      {
+        "state": "visible",
+        "frontDecisions": 14,
+        "modelCalls": 84,
+        "driverRequests": 601
+      }
+    ]
+  },
+  "result": {
+    "done": true,
+    "failure": null,
+    "failureCategory": null,
+    "completedTrials": 5,
+    "status": "complete",
+    "reusedDriver": true
+  },
+  "modelCalls": 91,
+  "frontCalls": 17,
+  "controlCalls": 74,
+  "usage": {
+    "input_tokens": 457583,
+    "output_tokens": 42140,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "rateLimitRetries": 0,
+  "decisionRejections": 3,
+  "actionCount": 330,
+  "xyActionCount": 290,
+  "auxiliaryActionCount": 40,
+  "unconfirmedActuationCount": 0,
+  "recalibrations": 0,
+  "driverRuntime": {
+    "requests": 703,
+    "retries": 0,
+    "failures": 0,
+    "programErrors": 6
+  },
+  "onboardingSteps": [
+    [
+      "inspect_device",
+      true
+    ],
+    [
+      "read_manual",
+      true
+    ],
+    [
+      "list_interfaces",
+      true
+    ],
+    [
+      "connect",
+      true
+    ],
+    [
+      "handshake",
+      true
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      false
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      true
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      false
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      true
+    ],
+    [
+      "start_control",
+      true
+    ]
+  ],
+  "failedAttempts": [
+    {
+      "tool": "test_driver",
+      "kind": "onboarding-error",
+      "summary": "驅動程式測試未通過；保留測試結果，必須修正程式後重新驗證。",
+      "failed": [
+        "驅動程式拒絕失敗或毀損回覆"
+      ]
+    },
+    {
+      "tool": null,
+      "kind": "decision-rejected",
+      "summary": "Claude 回覆未通過檢查（INVALID_TOOL_RESPONSE / stop-reason）：模型回覆未以完整工具決策結束，可能被截斷；這次未執行動作。 本次沒有執行動作；保留目前進度，下一步請模型修正（第 1／2 次）。",
+      "failed": []
+    },
+    {
+      "tool": "test_controller",
+      "kind": "onboarding-error",
+      "summary": "控制程式未通過隔離測試：到達後通道 A 反向的恢復、起點貼近行程邊界。必須修正後重新測試。",
+      "failed": [
+        "到達後通道 A 反向的恢復",
+        "起點貼近行程邊界"
+      ]
+    },
+    {
+      "tool": null,
+      "kind": "decision-rejected",
+      "summary": "Claude 回覆未通過檢查（INVALID_TOOL_RESPONSE / stop-reason）：模型回覆未以完整工具決策結束，可能被截斷；這次未執行動作。 本次沒有執行動作；保留目前進度，下一步請模型修正（第 1／2 次）。",
+      "failed": []
+    },
+    {
+      "tool": null,
+      "kind": "decision-rejected",
+      "summary": "Claude 回覆未通過檢查（INVALID_TOOL_RESPONSE / stop-reason）：模型回覆未以完整工具決策結束，可能被截斷；這次未執行動作。 本次沒有執行動作；保留目前進度，下一步請模型修正（第 2／2 次）。",
+      "failed": []
+    }
+  ],
+  "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+  },
+  "driverTests": {
+    "passed": true,
+    "protocol": "vlab-p2-json/1",
+    "tests": [
+      [
+        "雙通道、零值與上下限的編碼及回覆往返",
+        true
+      ],
+      [
+        "升降與夾爪四種命令的實際編解碼",
+        true
+      ],
+      [
+        "設備受限回覆的解析",
+        true
+      ],
+      [
+        "驅動程式拒絕失敗或毀損回覆",
+        true
+      ],
+      [
+        "主機側限制阻擋超量及非有限輸入",
+        true
+      ],
+      [
+        "設備側限制與框架檢查",
+        true
+      ]
+    ]
+  },
+  "controllerTests": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "旋轉 0.3 rad、正向通道",
+        "passed": true,
+        "actions": 17
+      },
+      {
+        "name": "通道交換且 A 反向",
+        "passed": true,
+        "actions": 30
+      },
+      {
+        "name": "大角度旋轉與 B 反向",
+        "passed": true,
+        "actions": 33
+      },
+      {
+        "name": "位置相依的非線性映射",
+        "passed": true,
+        "actions": 32
+      },
+      {
+        "name": "到達後通道 A 反向的恢復",
+        "passed": true,
+        "actions": 37
+      },
+      {
+        "name": "起點貼近行程邊界",
+        "passed": true,
+        "actions": 24
+      }
+    ]
+  },
+  "trials": [
+    {
+      "trialNumber": 1,
+      "label": "遠距桌面取放",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 1.9030425485124134,
+      "actionCount": 72,
+      "xyActionCount": 64,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 31,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 1.621
+      }
+    },
+    {
+      "trialNumber": 2,
+      "label": "更換物件位置・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 3.122429639931242,
+      "actionCount": 63,
+      "xyActionCount": 55,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 3.488
+      }
+    },
+    {
+      "trialNumber": 3,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "success": true,
+      "failure": null,
+      "placementError": 2.6777186029380076,
+      "actionCount": 56,
+      "xyActionCount": 48,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.65,
+        "objectToDestinationPx": 2.633
+      }
+    },
+    {
+      "trialNumber": 4,
+      "label": "不同方向・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 2.056125007775838,
+      "actionCount": 70,
+      "xyActionCount": 62,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 16,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 1.771
+      }
+    },
+    {
+      "trialNumber": 5,
+      "label": "回到桌面・另一組位置",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 4.217327054596468,
+      "actionCount": 69,
+      "xyActionCount": 61,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 3.918
+      }
+    }
+  ],
+  "generatedDriverSource": "function encode(command) {\n  var obj;\n  var i;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"xy command must have exactly 2 channels\");\n    }\n    for (i = 0; i < 2; i++) {\n      var v = command[i];\n      if (typeof v !== \"number\" || !isFinite(v) || v < -0.1 || v > 0.1) {\n        throw new Error(\"channel value out of range [-0.1, 0.1]\");\n      }\n    }\n    obj = { op: \"step\", channels: [command[0], command[1]] };\n  } else if (command !== null && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"lift position must be up or down\");\n      }\n      obj = { op: \"lift\", position: command.position };\n    } else if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"grip state must be open or closed\");\n      }\n      obj = { op: \"grip\", state: command.state };\n    } else if (command.op === \"hello\") {\n      obj = { op: \"hello\" };\n    } else {\n      throw new Error(\"unknown op\");\n    }\n  } else {\n    throw new Error(\"unsupported command type\");\n  }\n  var line = JSON.stringify(obj) + \"\\n\";\n  if (line.length > 1024) {\n    throw new Error(\"frame too long\");\n  }\n  return line;\n}\n\nfunction decode(rawReply) {\n  var text = rawReply;\n  if (typeof text === \"string\") {\n    if (text.charAt(text.length - 1) !== \"\\n\") {\n      throw new Error(\"reply frame must end with LF\");\n    }\n    text = text.substring(0, text.length - 1);\n    if (text.indexOf(\"\\n\") !== -1) {\n      throw new Error(\"multiple frames in reply\");\n    }\n    try {\n      text = JSON.parse(text);\n    } catch (e) {\n      throw new Error(\"malformed reply JSON\");\n    }\n  }\n  if (text === null || typeof text !== \"object\" || Array.isArray(text)) {\n    throw new Error(\"reply is not an object\");\n  }\n  if (text.ok !== true) {\n    throw new Error(text.error ? String(text.error) : \"device returned ok:false\");\n  }\n  if (text.limited !== undefined && typeof text.limited !== \"boolean\") {\n    throw new Error(\"limited field must be boolean\");\n  }\n  if (text.accepted === undefined || text.accepted === null) {\n    throw new Error(\"reply missing accepted field\");\n  }\n  var applied = text.accepted;\n  if (Array.isArray(applied)) {\n    if (applied.length !== 2) {\n      throw new Error(\"accepted step must have 2 channels\");\n    }\n    for (var i = 0; i < 2; i++) {\n      var a = applied[i];\n      if (typeof a !== \"number\" || !isFinite(a) || a < -0.1 || a > 0.1) {\n        throw new Error(\"accepted channel out of range\");\n      }\n    }\n  } else if (typeof applied === \"object\") {\n    if (applied.op === \"lift\") {\n      if (applied.position !== \"up\" && applied.position !== \"down\") {\n        throw new Error(\"accepted lift position invalid\");\n      }\n    } else if (applied.op === \"grip\") {\n      if (applied.state !== \"open\" && applied.state !== \"closed\") {\n        throw new Error(\"accepted grip state invalid\");\n      }\n    } else {\n      throw new Error(\"accepted object has unknown op\");\n    }\n  } else {\n    throw new Error(\"accepted field has invalid type\");\n  }\n  return { applied: applied, limited: text.limited === true };\n}\n",
+  "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var target = state.target;\n  var tol = state.tolerancePx;\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) {\n    return { action: \"stop\", reason: \"non-finite error\" };\n  }\n  if (err <= tol) {\n    return { action: \"verify\" };\n  }\n  var h = state.history || [];\n  var n = h.length;\n  var last = n > 0 ? h[n - 1] : null;\n  if (last && last.limited && last.command) {\n    var b0 = last.command[0] > 0 ? -0.03 : (last.command[0] < 0 ? 0.03 : 0);\n    var b1 = last.command[1] > 0 ? -0.03 : (last.command[1] < 0 ? 0.03 : 0);\n    if (b0 === 0 && b1 === 0) {\n      b0 = 0.03;\n    }\n    return { action: \"move\", u: [b0, b1] };\n  }\n  var c0 = null;\n  var c1 = null;\n  var i;\n  for (i = n - 1; i >= 0 && i >= n - 12; i--) {\n    var s = h[i];\n    var a = s.applied;\n    var d = s.delta;\n    if (!a || !d || s.limited) { continue; }\n    if (c0 === null && Math.abs(a[0]) > 0.002 && Math.abs(a[1]) < 0.0005) {\n      c0 = [d[0] / a[0], d[1] / a[0]];\n    }\n    if (c1 === null && Math.abs(a[1]) > 0.002 && Math.abs(a[0]) < 0.0005) {\n      c1 = [d[0] / a[1], d[1] / a[1]];\n    }\n    if (c0 !== null && c1 !== null) { break; }\n  }\n  if (c0 === null || c1 === null) {\n    var pick = (n % 2 === 0) ? [0.03, 0] : [0, 0.03];\n    if (c0 !== null) { pick = [0, 0.03]; }\n    if (c1 !== null) { pick = [0.03, 0]; }\n    return { action: \"move\", u: pick };\n  }\n  if (last && last.applied && last.delta) {\n    var pdx = c0[0] * last.applied[0] + c1[0] * last.applied[1];\n    var pdy = c0[1] * last.applied[0] + c1[1] * last.applied[1];\n    var rx = last.delta[0] - pdx;\n    var ry = last.delta[1] - pdy;\n    var res = Math.sqrt(rx * rx + ry * ry);\n    var mag = Math.sqrt(last.delta[0] * last.delta[0] + last.delta[1] * last.delta[1]);\n    if (res > 0.6 * mag + 3 && err > 3 * tol) {\n      var q = (n % 2 === 0) ? [0.03, 0] : [0, 0.03];\n      return { action: \"move\", u: q };\n    }\n  }\n  var det = c0[0] * c1[1] - c1[0] * c0[1];\n  if (!isFinite(det) || Math.abs(det) < 1e-6) {\n    return { action: \"move\", u: [0.03, 0.03] };\n  }\n  var ua = (c1[1] * ex - c1[0] * ey) / det;\n  var ub = (-c0[1] * ex + c0[0] * ey) / det;\n  var ga = 0.5 * ua;\n  var gb = 0.5 * ub;\n  var m = Math.max(Math.abs(ga), Math.abs(gb));\n  if (m > 0.1) {\n    ga = ga * 0.1 / m;\n    gb = gb * 0.1 / m;\n  }\n  if (!isFinite(ga) || !isFinite(gb)) {\n    return { action: \"stop\", reason: \"non-finite command\" };\n  }\n  return { action: \"move\", u: [ga, gb] };\n}\n",
+  "fullExport": "kept outside the repo (22.7 MB)"
+}

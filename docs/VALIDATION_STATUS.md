@@ -31,6 +31,24 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 真實模型 seed 2026（未用於開發）5/5（使用者本機瀏覽器，2026-10-13）
+
+紀錄：`validation/live-claude-v7-ui-p2-seed2026-2026-10-13.json`、`validation/live-claude-v7-ui-g3-seed2026-2026-10-13.json`。條件同前（`claude-haiku-5-5`、無範本、產生控制程式），Windows Chrome 154、`file:`。
+
+| | P2 | G3 |
+|---|---|---|
+| 完成 | 5/5 | 5/5 |
+| 影像誤差 px | 1.90／3.12／2.68／2.06／4.22 | 2.76／6.13／1.90／1.77／3.49 |
+| 真值 | 全部 placed，1.6–3.9 px | 全部 placed，1.9–5.9 px |
+| 閘門 | 驅動、控制程式各失敗一次後修正通過 | 驅動第一次通過；控制程式失敗一次後修正通過 |
+| 模型呼叫（前段／控制） | 91（17／74） | 87（13／74） |
+| 截斷回覆（修正上限內恢復） | 3 | 1 |
+| 設備動作（XY） | 330（290） | 236（196） |
+| 同 seed 離線基準動作（內建／參考模組） | 299／289 | 146／151 |
+
+0 次 429、0 未確認、驅動執行環境 0 失敗。模型控制程式在 seed 2026 動作數高於離線基準（P2 約 +10–14%，G3 約 +56–62%）。
+界線：每條件 1 次；任務前提與影像驗證器仍預寫；只涵蓋兩種已知設備家族。
+
 ### seed 2026 離線基準（2026-10-13，離線 Node）
 
 紀錄：`validation/v7-offline-baseline-seed2026.json`（`tests/baseline_v7_seed.cjs`）。seed 2026 先前未用於開發。無範本、規格產生器驅動：
