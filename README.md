@@ -82,6 +82,7 @@ python run_experiments.py --devices P2,G3 --seeds 2026,3140,8675 --model claude-
 - 預算：每組有單組上限（預設 150），整批另有總上限；每次真正送出的請求都計入，用量不明時以單組上限扣除；剩餘額度不足 `--min-calls-to-start`（預設 60）就不再開始新的一組。真實模式開始前會要求輸入 `yes` 確認（`--yes` 可略過）。
 - 金鑰：只由橋接讀取 `ANTHROPIC_API_KEY`（或 `--key-env ANTHROPIC_API_KEY_Extra`）；找不到時整批停止，沒有送出任何請求。
 - 輸出：`artifacts/live-runs/batch-<時間>/`（不進 repo）內有每組 `*.summary.json`（數十 KB，含自產程式、步長、效率倍率、模擬器真值核對、git commit）、`*.full.json.gz`（完整紀錄壓縮檔），以及 `batch-summary.json`／`batch-summary.csv` 總表。分享時壓縮 summary 與 batch 檔即可。
+- **離線重播控制程式**（不呼叫 API）：`node tests/replay_controller.cjs --summary <某組>.summary.json --seeds 2026,3140,8675 --compare-reference` 會把該組 Claude 寫的控制程式放回模擬器重跑（高階步驟用離線規則），輸出動作數與隔離測試倍率。已驗證與真實執行的動作數逐回合相同，可用來比較或分析控制程式而不花費。
 - **與瀏覽器版的差異**：影像以軟體畫布繪製（無瀏覽器抗鋸齒），產生的程式在 Node vm 沙箱而非 iframe／Worker 執行。成功門檻、測試關卡與模型流程相同，但結果須與瀏覽器實驗分開記錄。
 
 ## 高度與程式生成的能力界線
@@ -100,6 +101,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 ## 驗證與歷史
 
 **V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
+
+**2026-10-13 二連桿效率案例與離線重播**（`validation/v70-controller-replay-analysis.json`）：命令列批次中 P2 動作數為基準約 1.8×；離線重播證實原因是控制程式用整段 40 筆歷史擬合單一線性映射（只用最近 10 筆即降到 264，基準 289）。隔離測試新增「二連桿長距離多目標」案例，只回報效率、不影響通過；新增 `tests/replay_controller.cjs`。
 
 **2026-10-13 控制程式效率回報**（`validation/v70-controller-efficiency.json`）：契約明示單步可用到 0.1；隔離測試回報相對參考模組的動作倍率（不影響通過判定）。之後的真實模型結果須與先前分開記錄。
 
