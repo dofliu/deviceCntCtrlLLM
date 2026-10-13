@@ -29,7 +29,7 @@ UPSTREAM = "https://generativelanguage.googleapis.com/v1beta"
 MAX_BODY = 6 * 1024 * 1024
 MAX_RESPONSE = 4 * 1024 * 1024
 MODEL_RE = r"[A-Za-z0-9][A-Za-z0-9._-]{0,119}"
-TOOLS = frozenset("inspect_device list_interfaces read_manual connect handshake write_driver test_driver start_control observe probe fit_model move reset_model verify inspect_scene select_goal lift grip verify_grasp verify_place stop".split())
+TOOLS = frozenset("inspect_device list_interfaces read_manual connect handshake write_driver test_driver write_controller test_controller start_control observe probe fit_model move reset_model verify inspect_scene select_goal lift grip verify_grasp verify_place stop".split())
 
 
 def authorized_name(key_name: str) -> bool:

@@ -406,7 +406,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
   }
   // The two cloud providers share the observation boundary and local tool contract.
   // No transport, credentials, simulator truth or model response history is exposed.
-  global.VlabAgentContract=Object.freeze({allowContext,toolDefinition,validateToolCall,cameraPNG,rejectionDiagnostic,instruction:INSTRUCTION+REPAIR_INSTRUCTION});
+  global.VlabAgentContract=Object.freeze({toolNames:Object.freeze(Object.keys(schemas)),allowContext,toolDefinition,validateToolCall,cameraPNG,rejectionDiagnostic,instruction:INSTRUCTION+REPAIR_INSTRUCTION});
   global.VlabModelRequests=Object.freeze({ModelRequestScheduler,schedulingError,rateLimitMetadata});
   global.ClaudeAgentProvider=ClaudeAgentProvider;
 })(typeof window!=='undefined'?window:globalThis);
