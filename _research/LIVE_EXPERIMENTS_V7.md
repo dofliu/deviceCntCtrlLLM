@@ -235,7 +235,8 @@ R0 不計入成功率分母的理由需在正式協定中事先定義（屬基�
 | `validation/live-claude-v7-ui-{p2,g3}-seed{2026,3140,8675}-8192-2026-10-13.json` | R5–R10 摘要、自產原始碼與步長統計 |
 | `validation/v7-offline-baseline-seed3140-8675.json` | seed 3140、8675 離線基準 |
 | `tests/baseline_v7_seed.cjs` | 任一 seed 的離線五回合基準 |
-| `tests/live_claude_v7.cjs` | 經本機橋接的授權真實模型執行器（CLI） |
+| `tests/live_claude_v7.cjs` | 命令列單組執行器（無瀏覽器；`--offline` 不呼叫 API） |
+| `run_experiments.py` | 命令列批次執行與總預算控制；輸出 `batch-summary.json／.csv` |
 
 重現步驟：`python build.py` → 開啟 `unknown-device-v7.0.html` → 設定頁選 Claude、設備、seed、「不提供範本」、「產生控制程式」→ 套用並開始 → 完成後下載實驗 JSON。
 
