@@ -40,6 +40,14 @@
 - 判定：驅動執行環境／瀏覽器問題，不是模型決策失敗；也不構成無範本驅動成功或失敗的證據（模型 35 次都重送同一份原始碼）。
 - 雲端重現：同條件離線代理經 `claude_bridge.py`（http）與 `file://` 在無頭 Chromium 皆完成，144 次驅動請求 0 失敗；**未重現**，使用者瀏覽器的成因未知（匯出未記錄瀏覽器版本、分頁可見性等）。
 
+### 執行環境停止與瀏覽器資訊（2026-10-13，離線 Node）
+
+紀錄：`validation/v70-runtime-environment.json`。因上述本機紀錄而新增：
+- 前段工具（寫入／測試驅動或控制程式）連續 3 次 `DRIVER_STARTUP_TIMEOUT` 或 `DRIVER_ISOLATION_TIMEOUT` 即停止，`failureCategory: "runtime-environment"`，不再讓模型重送；任一次驅動／控制程式工具成功就歸零。`DRIVER_PROGRAM_ERROR` 等程式錯誤仍由模型修正，維持原本 40 次前段上限。
+- 匯出新增 `environment`（userAgent、品牌版本、平台、頁面協定、可見性、焦點、`visibilitychange` 紀錄）；每次環境錯誤的工具結果附 `environmentAtFailure`。
+- 測試：3 次逾時停止且 0 動作；2 次逾時後成功可完成 1/1；程式錯誤不被歸為環境錯誤。皆為故障注入，**未在使用者瀏覽器重現或驗證成因**。
+- 修改後回歸（雲端 Linux，Node v22.22.0、Python 3.13.16）：V7 協定／控制程式、V6.2 驅動／報告、V6.3 模型報告／請求間隔／放手高度、V6.1 預算、Claude／Gemini provider 與 bridge、V6 suite、V7 離線矩陣、無頭 Chromium 煙霧測試共 21 項皆 exit 0。被測試改寫的舊 `validation/` 檔已還原，未新增這些重跑的紀錄檔。
+
 離線五回合總動作數（內建控制器 vs. 控制程式模組；同設備、同 seed）：
 
 | 設備 | seed | 內建 | 控制程式模組 | XY 動作（內建／模組） |

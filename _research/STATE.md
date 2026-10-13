@@ -65,3 +65,5 @@
 2026-10-12（V7.0 開發）：依使用者要求一次完成三項：(1) 第二種設備 VLAB-G3 與二進位框架協定、主機端受信任協定設定檔；(2) 手冊可不提供驅動範本，離線以規則式規格產生器產生驅動；(3) 可產生 XY 控制程式，須先通過 6 組合成設備隔離測試才可控制。結果見 validation/v7-*.json。全部為離線 Node、無頭 Chromium 與模擬 API；未呼叫真實模型。研究上下一步是以真實模型在「無範本＋產生控制程式」條件下重測，並與離線基準（規格產生器、參考模組、內建控制器）比較。
 
 2026-10-12（使用者本機真實 Claude 紀錄）：使用者回傳的 UI 匯出為 VLAB-P2（非原定 G3）、claude-haiku-5-5、無範本＋產生控制程式、seed 42。握手後 35 次 write_driver 全部 DRIVER_STARTUP_TIMEOUT（Worker 未就緒、原始碼未送出），40 次呼叫耗盡前段上限，0/5、0 次設備動作。歸類為瀏覽器驅動執行環境問題，非模型失敗；雲端無頭 Chromium 經橋接 http 與 file:// 皆未重現。摘要存 validation/live-claude-v7-ui-p2-2026-10-12.json。G3 真實模型實驗仍未執行。
+
+2026-10-13（執行環境停止）：依使用者同意，onboarding 在連續 3 次 DRIVER_STARTUP_TIMEOUT／DRIVER_ISOLATION_TIMEOUT 後停止並標記 failureCategory=runtime-environment；匯出加入瀏覽器環境與可見性紀錄。新增 tests/test_v70_runtime_environment.cjs（離線故障注入）。成功門檻與前段 40 次上限未改；未呼叫模型，使用者端成因仍未知。
