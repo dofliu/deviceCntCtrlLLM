@@ -29,6 +29,26 @@ python claude_bridge.py --key-env ANTHROPIC_API_KEY_Extra
 
 也可使用瀏覽器直接連線，在介面輸入自己的 Claude API 金鑰。金鑰只保存在目前頁面的記憶體，不寫入報告、下載檔、原始碼或瀏覽器儲存。重新整理後需重新輸入。
 
+## 命令列批次實驗（不開網頁）
+
+詳見 README 同名段落；摘要如下。
+
+`run_experiments.py`（Python 標準函式庫）逐組呼叫 `tests/live_claude_v7.cjs`（Node），每組啟動本機橋接、跑完五回合、關閉橋接。需要 Python 3、Node.js，並先執行 `python build.py`。
+
+```text
+# 先離線確認流程（不呼叫 API、不花費）
+python run_experiments.py --offline --devices P2,G3 --seeds 2026
+
+# 真實 Claude：兩種設備 × 三個 seed，整批最多 600 次模型呼叫
+python run_experiments.py --devices P2,G3 --seeds 2026,3140,8675 --model claude-haiku-5-5 --total-max-calls 600
+```
+
+- 預設條件與瀏覽器實驗相同：無範本、產生控制程式、5 回合、請求間隔 6 秒。可用 `--manual-template on`、`--controller-mode builtin`、`--repeat n`、`--max-calls-per-run n` 調整。
+- 預算：每組有單組上限（預設 150），整批另有總上限；每次真正送出的請求都計入，用量不明時以單組上限扣除；剩餘額度不足 `--min-calls-to-start`（預設 60）就不再開始新的一組。真實模式開始前會要求輸入 `yes` 確認（`--yes` 可略過）。
+- 金鑰：只由橋接讀取 `ANTHROPIC_API_KEY`（或 `--key-env ANTHROPIC_API_KEY_Extra`）；找不到時整批停止，沒有送出任何請求。
+- 輸出：`artifacts/live-runs/batch-<時間>/`（不進 repo）內有每組 `*.summary.json`（數十 KB，含自產程式、步長、效率倍率、模擬器真值核對、git commit）、`*.full.json.gz`（完整紀錄壓縮檔），以及 `batch-summary.json`／`batch-summary.csv` 總表。分享時壓縮 summary 與 batch 檔即可。
+- **與瀏覽器版的差異**：影像以軟體畫布繪製（無瀏覽器抗鋸齒），產生的程式在 Node vm 沙箱而非 iframe／Worker 執行。成功門檻、測試關卡與模型流程相同，但結果須與瀏覽器實驗分開記錄。
+
 ## 決策與動作的區分
 
 V5.3 將 `expected`（預期結果說明）設為選填。省略時回傳 `expected:""` 與 `expectedProvided:false`，介面明確標示模型沒有提供這段說明；不代填模型預測。工具名稱、`args`、`reason` 與動作參數驗證維持不變。有提供 `expected` 時仍須是非空白、長度合法的字串。這項調整修正使用者 V5.2 實測中連續省略 `expected` 而停止的原因，不能據此宣稱已通過真正模型的完整取放。

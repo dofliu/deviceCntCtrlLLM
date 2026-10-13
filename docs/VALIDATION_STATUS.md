@@ -31,6 +31,15 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 命令列批次實驗（2026-10-13，離線 Node）
+
+紀錄：`validation/v70-cli-runner.json`。新增 `run_experiments.py`（批次、總預算）並改寫 `tests/live_claude_v7.cjs`（設備／seed／條件參數、`--offline`、摘要與 gzip 完整紀錄）。
+- 修正舊命令列執行器兩個從未被執行到的缺陷：(1) 以 Node 的 `URL` 取代了無頭環境的 blob URL 墊片，導航 Worker 無法啟動；(2) 無頭畫布不能編碼 PNG，模型收不到相機影像。現改為保留墊片並以 zlib 實作無損 PNG 編碼（與影格逐位元相同；Chromium 解碼後一致）。
+- 測試：PNG 往返；離線 G3 單回合摘要含真值核對、效率倍率與步長；未設金鑰時在啟動橋接前停止、0 次呼叫；錯誤參數被拒。另以「替換上游的橋接替身」跑完真實模式流程（影像編碼、橋接轉送、工具執行、呼叫計數與預算扣除），不連網、不用真金鑰。
+- 離線批次 P2／G3 × 2026／3140／8675 皆 5/5，動作數 289／151／282／148／288／158，與 `tests/baseline_v7_seed.cjs` 的參考模組結果完全相同。
+- 回歸：V7 控制程式／效率／執行環境／協定、Claude／Gemini provider、V6.2 驅動與報告、V6.3 放手高度、V6 suite 皆通過。
+- 命令列結果與瀏覽器結果須分開記錄（軟體畫布、Node vm 沙箱）。
+
 ### 控制程式效率回報（2026-10-13，離線 Node）
 
 紀錄：`validation/v70-controller-efficiency.json`。依第二批分析（動作倍率與控制程式自訂步長高度相關），加入：

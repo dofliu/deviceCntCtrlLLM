@@ -7,6 +7,23 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
+const zlib = require('node:zlib');
+
+// Minimal RGBA PNG encoder so the command-line live runner can send the real
+// camera frame to a model. Lossless; filter 0 on every row.
+const CRC_TABLE = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
+function crc32(buffer) { let c = 0xffffffff; for (const byte of buffer) c = CRC_TABLE[(c ^ byte) & 0xff] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+function pngChunk(type, data) {
+  const head = Buffer.alloc(8); head.writeUInt32BE(data.length, 0); head.write(type, 4, 'ascii');
+  const crc = Buffer.alloc(4); crc.writeUInt32BE(crc32(Buffer.concat([head.subarray(4), data])), 0);
+  return Buffer.concat([head, data, crc]);
+}
+function encodePNG(width, height, pixels) {
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(width, 0); ihdr.writeUInt32BE(height, 4); ihdr[8] = 8; ihdr[9] = 6;
+  const raw = Buffer.alloc((width * 4 + 1) * height);
+  for (let y = 0; y < height; y++) Buffer.from(pixels.buffer, pixels.byteOffset + y * width * 4, width * 4).copy(raw, y * (width * 4 + 1) + 1);
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), pngChunk('IHDR', ihdr), pngChunk('IDAT', zlib.deflateSync(raw)), pngChunk('IEND', Buffer.alloc(0))]);
+}
 const root = path.resolve(__dirname, '..');
 const plain = value => value == null ? value : JSON.parse(JSON.stringify(value));
 
@@ -26,7 +43,10 @@ class SoftwareCanvas {
   get height() { return this._height; }
   set height(v) { this._height = Math.floor(v); this._pixels = new Uint8ClampedArray(this.width * this.height * 4); }
   getContext(kind) { if (kind !== '2d') throw new Error('Only software 2D canvas is supported.'); return this._context; }
-  toDataURL() { throw new Error('Headless integration must use recordFrames:false; PNG encoding is not emulated.'); }
+  toDataURL(type = 'image/png') {
+    if (type !== 'image/png') throw new Error('Headless canvas encodes PNG only.');
+    return 'data:image/png;base64,' + encodePNG(this.width, this.height, this._pixels).toString('base64');
+  }
 }
 class SoftwareContext {
   constructor(canvas) { this.canvas = canvas; this.fillStyle = '#000000'; this.strokeStyle = '#000000'; this.lineWidth = 1; this._path = []; this._stack = []; }
@@ -166,4 +186,4 @@ function createRuntime({ extraSources = [] } = {}) {
     vm.runInContext(fs.readFileSync(path.join(root, 'src', file), 'utf8'), context, { filename: file, timeout: 1000 });
   return { global: context, close() { for (const worker of workers) worker.terminate(); listeners.clear(); blobs.clear(); } };
 }
-module.exports = { createRuntime, SoftwareCanvas, plain, root };
+module.exports = { createRuntime, SoftwareCanvas, encodePNG, plain, root };

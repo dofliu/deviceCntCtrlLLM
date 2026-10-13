@@ -1,0 +1,13 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "headless PNG encoder round-trips P2 and G3 camera frames losslessly (provider cameraPNG accepts it)",
+    "offline G3 one-trial CLI run: summary with truth check, efficiency, step stats; gzipped full report",
+    "live mode without ANTHROPIC_API_KEY stops before starting the bridge; 0 model calls",
+    "invalid device argument is rejected"
+  ]
+}
