@@ -1,0 +1,272 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-controller-replay-analysis",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "modelCalls": 0,
+  "source": "generatedControllerSource of the user's command-line batch 20261013-201302 (P2 seeds 2026, 3140, 8675; efficiency-guidance version)",
+  "finding": "Replaying a generated controller offline reproduces the live action count exactly (P2/2026: 519, trials 95/71/165/100/88). All three P2 controllers need 1.6-1.9x the reference module on every seed. The cause is fitting one linear map over the full 40-entry history on a two-link arm whose local mapping rotates with position: limiting the same controller to the last 10 entries gives 264 actions (reference 289); raising the gain does not help.",
+  "crossSeedReplay": [
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "src": "reference",
+      "done": 5,
+      "actions": 288,
+      "trials": [
+        65,
+        55,
+        61,
+        56,
+        51
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "src": "reference",
+      "done": 5,
+      "actions": 289,
+      "trials": [
+        62,
+        53,
+        63,
+        55,
+        56
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "src": "reference",
+      "done": 5,
+      "actions": 282,
+      "trials": [
+        66,
+        49,
+        58,
+        53,
+        56
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "src": "p2_8675.js",
+      "done": 5,
+      "actions": 460,
+      "trials": [
+        125,
+        69,
+        99,
+        76,
+        91
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "src": "p2_2026.js",
+      "done": 5,
+      "actions": 485,
+      "trials": [
+        127,
+        82,
+        99,
+        87,
+        90
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "src": "p2_2026.js",
+      "done": 5,
+      "actions": 477,
+      "trials": [
+        141,
+        69,
+        100,
+        76,
+        91
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "src": "p2_8675.js",
+      "done": 5,
+      "actions": 500,
+      "trials": [
+        128,
+        93,
+        105,
+        78,
+        96
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "src": "p2_8675.js",
+      "done": 5,
+      "actions": 501,
+      "trials": [
+        116,
+        93,
+        101,
+        88,
+        103
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "src": "p2_2026.js",
+      "done": 5,
+      "actions": 519,
+      "trials": [
+        95,
+        71,
+        165,
+        100,
+        88
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "src": "p2_3140.js",
+      "done": 5,
+      "actions": 526,
+      "trials": [
+        130,
+        82,
+        100,
+        115,
+        99
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "src": "p2_3140.js",
+      "done": 5,
+      "actions": 519,
+      "trials": [
+        129,
+        84,
+        102,
+        105,
+        99
+      ],
+      "failure": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "src": "p2_3140.js",
+      "done": 5,
+      "actions": 533,
+      "trials": [
+        139,
+        87,
+        95,
+        116,
+        96
+      ],
+      "failure": null
+    }
+  ],
+  "variantsOnSeed2026": [
+    {
+      "controller": "p2_2026 with history .slice(-10)",
+      "seed": 2026,
+      "actions": 264,
+      "trials": [
+        54,
+        51,
+        56,
+        52,
+        51
+      ]
+    },
+    {
+      "controller": "p2_2026 with history .slice(-6)",
+      "seed": 2026,
+      "actions": 270,
+      "trials": [
+        57,
+        51,
+        58,
+        54,
+        50
+      ]
+    },
+    {
+      "controller": "p2_2026 with gain 0.9",
+      "seed": 2026,
+      "actions": 494,
+      "trials": [
+        104,
+        70,
+        127,
+        104,
+        89
+      ]
+    },
+    {
+      "controller": "p2_2026 with .slice(-10) and gain min(0.8,30/err)",
+      "seed": 2026,
+      "actions": 264,
+      "trials": [
+        54,
+        51,
+        57,
+        52,
+        50
+      ]
+    }
+  ],
+  "twoLinkCaseVsLive": {
+    "note": "report-only two-link synthetic case ratio vs live action ratio to the same-seed offline baseline, for earlier P2 controllers",
+    "rows": [
+      {
+        "run": "R1 P2/42 (browser)",
+        "liveRatio": 1.77,
+        "twoLinkCase": "1.61"
+      },
+      {
+        "run": "R3 P2/2026 (browser)",
+        "liveRatio": 1.14,
+        "twoLinkCase": "1.14"
+      },
+      {
+        "run": "R5 P2/2026 8192 (browser)",
+        "liveRatio": 0.99,
+        "twoLinkCase": "1.09"
+      },
+      {
+        "run": "R6 P2/3140 8192 (browser)",
+        "liveRatio": 1.94,
+        "twoLinkCase": "not reached"
+      },
+      {
+        "run": "R7 P2/8675 8192 (browser)",
+        "liveRatio": 1.99,
+        "twoLinkCase": "not reached"
+      }
+    ]
+  },
+  "runner": "scratch replay (now tests/replay_controller.cjs)"
+}

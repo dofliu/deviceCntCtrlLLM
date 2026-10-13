@@ -17,7 +17,7 @@
     '回傳 {action:"move", u:[a,b]}（|a|,|b| ≤ 0.1 的有限數值）、{action:"verify"}（認為已在 tolerancePx 內，主機會重新拍攝驗證）或 {action:"stop", reason}。',
     '違反格式、超出範圍或拋出例外時主機不送出任何動作並停止。設備遇行程限制會回覆較小的 applied 與 limited:true。',
     'inputLimit（0.1）是每個通道每步的上限，可以使用到上限；設備在行程邊界會自行縮小並回覆 limited，不會因此損壞。動作數是評估指標：遠離目標時應讓 u 的最大分量接近 0.1，接近目標時再縮小；不要另設更小的固定步長上限。',
-    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制與中途反向），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過。'
+    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制與中途反向），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過；其中「二連桿長距離多目標」只回報效率（efficiency.nonlinearArm），反映映射隨位置改變的設備上的表現。'
   ].join('\n');
 
   // Offline reference controller. It is a hand-written baseline used by the
@@ -102,10 +102,46 @@
     {name: '大角度旋轉與 B 反向', theta: 2.2, gains: [200, 110], swap: false, signs: [1, -1], start: [320, 380], targets: [[150, 140]]},
     {name: '位置相依的非線性映射', theta: 0.9, gains: [160, 160], swap: false, signs: [1, 1], curvature: 0.6, start: [120, 120], targets: [[500, 360]]},
     {name: '到達後通道 A 反向的恢復', theta: -1.2, gains: [140, 175], swap: true, signs: [1, 1], start: [300, 200], targets: [[460, 320], [180, 140]], flipAfterFirst: 0},
-    {name: '起點貼近行程邊界', theta: Math.PI, gains: [150, 150], swap: false, signs: [1, 1], start: [21, 240], targets: [[300, 260]]}
+    {name: '起點貼近行程邊界', theta: Math.PI, gains: [150, 150], swap: false, signs: [1, 1], start: [21, 240], targets: [[300, 260]]},
+    // Two-link arm crossing its workspace: the local mapping rotates as the
+    // joints move, so one linear fit over a long history is biased. Joint
+    // targets keep every point reachable; the elbow has a travel limit.
+    // Reported only (gate:false): it predicts efficiency on two-link arms but
+    // would reject controllers that are efficient on linear devices.
+    {name: '二連桿長距離多目標（僅回報效率）', gate: false, maxCalls: 260, arm: {base: [320, 240], lengths: [95, 75], gains: [1.25, -1.15], swap: true, view: 0.3,
+      q0: [-2.0, 1.0], targetQ: [[-0.6, 1.9], [-1.9, 2.3], [-0.9, 0.7], [-2.2, 1.6]], elbow: [0.25, 2.85]}}
   ];
+  for (const spec of CASES) if (spec.arm) {
+    const a = spec.arm, tipOf = q => {
+      const x = a.lengths[0] * Math.cos(q[0]) + a.lengths[1] * Math.cos(q[0] + q[1]), y = a.lengths[0] * Math.sin(q[0]) + a.lengths[1] * Math.sin(q[0] + q[1]);
+      return [a.base[0] + Math.cos(a.view) * x - Math.sin(a.view) * y, a.base[1] + Math.sin(a.view) * x + Math.cos(a.view) * y];
+    };
+    a.tipOf = tipOf; spec.start = tipOf(a.q0); spec.targets = a.targetQ.map(tipOf);
+  }
+
+  function simulateArm(spec) {
+    const a = spec.arm, q = a.q0.slice(), signs = [1, 1];
+    return {
+      signs,
+      step(tip, command) {
+        const ordered = a.swap ? [command[1], command[0]] : command.slice(), applied = command.slice();
+        let limited = false;
+        q[0] += ordered[0] * a.gains[0] * signs[0];
+        const desired = q[1] + ordered[1] * a.gains[1] * signs[1], clamped = Math.max(a.elbow[0], Math.min(a.elbow[1], desired));
+        if (Math.abs(clamped - desired) > 1e-12) {
+          limited = true;
+          const scaled = (clamped - q[1]) / (a.gains[1] * signs[1]);
+          if (a.swap) applied[0] = scaled; else applied[1] = scaled;
+        }
+        q[1] = clamped;
+        const next = a.tipOf(q);
+        return {applied, limited, tip: next, delta: [next[0] - tip[0], next[1] - tip[1]]};
+      }
+    };
+  }
 
   function simulateCase(spec) {
+    if (spec.arm) return simulateArm(spec);
     const signs = spec.signs.slice();
     const map = (tip, u) => {
       const theta = spec.theta + (spec.curvature || 0) * (tip[0] - 320) / 320;
@@ -151,10 +187,12 @@
       const ref = reference[i];
       c.referenceActions = ref;
       c.actionRatio = c.passed && ref ? Number((c.actions / ref).toFixed(2)) : null;
-      if (c.passed && ref) { actions += c.actions; referenceActions += ref; }
+      if (c.gate && c.passed && ref) { actions += c.actions; referenceActions += ref; }
     });
+    const arm = result.cases.find(c => !c.gate);
     result.efficiency = {actions, referenceActions, ratio: referenceActions ? Number((actions / referenceActions).toFixed(2)) : null,
-      note: 'passed cases only; reference = offline hand-written module; informational, not a pass criterion'};
+      nonlinearArm: arm ? {reached: arm.passed, actions: arm.actions, referenceActions: arm.referenceActions, ratio: arm.actionRatio, failure: arm.failure} : null,
+      note: 'ratio = gate cases that passed; nonlinearArm = report-only two-link case; reference = offline hand-written module; neither is a pass criterion'};
     return result;
   }
 
@@ -167,7 +205,7 @@
         const target = spec.targets[t];
         let goalActions = 0, done = false;
         while (!done && !failure) {
-          if (calls >= maxCallsPerCase) { failure = '呼叫次數超過上限'; break; }
+          if (calls >= (spec.maxCalls || maxCallsPerCase)) { failure = '呼叫次數超過上限'; break; }
           if (goalActions >= maxActionsPerTarget) { failure = `目標 ${t + 1} 未在 ${maxActionsPerTarget} 次動作內到達`; break; }
           calls++;
           let decision;
@@ -187,11 +225,11 @@
         }
         if (done && spec.flipAfterFirst != null && t === 0) plant.signs[spec.flipAfterFirst] *= -1;
       }
-      cases.push({name: spec.name, passed: !failure && reached.length === spec.targets.length, actions, calls, reached, failure});
+      cases.push({name: spec.name, gate: spec.gate !== false, passed: !failure && reached.length === spec.targets.length, actions, calls, reached, failure});
     }
-    return {passed: cases.every(c => c.passed), cases, tolerancePx: TOLERANCE, maxActionsPerTarget,
+    return {passed: cases.filter(c => c.gate).every(c => c.passed), cases, tolerancePx: TOLERANCE, maxActionsPerTarget,
       scope: 'synthetic host simulation only; no device command was sent'};
   }
 
-  global.VlabControllerModule = {CONTRACT, REFERENCE_SOURCE, LIMIT, TOLERANCE, HISTORY, validateDecision, state, isolationTest, cases: () => copy(CASES)};
+  global.VlabControllerModule = {CONTRACT, REFERENCE_SOURCE, LIMIT, TOLERANCE, HISTORY, validateDecision, state, isolationTest, cases: () => CASES.map(({arm, ...rest}) => copy(rest))};
 })(globalThis);

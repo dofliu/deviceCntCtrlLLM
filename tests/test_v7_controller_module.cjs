@@ -49,7 +49,8 @@ async function run() {
 
     const reference = await isolation(g, M.REFERENCE_SOURCE);
     assert.equal(reference.passed, true, JSON.stringify(reference.cases.filter(c => !c.passed)));
-    assert.equal(reference.cases.length, 6);
+    assert.equal(reference.cases.filter(c => c.gate).length, 6);
+    assert.equal(reference.cases.filter(c => !c.gate).length, 1, 'one report-only two-link case');
     assert.ok(reference.cases.every(c => c.reached.every(r => r.errorPx <= 7)));
     checks.push('offline reference module reaches every synthetic case (rotation, swap, reversal, nonlinearity, travel limit, mid-run reversal)');
 
@@ -57,7 +58,7 @@ async function run() {
     for (const [name, source] of Object.entries(BAD)) {
       const result = await isolation(g, source);
       assert.equal(result.passed, false, name + ' must fail the isolation gate.');
-      rejected[name] = result.cases.filter(c => !c.passed).length;
+      rejected[name] = result.cases.filter(c => c.gate && !c.passed).length;
     }
     assert.ok(rejected.naiveIdentity >= 2, 'A controller that assumes a fixed mapping fails the swapped/rotated cases.');
     checks.push('isolation gate rejects out-of-range, throwing, NaN, always-verify and fixed-mapping controllers');
