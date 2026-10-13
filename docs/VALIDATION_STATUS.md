@@ -31,6 +31,15 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 控制程式效率回報（2026-10-13，離線 Node）
+
+紀錄：`validation/v70-controller-efficiency.json`。依第二批分析（動作倍率與控制程式自訂步長高度相關），加入：
+- 控制程式契約明示每通道單步可用到 0.1、遠離目標時應接近上限、不要另設更小的固定上限；`write_controller` 工具說明同步補充。
+- 隔離測試報告新增每案例 `referenceActions`、`actionRatio` 與總 `efficiency.ratio`（相對預寫參考模組，只計通過的案例）。**只供參考，通過判定不變**（仍只看是否到達所有目標）。模型上下文與 UI 皆顯示倍率。
+- 測試：參考模組 1.00×；同演算法自限 0.05 的控制程式仍通過、倍率 1.8×（與真實實驗 1.6–2.0× 一致）；失敗案例不計倍率；上下文保留倍率。
+- 這改變了模型看到的契約與回饋，**之後的真實模型結果須與 R1–R10 分開報告**。
+- 回歸：V7 控制程式／協定／執行環境、Claude／Gemini provider、V6.3 模型報告、V6.2 驅動、V7 離線矩陣（12 組 5/5）、無頭 Chromium 煙霧測試、Claude 橋接皆通過。`test_gemini_ui.py` 因雲端環境缺 Python Playwright 套件無法執行（main 上相同），非本修改造成。被測試改寫的舊 `validation/` 檔已還原。
+
 ### 真實模型第二批：前段 8192、seed 2026／3140／8675（使用者本機，2026-10-13）
 
 紀錄：`validation/live-claude-v7-ui-{p2,g3}-seed{2026,3140,8675}-8192-2026-10-13.json`；離線基準 `validation/v7-offline-baseline-seed3140-8675.json`。條件同前，前段 `max_tokens` 8192。

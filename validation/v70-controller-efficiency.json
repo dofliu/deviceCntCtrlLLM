@@ -1,0 +1,13 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "reference module: ratio 1.00 on all 6 cases (169 actions)",
+    "half-step (0.05) controller passes with ratio 1.8; efficiency does not change the pass decision",
+    "failed cases carry no ratio and are excluded from the total",
+    "contract states the 0.1 step guidance; model context keeps per-case and total ratios"
+  ]
+}

@@ -16,7 +16,8 @@
     '通道與像素的對應、方向、增益與耦合都未知，且可能在執行中改變（例如某通道反向）；只能從 history 推估。',
     '回傳 {action:"move", u:[a,b]}（|a|,|b| ≤ 0.1 的有限數值）、{action:"verify"}（認為已在 tolerancePx 內，主機會重新拍攝驗證）或 {action:"stop", reason}。',
     '違反格式、超出範圍或拋出例外時主機不送出任何動作並停止。設備遇行程限制會回覆較小的 applied 與 limited:true。',
-    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制與中途反向），才會用於真實模擬設備。'
+    'inputLimit（0.1）是每個通道每步的上限，可以使用到上限；設備在行程邊界會自行縮小並回覆 limited，不會因此損壞。動作數是評估指標：遠離目標時應讓 u 的最大分量接近 0.1，接近目標時再縮小；不要另設更小的固定步長上限。',
+    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制與中途反向），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過。'
   ].join('\n');
 
   // Offline reference controller. It is a hand-written baseline used by the
@@ -129,8 +130,35 @@
     };
   }
 
-  // decide(state) is the sandboxed generated controller call.
-  async function isolationTest(decide, {maxActionsPerTarget = 60, maxCallsPerCase = 160} = {}) {
+  // Reference action counts per case, used only to report efficiency. The
+  // reference is the trusted, hand-written baseline above, so it runs on the
+  // host; generated code never does.
+  let referenceRun = null;
+  function referenceCounts() {
+    if (!referenceRun) {
+      const control = new Function('"use strict";\n' + REFERENCE_SOURCE + '\n;return control;')();
+      referenceRun = runCases(async value => control(value), {}).then(result => result.cases.map(c => c.passed ? c.actions : null));
+    }
+    return referenceRun;
+  }
+
+  // decide(state) is the sandboxed generated controller call. Pass/fail is
+  // decided only by reaching every target; efficiency is informational.
+  async function isolationTest(decide, options = {}) {
+    const result = await runCases(decide, options), reference = await referenceCounts();
+    let actions = 0, referenceActions = 0;
+    result.cases.forEach((c, i) => {
+      const ref = reference[i];
+      c.referenceActions = ref;
+      c.actionRatio = c.passed && ref ? Number((c.actions / ref).toFixed(2)) : null;
+      if (c.passed && ref) { actions += c.actions; referenceActions += ref; }
+    });
+    result.efficiency = {actions, referenceActions, ratio: referenceActions ? Number((actions / referenceActions).toFixed(2)) : null,
+      note: 'passed cases only; reference = offline hand-written module; informational, not a pass criterion'};
+    return result;
+  }
+
+  async function runCases(decide, {maxActionsPerTarget = 60, maxCallsPerCase = 160} = {}) {
     const cases = [];
     for (const spec of CASES) {
       const plant = simulateCase(spec), history = [];

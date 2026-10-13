@@ -74,7 +74,8 @@
   // JSON clone only, never functions or oversized content.
   const boundedJson=(v,max=6000)=>{if(!record(v))return null;try{const text=JSON.stringify(v);return text.length<=max?JSON.parse(text):null;}catch(_){return null;}};
   const allowControllerTests=v=>record(v)?{passed:v.passed===true,tolerancePx:num(v.tolerancePx),maxActionsPerTarget:num(v.maxActionsPerTarget),
-    cases:Array.isArray(v.cases)?v.cases.slice(0,12).map(x=>fields(x,{name:str,passed:bool,actions:num,calls:num,failure:v=>str(v,300)})):[]}:null;
+    cases:Array.isArray(v.cases)?v.cases.slice(0,12).map(x=>fields(x,{name:str,passed:bool,actions:num,calls:num,referenceActions:num,actionRatio:num,failure:v=>str(v,300)})):[],
+    efficiency:fields(v.efficiency,{actions:num,referenceActions:num,ratio:num})}:null;
   const markerQuality=v=>fields(v,{accepted:bool,reason:str,pixelCount:num,inlierCount:num,inlierFraction:num,coverageBins:num,totalBins:num,largestGapDeg:num,radiusPx:num,residualRmsPx:num});
   function allowContext(c) {
     c=record(c)?c:{};
@@ -151,7 +152,7 @@
     connect:'依已讀手冊與列出的端點建立模擬連線。必須精確符合 endpointId、transport、baudRate、protocol；TCP 的 baudRate 使用手冊指定值。此工具不代表握手成功，也不移動設備。',
     handshake:'送出 hello 封包並解析設備回覆，確認型號、協定版本與通道數。連線和握手是不同證據。成功後才可測試控制驅動程式。',
     write_driver:'編寫完整 JavaScript 原始碼，包含頂層 function encode(command) 與 function decode(rawReply)。遵循 manual.driverContract、protocol、protocolSpec、limits（若手冊提供 sampleDriverSource 也可參考；templateIncluded 為 false 時沒有範本）的完整契約，沒有 import/export、外部函式或網路。encode 同時接受 XY 兩通道陣列與 lift/grip 機械指令物件，回傳手冊規定的單一框架字串（JSON 單行或小寫十六進位位元組）；decode 分別驗證 XY 及輔助動作回覆，依手冊回傳正確結構。務必支援全部指令及錯誤檢查。程式會隔離編譯和測試，並用於後續每次控制。此步尚不移動設備。',
-    write_controller:'僅在 controllerMode 為 generated 時可用。編寫完整 JavaScript function control(state)，依 controllerContract：只用 state.history 中已確認的 applied 與影像 delta 推估未知映射，回傳 {action:"move",u:[a,b]}（|a|,|b|≤0.1）、{action:"verify"} 或 {action:"stop",reason}。必須無狀態、不可用亂數、時間或網路；同一程式會用於每回合所有 XY 移動。',
+    write_controller:'僅在 controllerMode 為 generated 時可用。編寫完整 JavaScript function control(state)，依 controllerContract：只用 state.history 中已確認的 applied 與影像 delta 推估未知映射，回傳 {action:"move",u:[a,b]}（|a|,|b|≤0.1；遠離目標時最大分量應接近 0.1，以減少動作數）、{action:"verify"} 或 {action:"stop",reason}。必須無狀態、不可用亂數、時間或網路；同一程式會用於每回合所有 XY 移動。',
     test_controller:'在合成設備（旋轉、通道交換、反向、非線性、行程限制、到達後反向）上隔離測試已編譯的 control(state)。測試不送出設備命令；未通過時依 controllerTests 修正後重新編寫。通過後才允許 start_control。',
     test_driver:'執行已編譯驅動程式的封包、回覆、範圍及錯誤處理測試。這是 dry run，不移動設備。若失敗，依 driverTests/lastResult 修正原始碼，不能宣稱已可控制。',
     start_control:'僅在握手與驅動程式測試通過後，交付控制權開始視覺試動。運動映射仍未知。後續控制工具會透過剛剛產生並驗證的驅動程式傳輸。',
