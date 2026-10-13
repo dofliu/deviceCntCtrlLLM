@@ -31,6 +31,17 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### seed 2026 離線基準（2026-10-13，離線 Node）
+
+紀錄：`validation/v7-offline-baseline-seed2026.json`（`tests/baseline_v7_seed.cjs`）。seed 2026 先前未用於開發。無範本、規格產生器驅動：
+
+| 設備 | 內建控制器 | 參考模組 |
+|---|---|---|
+| P2 | 5/5，299 動作 | 5/5，289 動作 |
+| G3 | 5/5，146 動作 | 5/5，151 動作 |
+
+供同 seed 真實模型比較；不是模型證據。
+
 ### 真實模型 G3 5/5（使用者本機瀏覽器，2026-10-13）
 
 紀錄：`validation/live-claude-v7-ui-g3-2026-10-13.json`（含模型產生的驅動與控制程式原始碼；完整 13.2 MB 匯出留在 repo 外）。
