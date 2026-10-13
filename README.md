@@ -1,6 +1,6 @@
 # DOFLAB 陌生設備接手與連續取放實驗 V7.0
 
-> **V7.0 開發版本。** 新增第二種模擬設備與通訊協定、手冊可不提供驅動範本、可選擇產生 XY 控制程式。驗證以離線 Node、無頭 Chromium 與模擬 API 為主；已有真實 Claude 無範本驅動＋產生控制程式的本機紀錄：P2、G3 在 seed 42（開發）與 seed 2026（未用於開發）各一次，皆 5/5；尚無重複次數與其他未見 seed。先讀 `docs/CODEX_HANDOFF.md` 與 `docs/VALIDATION_STATUS.md`。
+> **V7.0 開發版本。** 新增第二種模擬設備與通訊協定、手冊可不提供驅動範本、可選擇產生 XY 控制程式。驗證以離線 Node、無頭 Chromium 與模擬 API 為主；已有真實 Claude 無範本驅動＋產生控制程式的本機紀錄：P2、G3 在 seed 42（開發）與未用於開發的 seed 2026／3140／8675 共 10 組，皆 5/5；仍非統計結論。先讀 `docs/CODEX_HANDOFF.md` 與 `docs/VALIDATION_STATUS.md`。
 
 直接開啟 `unknown-device-v7.0.html`，按「開始完整實驗」。預設與 V6.3 相同：VLAB-P2、提供手冊範本、內建 XY 控制器、離線規則代理、五回合；不會自行呼叫模型。新選項在「連線設定」頁。
 
@@ -82,6 +82,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 ## 驗證與歷史
 
 **V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
+
+**2026-10-13 真實 Claude 第二批（8192）**：P2、G3 × seed 2026／3140／8675 共 6 組皆 5/5（30/30），模擬器真值確認，截斷回覆 0 次。動作數為離線基準的 0.95–1.99×，主要由模型控制程式自訂的步長決定。見 `_research/LIVE_EXPERIMENTS_V7.md` §4.5。
 
 **2026-10-13 前段 max_tokens 調為 8192**：先前截斷回覆都發生在撰寫驅動／控制程式時；之後的真實模型結果須與先前分開記錄。四次真實模型實驗的整理見 `_research/LIVE_EXPERIMENTS_V7.md`。
 
