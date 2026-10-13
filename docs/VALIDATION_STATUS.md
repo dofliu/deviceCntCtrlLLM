@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 前段 max_tokens 4096 → 8192（2026-10-13）
+
+上述真實模型執行（R0–R4）都在前段 `max_tokens` 4096 下進行；截斷回覆全部發生在模型要撰寫驅動／控制程式時。之後前段改為 8192（控制階段維持 1400；橋接上限本為 8192；Gemini 原本即 8192）。`test_claude_provider.cjs` 新增上限斷言；Claude／Gemini provider、bridge、V6.3 模型報告／請求間隔、V6.1 預算、V7 協定／控制程式與執行環境測試皆通過。**此後的真實模型結果須與 R1–R4 分開報告。** 整理後的研究紀錄見 `_research/LIVE_EXPERIMENTS_V7.md`。
+
 ### 真實模型 seed 2026（未用於開發）5/5（使用者本機瀏覽器，2026-10-13）
 
 紀錄：`validation/live-claude-v7-ui-p2-seed2026-2026-10-13.json`、`validation/live-claude-v7-ui-g3-seed2026-2026-10-13.json`。條件同前（`claude-haiku-5-5`、無範本、產生控制程式），Windows Chrome 154、`file:`。

@@ -358,7 +358,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
       const safe=allowContext(context);if(!safe.allowedTools.length)fail('NO_TOOLS','目前沒有開放給 Claude 的工具。');
       safe.modelRequests={used:this.#calls,limit:this.#maxCalls};
       let evidence=JSON.stringify(safe);if(this.#key)evidence=evidence.split(this.#key).join('[REDACTED]');
-      const request={model:this.#model,max_tokens:safe.phase==='onboarding'?4096:1400,system:INSTRUCTION+REPAIR_INSTRUCTION,
+      const request={model:this.#model,max_tokens:safe.phase==='onboarding'?8192:1400,system:INSTRUCTION+REPAIR_INSTRUCTION,
         tools:safe.allowedTools.map(toolDefinition),tool_choice:{type:this.#toolChoice,disable_parallel_tool_use:true},
         messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/png',data:cameraPNG(frame)}},{type:'text',text:'目前可檢查的狀態（每次請求是獨立決策，以此狀態為準）：\n'+evidence+'\n選擇一個工具並提供完整參數。'}]}]};
       const c=new AbortController();this.#active=c;
