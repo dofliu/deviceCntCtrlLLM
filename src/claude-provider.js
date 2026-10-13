@@ -75,7 +75,7 @@
   const boundedJson=(v,max=6000)=>{if(!record(v))return null;try{const text=JSON.stringify(v);return text.length<=max?JSON.parse(text):null;}catch(_){return null;}};
   const allowControllerTests=v=>record(v)?{passed:v.passed===true,tolerancePx:num(v.tolerancePx),maxActionsPerTarget:num(v.maxActionsPerTarget),
     cases:Array.isArray(v.cases)?v.cases.slice(0,12).map(x=>fields(x,{name:str,gate:v=>v!==false,passed:bool,actions:num,calls:num,referenceActions:num,actionRatio:num,failure:v=>str(v,300)})):[],
-    efficiency:record(v.efficiency)?{...fields(v.efficiency,{actions:num,referenceActions:num,ratio:num}),nonlinearArm:fields(v.efficiency.nonlinearArm,{reached:bool,actions:num,referenceActions:num,ratio:num,failure:v=>str(v,300)})}:null}:null;
+    efficiency:record(v.efficiency)?{...fields(v.efficiency,{actions:num,referenceActions:num,ratio:num}),nonlinearArm:fields(v.efficiency.nonlinearArm,{required:bool,reached:bool,actions:num,referenceActions:num,ratio:num,failure:v=>str(v,300)})}:null}:null;
   const markerQuality=v=>fields(v,{accepted:bool,reason:str,pixelCount:num,inlierCount:num,inlierFraction:num,coverageBins:num,totalBins:num,largestGapDeg:num,radiusPx:num,residualRmsPx:num});
   function allowContext(c) {
     c=record(c)?c:{};
@@ -88,7 +88,7 @@
         hypothesis:fields(c.hypothesis,{deviceClass:str,visibleAxes:num,modelLabel:str,uncertainties:str}),
         inventory:Array.isArray(c.inventory)?c.inventory.slice(0,30).map(x=>fields(x,endpointSpec)):[],
         manual:fields(c.manual,{
-          documentId:str,model:str,title:str,simulated:bool,disclaimer:str,deviceClass:str,channels:num,
+          documentId:str,model:str,title:str,simulated:bool,disclaimer:str,deviceClass:str,channels:num,channelKind:v=>['rotary','linear'].includes(v)?v:null,
           connection:v=>fields(v,{transport:str,baudRate:num,protocol:str}),selection:str,
           protocol:v=>fields(v,{name:str,framing:str,hello:str,helloReply:str,command:str,reply:str,commandLayout:v=>str(v,1200),replyLayout:v=>str(v,1200),liftCommand:str,liftReply:str,gripCommand:str,gripReply:str,errors:str,
             limits:x=>fields(x,{channels:num,min:num,max:num,resolution:num,units:str})}),

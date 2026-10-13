@@ -21,6 +21,7 @@
 //   --trials 5|1  --min-interval-ms n (6000)  --port n (8766)
 //   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra  --out-dir dir  --label name
 //   --offline  --no-full
+//   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
 // The last stdout line is "RESULT <json>" with the summary path for wrappers.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -44,6 +45,7 @@ if (!['generated', 'builtin'].includes(controllerMode)) fail('--controller-mode 
 const trials = Number(arg('--trials', 5));
 if (![1, 5].includes(trials)) fail('--trials must be 1 or 5.');
 const offline = flag('--offline');
+const fixedGoalTarget = !flag('--legacy-target');
 const keyEnv = arg('--key-env', 'ANTHROPIC_API_KEY');
 const maxCalls = Math.min(500, Math.max(1, Math.floor(Number(arg('--max-calls', 150)) || 150)));
 const minIntervalMs = Math.min(120000, Math.max(0, Number(arg('--min-interval-ms', 6000))));
@@ -108,7 +110,7 @@ function summarize(report, { model, error }) {
   return {
     version: report?.version || '0.7.0', kind: offline ? 'offline-cli-run' : 'live-model-run', runner: 'headless-node (tests/live_claude_v7.cjs)',
     provider: offline ? null : 'claude', model: offline ? null : (report?.model || model || null), git: gitInfo(), node: process.version,
-    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs },
+    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs },
     startedAt: started.toISOString(), finishedAt: new Date().toISOString(), runnerError: error,
     result: { done: report?.done ?? false, failure: report?.failure ?? null, failureCategory: report?.failureCategory ?? null, completedTrials: report?.suiteProgress?.totalCompleted ?? 0,
       allTruthPlaced: trialRows.length === trials && trialRows.every(t => t.evaluatorTruth?.placed === true) },
@@ -154,7 +156,7 @@ async function main() {
       strategy = 'claude';
     }
     console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : 'claude'} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
-    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode });
+    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget });
     let state = await engine.initialize(), lastKind = '';
     for (let step = 0; !state.done && step < 6000; step++) {
       state = await engine.next();

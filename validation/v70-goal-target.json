@@ -1,0 +1,12 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "agent measures the goal marker once in the goal frame, holds it until the next goal, then re-measures",
+    "target-bias gate case rejects the live undamped G3/8675 controller and accepts it with a 0.6 step gain; reference passes",
+    "offline replay of the live controller with the gate bypassed for analysis, G3 seed 8675 trial 1: legacy target 180 actions not completed; fixed goal target 34 actions completed"
+  ]
+}
