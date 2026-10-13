@@ -1,0 +1,335 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (unknown-device-v7.0-experiment_1.json) plus device-driver.js; not run in this repo's cloud environment",
+  "recordedAt": "2026-10-13",
+  "exportSha256": "5f5a6f4bef07861d5628fe8de255dcbbcca49a61c93e06ff18e333edf715f372",
+  "exportBytes": 30293155,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-P2",
+    "protocol": "vlab-p2-json/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 42,
+    "trials": 5,
+    "minIntervalMs": 6000
+  },
+  "note": "Intended as the G3 run, but the export is again VLAB-P2. seed 42 is development/regression data, so this is a development case, not unseen-device evidence.",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "brands": [
+      "Chromium 154",
+      "Google Chrome 154",
+      "Not A(Brand 99"
+    ],
+    "platform": "Windows",
+    "hardwareConcurrency": 32,
+    "pageProtocol": "file:",
+    "visibilityState": "visible",
+    "hasFocus": true,
+    "crossOriginIsolated": false,
+    "visibilityChanges": [
+      {
+        "state": "hidden",
+        "frontDecisions": 14,
+        "modelCalls": 76,
+        "driverRequests": 873
+      },
+      {
+        "state": "visible",
+        "frontDecisions": 14,
+        "modelCalls": 86,
+        "driverRequests": 1033
+      }
+    ]
+  },
+  "result": {
+    "done": true,
+    "failure": null,
+    "failureCategory": null,
+    "completedTrials": 5,
+    "reusedDriver": true
+  },
+  "modelCalls": 86,
+  "frontCalls": 14,
+  "controlCalls": 72,
+  "usage": {
+    "input_tokens": 411779,
+    "output_tokens": 31179,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "rateLimitRetries": 0,
+  "decisionRejections": 0,
+  "actionCount": 495,
+  "xyActionCount": 455,
+  "auxiliaryActionCount": 40,
+  "unconfirmedActuationCount": 0,
+  "recalibrations": 0,
+  "driverRuntime": {
+    "requests": 1033,
+    "retries": 0,
+    "failures": 0,
+    "programErrors": 6
+  },
+  "onboardingSteps": [
+    [
+      "inspect_device",
+      true
+    ],
+    [
+      "read_manual",
+      true
+    ],
+    [
+      "list_interfaces",
+      true
+    ],
+    [
+      "connect",
+      true
+    ],
+    [
+      "handshake",
+      true
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      false
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      true
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      false
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      true
+    ],
+    [
+      "start_control",
+      true
+    ]
+  ],
+  "failedAttemptsBeforeFix": [
+    {
+      "tool": "test_driver",
+      "failed": [
+        "驅動程式拒絕失敗或毀損回覆"
+      ]
+    },
+    {
+      "tool": "test_controller",
+      "failed": [
+        "起點貼近行程邊界"
+      ]
+    }
+  ],
+  "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+  },
+  "driverTests": {
+    "passed": true,
+    "sourceHash": "fnv1a-fab7fac5",
+    "tests": [
+      [
+        "雙通道、零值與上下限的編碼及回覆往返",
+        true
+      ],
+      [
+        "升降與夾爪四種命令的實際編解碼",
+        true
+      ],
+      [
+        "設備受限回覆的解析",
+        true
+      ],
+      [
+        "驅動程式拒絕失敗或毀損回覆",
+        true
+      ],
+      [
+        "主機側限制阻擋超量及非有限輸入",
+        true
+      ],
+      [
+        "設備側限制與框架檢查",
+        true
+      ]
+    ]
+  },
+  "controllerTests": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "旋轉 0.3 rad、正向通道",
+        "passed": true,
+        "actions": 24,
+        "finalErrorPx": 5.848
+      },
+      {
+        "name": "通道交換且 A 反向",
+        "passed": true,
+        "actions": 50,
+        "finalErrorPx": 6.219
+      },
+      {
+        "name": "大角度旋轉與 B 反向",
+        "passed": true,
+        "actions": 55,
+        "finalErrorPx": 3.888
+      },
+      {
+        "name": "位置相依的非線性映射",
+        "passed": true,
+        "actions": 53,
+        "finalErrorPx": 3.402
+      },
+      {
+        "name": "到達後通道 A 反向的恢復",
+        "passed": true,
+        "actions": 60,
+        "finalErrorPx": 5.026
+      },
+      {
+        "name": "起點貼近行程邊界",
+        "passed": true,
+        "actions": 39,
+        "finalErrorPx": 4.02
+      }
+    ]
+  },
+  "trials": [
+    {
+      "trialNumber": 1,
+      "label": "遠距桌面取放",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 4.097485428588113,
+      "actionCount": 106,
+      "xyActionCount": 98,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 28,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 4.336
+      }
+    },
+    {
+      "trialNumber": 2,
+      "label": "更換物件位置・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 3.2314707744415365,
+      "actionCount": 86,
+      "xyActionCount": 78,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 3.489
+      }
+    },
+    {
+      "trialNumber": 3,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "success": true,
+      "failure": null,
+      "placementError": 4.913644604688016,
+      "actionCount": 105,
+      "xyActionCount": 97,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.65,
+        "objectToDestinationPx": 5.468
+      }
+    },
+    {
+      "trialNumber": 4,
+      "label": "不同方向・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 1.3938884020082674,
+      "actionCount": 103,
+      "xyActionCount": 95,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 1.723
+      }
+    },
+    {
+      "trialNumber": 5,
+      "label": "回到桌面・另一組位置",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 2.7727575098583674,
+      "actionCount": 95,
+      "xyActionCount": 87,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 3.032
+      }
+    }
+  ],
+  "generatedDriverSource": "function encode(command) {\n  var frame;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step requires two channels\");\n    var a = Number(command[0]);\n    var b = Number(command[1]);\n    if (!isFinite(a) || !isFinite(b)) throw new Error(\"non-finite channel\");\n    if (Math.abs(a) > 0.1 || Math.abs(b) > 0.1) throw new Error(\"channel out of range\");\n    frame = { op: \"step\", channels: [a, b] };\n  } else if (command && typeof command === \"object\" && command.op === \"lift\") {\n    if (command.position !== \"up\" && command.position !== \"down\") throw new Error(\"invalid lift position\");\n    frame = { op: \"lift\", position: command.position };\n  } else if (command && typeof command === \"object\" && command.op === \"grip\") {\n    if (command.state !== \"open\" && command.state !== \"closed\") throw new Error(\"invalid grip state\");\n    frame = { op: \"grip\", state: command.state };\n  } else {\n    throw new Error(\"unsupported command\");\n  }\n  return JSON.stringify(frame) + \"\\n\";\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"reply must be a string\");\n  if (rawReply.length === 0 || rawReply.length > 1024) throw new Error(\"reply length invalid\");\n  if (rawReply.charAt(rawReply.length - 1) !== \"\\n\") throw new Error(\"reply missing LF terminator\");\n  var body = rawReply.slice(0, -1);\n  if (body.indexOf(\"\\n\") !== -1 || body.indexOf(\"\\r\") !== -1) throw new Error(\"reply must be exactly one line\");\n  var reply;\n  try {\n    reply = JSON.parse(body);\n  } catch (e) {\n    throw new Error(\"malformed JSON reply\");\n  }\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) throw new Error(\"reply must be an object\");\n  if (reply.ok === false) {\n    throw new Error(reply.error ? String(reply.error) : \"device returned ok:false\");\n  }\n  if (reply.ok !== true) throw new Error(\"reply ok field must be true\");\n  if (reply.error !== undefined) throw new Error(\"ok reply must not carry error\");\n  if (typeof reply.limited !== \"boolean\") throw new Error(\"limited field must be boolean\");\n  if (!Object.prototype.hasOwnProperty.call(reply, \"accepted\")) throw new Error(\"accepted field missing\");\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) throw new Error(\"step reply must have two channels\");\n    for (var i = 0; i < 2; i++) {\n      if (typeof acc[i] !== \"number\" || !isFinite(acc[i])) throw new Error(\"non-finite accepted channel\");\n      if (Math.abs(acc[i]) > 0.1 + 1e-12) throw new Error(\"accepted channel out of range\");\n    }\n    return { applied: [acc[0], acc[1]], limited: reply.limited };\n  }\n  if (acc && typeof acc === \"object\") {\n    if (acc.op === \"lift\" && (acc.position === \"up\" || acc.position === \"down\")) {\n      return { applied: { op: \"lift\", position: acc.position }, limited: reply.limited };\n    }\n    if (acc.op === \"grip\" && (acc.state === \"open\" || acc.state === \"closed\")) {\n      return { applied: { op: \"grip\", state: acc.state }, limited: reply.limited };\n    }\n  }\n  throw new Error(\"accepted payload invalid\");\n}\n",
+  "generatedControllerSource": "function control(state) {\n  var tip = state.tip, target = state.target;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return { action: \"stop\", reason: \"invalid tip or target\" };\n  }\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var e = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(e)) return { action: \"stop\", reason: \"non-finite error\" };\n  if (e <= state.tolerancePx) return { action: \"verify\" };\n\n  var h = state.history || [];\n  var n = h.length;\n  var M = [[0, 0], [0, 0]];\n  var B = [[0, 0], [0, 0]];\n  for (var k = 0; k < n; k++) {\n    var rec = h[k];\n    if (!rec || !rec.delta || !isFinite(rec.delta[0]) || !isFinite(rec.delta[1])) continue;\n    var c = (rec.applied && isFinite(rec.applied[0]) && isFinite(rec.applied[1])) ? rec.applied : rec.command;\n    if (!c || !isFinite(c[0]) || !isFinite(c[1])) continue;\n    if (Math.abs(c[0]) + Math.abs(c[1]) < 1e-9) continue;\n    var w = (k + 1) / n;\n    var d = rec.delta;\n    for (var i = 0; i < 2; i++) {\n      for (var j = 0; j < 2; j++) {\n        M[i][j] += w * c[i] * c[j];\n        B[i][j] += w * d[i] * c[j];\n      }\n    }\n  }\n\n  // choose probe sign for a channel: flip if the last probe on it was limited or produced no motion\n  function probeSign(ch) {\n    var sign = 1;\n    for (var q = n - 1; q >= 0; q--) {\n      var r = h[q];\n      if (!r || !r.command || !isFinite(r.command[ch])) continue;\n      var cc = r.command;\n      if (Math.abs(cc[ch]) < 1e-9 || Math.abs(cc[1 - ch]) > 1e-9) continue;\n      var s = cc[ch] > 0 ? 1 : -1;\n      var ap = (r.applied && isFinite(r.applied[ch])) ? r.applied[ch] : 0;\n      if (Math.abs(ap) < 0.5 * Math.abs(cc[ch]) || r.limited === true && Math.abs(ap) < 0.5 * Math.abs(cc[ch])) {\n        sign = -s;\n      } else {\n        sign = s;\n      }\n      break;\n    }\n    return sign;\n  }\n\n  var probe = null;\n  if (M[0][0] < 1e-4) {\n    probe = [0.05 * probeSign(0), 0];\n  } else if (M[1][1] < 1e-4) {\n    probe = [0, 0.05 * probeSign(1)];\n  }\n\n  var u = null;\n  if (!probe) {\n    var mdet = M[0][0] * M[1][1] - M[0][1] * M[1][0];\n    if (Math.abs(mdet) > 1e-9) {\n      var Mi = [[M[1][1] / mdet, -M[0][1] / mdet], [-M[1][0] / mdet, M[0][0] / mdet]];\n      var J = [[0, 0], [0, 0]];\n      for (var r2 = 0; r2 < 2; r2++) {\n        for (var s2 = 0; s2 < 2; s2++) {\n          J[r2][s2] = B[r2][0] * Mi[0][s2] + B[r2][1] * Mi[1][s2];\n        }\n      }\n      var jdet = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n      if (isFinite(jdet) && Math.abs(jdet) > 1e-6) {\n        var Ji = [[J[1][1] / jdet, -J[0][1] / jdet], [-J[1][0] / jdet, J[0][0] / jdet]];\n        u = [Ji[0][0] * ex + Ji[0][1] * ey, Ji[1][0] * ex + Ji[1][1] * ey];\n      }\n    }\n    if (!u) {\n      probe = [0, 0.05 * probeSign(1)];\n    }\n  }\n\n  if (probe) {\n    return { action: \"move\", u: probe };\n  }\n\n  var g = 0.6;\n  u = [u[0] * g, u[1] * g];\n  var mx = Math.max(Math.abs(u[0]), Math.abs(u[1]));\n  if (!isFinite(mx)) return { action: \"stop\", reason: \"non-finite control\" };\n  if (mx > 0.05) {\n    u = [u[0] * 0.05 / mx, u[1] * 0.05 / mx];\n  }\n  if (mx < 1e-9) return { action: \"stop\", reason: \"zero control\" };\n  return { action: \"move\", u: [u[0], u[1]] };\n}\n",
+  "interpretation": [
+    "First recorded 5/5 run where both the no-template communication driver and the XY control(state) module were written by a real model (claude-haiku-5-5) and passed the unchanged isolation gates.",
+    "XY motion during trials was executed by the generated module (455 XY actions; 72 control-phase model calls were for scene/goal/lift/grip/verify tools).",
+    "Each generated program failed its first gate once (driver: malformed-reply rejection; controller: start near travel limit) and was fixed by the model after the test feedback.",
+    "Task preconditions and image verifiers are still pre-written; one seed, one device family (P2), development seed. Not evidence for G3, unseen devices, or generalization."
+  ],
+  "fullExport": "kept outside the repo (28.9 MB)"
+}

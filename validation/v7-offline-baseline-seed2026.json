@@ -1,0 +1,160 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "pureNode": true,
+  "browserUsed": false,
+  "modelCalls": 0,
+  "scope": "Offline headless five-trial baseline on seed 2026 (not used in development before this run), no manual template. Driver = rule-based spec synthesizer; controller = built-in or offline reference module. Comparison baseline for live-model runs on the same seed; not model evidence. Runner: tests/baseline_v7_seed.cjs.",
+  "rows": [
+    {
+      "device": "VLAB-G3",
+      "protocol": "vlab-g3-bin/1",
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 2026,
+      "passed": true,
+      "failure": null,
+      "completed": 5,
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "builtin-numerical-controller",
+      "controllerTestsPassed": null,
+      "trialActions": [
+        33,
+        28,
+        30,
+        29,
+        26
+      ],
+      "xyActions": [
+        25,
+        20,
+        22,
+        21,
+        18
+      ],
+      "totalActions": 146,
+      "placementErrorPx": [
+        2.2,
+        5.79,
+        1.28,
+        2.93,
+        5.23
+      ],
+      "modelCalls": 0,
+      "seconds": 123.194
+    },
+    {
+      "device": "VLAB-G3",
+      "protocol": "vlab-g3-bin/1",
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 2026,
+      "passed": true,
+      "failure": null,
+      "completed": 5,
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "offline-reference-module",
+      "controllerTestsPassed": true,
+      "trialActions": [
+        34,
+        30,
+        31,
+        28,
+        28
+      ],
+      "xyActions": [
+        26,
+        22,
+        23,
+        20,
+        20
+      ],
+      "totalActions": 151,
+      "placementErrorPx": [
+        0.85,
+        1.61,
+        1.41,
+        3.48,
+        3.35
+      ],
+      "modelCalls": 0,
+      "seconds": 97.997
+    },
+    {
+      "device": "VLAB-P2",
+      "protocol": "vlab-p2-json/1",
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 2026,
+      "passed": true,
+      "failure": null,
+      "completed": 5,
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "builtin-numerical-controller",
+      "controllerTestsPassed": null,
+      "trialActions": [
+        66,
+        55,
+        63,
+        59,
+        56
+      ],
+      "xyActions": [
+        58,
+        47,
+        55,
+        51,
+        48
+      ],
+      "totalActions": 299,
+      "placementErrorPx": [
+        1.5,
+        2.87,
+        3.43,
+        2.1,
+        4
+      ],
+      "modelCalls": 0,
+      "seconds": 197.785
+    },
+    {
+      "device": "VLAB-P2",
+      "protocol": "vlab-p2-json/1",
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 2026,
+      "passed": true,
+      "failure": null,
+      "completed": 5,
+      "driverSource": "offline-spec-synthesizer",
+      "controllerSource": "offline-reference-module",
+      "controllerTestsPassed": true,
+      "trialActions": [
+        62,
+        53,
+        63,
+        55,
+        56
+      ],
+      "xyActions": [
+        54,
+        45,
+        55,
+        47,
+        48
+      ],
+      "totalActions": 289,
+      "placementErrorPx": [
+        3.77,
+        3.67,
+        4.04,
+        3.09,
+        3.26
+      ],
+      "modelCalls": 0,
+      "seconds": 137.843
+    }
+  ]
+}
