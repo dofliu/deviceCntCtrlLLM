@@ -1,0 +1,257 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-batch",
+  "runner": "headless-node CLI (run_experiments.py -> tests/live_claude_v7.cjs)",
+  "model": "claude-haiku-5-5",
+  "recordedAt": "2026-10-13",
+  "condition": {
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "trials": 5,
+    "onboardingMaxTokens": 8192,
+    "minIntervalMs": 6000
+  },
+  "note": "Command-line (software canvas, Node vm sandbox) runs; report separately from browser runs. Two code versions: A = efficiency guidance; B = A + report-only two-link case. Infrastructure failures (HTTP 502 / timeout) are not model failures.",
+  "runs": [
+    {
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 5,
+      "failure": null,
+      "modelCalls": 86,
+      "actions": 519,
+      "trialActions": [
+        95,
+        71,
+        165,
+        100,
+        88
+      ],
+      "truthPlaced": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "gateRatio": 0.89,
+      "twoLinkCase": null,
+      "medianStep": 0.1,
+      "bestOfflineBaseline": 289,
+      "source": "6c5a2415-p2-s2026-r1-claude.summary.json",
+      "actionRatioToBaseline": 1.8
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 5,
+      "failure": null,
+      "modelCalls": 89,
+      "actions": 519,
+      "trialActions": [
+        129,
+        84,
+        102,
+        105,
+        99
+      ],
+      "truthPlaced": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "gateRatio": 1.01,
+      "twoLinkCase": null,
+      "medianStep": 0.1,
+      "bestOfflineBaseline": 282,
+      "source": "eb26d798-p2-s3140-r1-claude.summary.json",
+      "actionRatioToBaseline": 1.84
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 1,
+      "failure": "Claude 呼叫未完成（TIMEOUT）：模型請求逾時。 實驗停止，已保留目前進度。",
+      "modelCalls": 33,
+      "actions": 145,
+      "trialActions": [
+        128,
+        17
+      ],
+      "truthPlaced": [
+        true,
+        false
+      ],
+      "gateRatio": 0.89,
+      "twoLinkCase": null,
+      "medianStep": 0.1,
+      "bestOfflineBaseline": 288,
+      "source": "0aa79598-p2-s8675-r1-claude.summary.json",
+      "actionRatioToBaseline": null
+    },
+    {
+      "device": "VLAB-G3",
+      "seed": 8675,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 0,
+      "failure": "Claude 呼叫未完成（HTTP_502）：供應商呼叫未完成。 實驗停止，已保留目前進度。",
+      "modelCalls": 1,
+      "actions": 0,
+      "trialActions": [],
+      "truthPlaced": [],
+      "gateRatio": null,
+      "twoLinkCase": null,
+      "medianStep": null,
+      "bestOfflineBaseline": 152,
+      "source": "f4ab83b0-g3-s8675-r1-claude.summary.json",
+      "actionRatioToBaseline": null
+    },
+    {
+      "device": "VLAB-G3",
+      "seed": 2026,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 5,
+      "failure": null,
+      "modelCalls": 81,
+      "actions": 208,
+      "gateRatio": 0.93,
+      "medianStep": 0.1,
+      "bestOfflineBaseline": 146,
+      "source": "user table (summary not uploaded)",
+      "actionRatioToBaseline": 1.42
+    },
+    {
+      "device": "VLAB-G3",
+      "seed": 3140,
+      "version": "A: efficiency guidance (commit 02d45bc)",
+      "completed": 0,
+      "failure": "Claude 呼叫未完成（HTTP_502）",
+      "modelCalls": 11,
+      "actions": 0,
+      "bestOfflineBaseline": 143,
+      "source": "batch-summary.csv",
+      "actionRatioToBaseline": null
+    },
+    {
+      "device": "VLAB-P2",
+      "seed": 8675,
+      "version": "B: + report-only two-link case (after PR #12)",
+      "completed": 5,
+      "failure": null,
+      "modelCalls": 89,
+      "actions": 596,
+      "trialActions": [
+        128,
+        86,
+        131,
+        143,
+        108
+      ],
+      "truthPlaced": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "gateRatio": 0.89,
+      "twoLinkCase": {
+        "reached": true,
+        "actions": 98,
+        "referenceActions": 69,
+        "ratio": 1.42,
+        "failure": null
+      },
+      "medianStep": 0.1,
+      "decisionRejections": 0,
+      "bestOfflineBaseline": 288,
+      "fullReportSha256": "b198d8cedb51e70590edf2acd6df1f2d5e045f44921033c8cc2ad3d5e88de55a",
+      "generatedControllerSource": "function control(state) {\n  var err = [state.target[0] - state.tip[0], state.target[1] - state.tip[1]];\n  var dist = Math.sqrt(err[0] * err[0] + err[1] * err[1]);\n  if (dist <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n  if (state.step !== undefined && state.maxActions !== undefined && state.step >= state.maxActions) {\n    return { action: \"stop\", reason: \"action budget reached\" };\n  }\n  var h = state.history || [];\n  var Saa = [[1e-6, 0], [0, 1e-6]];\n  var Sda = [[0, 0], [0, 0]];\n  var n = 0;\n  for (var k = 0; k < h.length; k++) {\n    var e = h[k];\n    if (!e || !e.applied || !e.delta) continue;\n    var a = e.applied, d = e.delta;\n    if (typeof a[0] !== \"number\" || typeof a[1] !== \"number\" || typeof d[0] !== \"number\" || typeof d[1] !== \"number\") continue;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    if (Math.abs(a[0]) + Math.abs(a[1]) < 1e-9) continue;\n    for (var r = 0; r < 2; r++) {\n      for (var c = 0; c < 2; c++) {\n        Saa[r][c] += a[r] * a[c];\n      }\n      for (var o = 0; o < 2; o++) {\n        Sda[o][r] += d[o] * a[r];\n      }\n    }\n    n++;\n  }\n\n  // Detect channels that recently saturated (applied much smaller than commanded),\n  // using the last few entries only.\n  var stuck = [false, false];\n  var lastSign = [0, 0];\n  for (var q = Math.max(0, h.length - 3); q < h.length; q++) {\n    var eq = h[q];\n    if (!eq || !eq.command || !eq.applied) continue;\n    for (var cc = 0; cc < 2; cc++) {\n      var cmd = eq.command[cc], ap = eq.applied[cc];\n      if (typeof cmd !== \"number\" || typeof ap !== \"number\") continue;\n      if (Math.abs(cmd) > 1e-9) {\n        lastSign[cc] = cmd > 0 ? 1 : -1;\n        if (Math.abs(ap) < 0.3 * Math.abs(cmd)) stuck[cc] = true;\n      }\n    }\n  }\n\n  var probe = function (ch) {\n    var u = [0, 0];\n    var s = stuck[ch] ? -1 : 1;\n    if (stuck[ch] && lastSign[ch] !== 0) s = -lastSign[ch];\n    u[ch] = 0.1 * s;\n    return { action: \"move\", u: u };\n  };\n\n  var sel = (Saa[0][0] <= Saa[1][1]) ? 0 : 1;\n  if (n < 2) {\n    return probe(sel);\n  }\n  var detA = Saa[0][0] * Saa[1][1] - Saa[0][1] * Saa[1][0];\n  if (!isFinite(detA) || Math.abs(detA) < 1e-10) {\n    return probe(sel);\n  }\n  var Iaa = [[Saa[1][1] / detA, -Saa[0][1] / detA], [-Saa[1][0] / detA, Saa[0][0] / detA]];\n  var J = [[0, 0], [0, 0]];\n  for (var i = 0; i < 2; i++) {\n    for (var j = 0; j < 2; j++) {\n      J[i][j] = Sda[i][0] * Iaa[0][j] + Sda[i][1] * Iaa[1][j];\n    }\n  }\n  var detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-6) {\n    return probe(sel);\n  }\n  var Jinv = [[J[1][1] / detJ, -J[0][1] / detJ], [-J[1][0] / detJ, J[0][0] / detJ]];\n  var u0 = Jinv[0][0] * err[0] + Jinv[0][1] * err[1];\n  var u1 = Jinv[1][0] * err[0] + Jinv[1][1] * err[1];\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return probe(sel);\n  }\n  var gain = dist > 20 ? 1.0 : 0.7;\n  u0 *= gain;\n  u1 *= gain;\n  // Avoid pushing further into a saturated channel (boundary).\n  if (stuck[0] && lastSign[0] !== 0 && u0 * lastSign[0] > 0) u0 = 0;\n  if (stuck[1] && lastSign[1] !== 0 && u1 * lastSign[1] > 0) u1 = 0;\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 1e-6) {\n    return probe(sel);\n  }\n  if (m > 0.1) {\n    u0 = u0 * 0.1 / m;\n    u1 = u1 * 0.1 / m;\n  }\n  return { action: \"move\", u: [u0, u1] };\n}\n",
+      "generatedDriverSource": "function encode(command) {\n  var line;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step requires exactly 2 channels\");\n    for (var i = 0; i < 2; i++) {\n      var v = command[i];\n      if (typeof v !== \"number\" || !isFinite(v) || v < -0.1 || v > 0.1) {\n        throw new Error(\"channel value out of range [-0.1,0.1]\");\n      }\n    }\n    line = JSON.stringify({ op: \"step\", channels: [command[0], command[1]] });\n  } else if (command && typeof command === \"object\" && command.op === \"lift\") {\n    if (command.position !== \"up\" && command.position !== \"down\") {\n      throw new Error(\"lift position must be up or down\");\n    }\n    line = JSON.stringify({ op: \"lift\", position: command.position });\n  } else if (command && typeof command === \"object\" && command.op === \"grip\") {\n    if (command.state !== \"open\" && command.state !== \"closed\") {\n      throw new Error(\"grip state must be open or closed\");\n    }\n    line = JSON.stringify({ op: \"grip\", state: command.state });\n  } else if (command && typeof command === \"object\" && command.op === \"hello\") {\n    line = JSON.stringify({ op: \"hello\" });\n  } else {\n    throw new Error(\"unsupported command\");\n  }\n  return line + \"\\n\";\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"reply must be a string\");\n  var text = rawReply;\n  if (text.length === 0 || text.charAt(text.length - 1) !== \"\\n\") {\n    throw new Error(\"reply must end in LF\");\n  }\n  text = text.slice(0, -1);\n  if (text.indexOf(\"\\n\") !== -1 || text.indexOf(\"\\r\") !== -1) {\n    throw new Error(\"reply must be exactly one line\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"malformed JSON reply\");\n  }\n  if (reply === null || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"reply must be a JSON object\");\n  }\n  if (reply.ok === false) {\n    throw new Error(reply.error ? String(reply.error) : \"device returned ok:false\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"reply missing ok:true\");\n  }\n  if (typeof reply.limited !== \"boolean\") {\n    throw new Error(\"reply missing boolean limited field\");\n  }\n  if (!Object.prototype.hasOwnProperty.call(reply, \"accepted\")) {\n    throw new Error(\"reply missing accepted field\");\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) throw new Error(\"accepted step must have 2 channels\");\n    for (var j = 0; j < 2; j++) {\n      if (typeof acc[j] !== \"number\" || !isFinite(acc[j])) {\n        throw new Error(\"accepted channel is not a finite number\");\n      }\n    }\n    return { applied: [acc[0], acc[1]], limited: reply.limited };\n  }\n  if (acc === null || typeof acc !== \"object\") {\n    throw new Error(\"accepted must be channel array or command object\");\n  }\n  if (acc.op === \"lift\") {\n    if (acc.position !== \"up\" && acc.position !== \"down\") throw new Error(\"invalid lift accepted\");\n    return { applied: { op: \"lift\", position: acc.position }, limited: reply.limited };\n  }\n  if (acc.op === \"grip\") {\n    if (acc.state !== \"open\" && acc.state !== \"closed\") throw new Error(\"invalid grip accepted\");\n    return { applied: { op: \"grip\", state: acc.state }, limited: reply.limited };\n  }\n  throw new Error(\"unrecognized accepted reply\");\n}\n",
+      "source": "p2-s8675-r1-claude.full.json.gz",
+      "actionRatioToBaseline": 2.07
+    },
+    {
+      "device": "VLAB-G3",
+      "seed": 3140,
+      "version": "B: + report-only two-link case (after PR #12)",
+      "completed": 5,
+      "failure": null,
+      "modelCalls": 82,
+      "actions": 137,
+      "trialActions": [
+        34,
+        24,
+        27,
+        26,
+        26
+      ],
+      "truthPlaced": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "gateRatio": 0.89,
+      "twoLinkCase": {
+        "reached": true,
+        "actions": 74,
+        "referenceActions": 69,
+        "ratio": 1.07,
+        "failure": null
+      },
+      "medianStep": 0.1,
+      "decisionRejections": 0,
+      "bestOfflineBaseline": 143,
+      "fullReportSha256": "cc66530f5b28cecea575d2bdec0859dab7c21545b033433ff0f960bd89f96615",
+      "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var target = state.target;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return { action: \"stop\", reason: \"invalid tip or target\" };\n  }\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: \"stop\", reason: \"invalid error\" };\n  if (err <= state.tolerancePx) return { action: \"verify\" };\n\n  var h = state.history || [];\n  var n = h.length;\n  var start = Math.max(0, n - 12);\n\n  var A00 = 1e-9, A01 = 0, A11 = 1e-9;\n  var Bx0 = 0, Bx1 = 0, By0 = 0, By1 = 0;\n  var cnt = 0;\n  for (var i = start; i < n; i++) {\n    var rec = h[i];\n    if (!rec || !rec.applied || !rec.delta) continue;\n    var a0 = rec.applied[0], a1 = rec.applied[1];\n    var d0 = rec.delta[0], d1 = rec.delta[1];\n    if (![a0, a1, d0, d1].every(function (v) { return typeof v === \"number\" && isFinite(v); })) continue;\n    if (a0 === 0 && a1 === 0) continue;\n    A00 += a0 * a0;\n    A01 += a0 * a1;\n    A11 += a1 * a1;\n    Bx0 += d0 * a0;\n    Bx1 += d0 * a1;\n    By0 += d1 * a0;\n    By1 += d1 * a1;\n    cnt++;\n  }\n\n  var detA = A00 * A11 - A01 * A01;\n  if (cnt < 2 || !isFinite(detA) || Math.abs(detA) < 1e-12) {\n    // probe to excite both channels\n    return { action: \"move\", u: (n % 2 === 0) ? [0.06, 0] : [0, 0.06] };\n  }\n\n  // Jacobian J = B * inv(A), mapping applied command -> pixel delta\n  var iA00 = A11 / detA, iA01 = -A01 / detA, iA11 = A00 / detA;\n  var J00 = Bx0 * iA00 + Bx1 * iA01;\n  var J01 = Bx0 * iA01 + Bx1 * iA11;\n  var J10 = By0 * iA00 + By1 * iA01;\n  var J11 = By0 * iA01 + By1 * iA11;\n\n  var detJ = J00 * J11 - J01 * J10;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-9) {\n    return { action: \"move\", u: (n % 2 === 0) ? [0.06, 0] : [0, 0.06] };\n  }\n\n  // Inverse Jacobian: pixel error -> command\n  var K00 = J11 / detJ, K01 = -J01 / detJ;\n  var K10 = -J10 / detJ, K11 = J00 / detJ;\n  var u0 = K00 * ex + K01 * ey;\n  var u1 = K10 * ex + K11 * ey;\n  if (!isFinite(u0) || !isFinite(u1)) return { action: \"stop\", reason: \"non-finite command\" };\n\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) {\n    var s = 0.1 / m;\n    u0 *= s;\n    u1 *= s;\n  }\n  if (err < state.tolerancePx * 3) {\n    u0 *= 0.5;\n    u1 *= 0.5;\n  }\n  u0 = Math.max(-0.1, Math.min(0.1, u0));\n  u1 = Math.max(-0.1, Math.min(0.1, u1));\n  return { action: \"move\", u: [u0, u1] };\n}\n",
+      "generatedDriverSource": "function hex2(b) {\n  var s = (b & 255).toString(16);\n  return s.length < 2 ? \"0\" + s : s;\n}\n\nfunction frameOf(payload) {\n  var len = payload.length;\n  var x = len;\n  for (var i = 0; i < len; i++) x ^= payload[i];\n  var out = \"a5\" + hex2(len);\n  for (var j = 0; j < len; j++) out += hex2(payload[j]);\n  out += hex2(x);\n  return out;\n}\n\nfunction int16be(v) {\n  var u = v < 0 ? v + 65536 : v;\n  return [(u >> 8) & 255, u & 255];\n}\n\nfunction s16(hi, lo) {\n  var u = ((hi & 255) << 8) | (lo & 255);\n  return u >= 32768 ? u - 65536 : u;\n}\n\nfunction checkVal(v) {\n  if (typeof v !== \"number\" || !isFinite(v)) throw new Error(\"ARGUMENT: not finite\");\n  if (Math.abs(v) > 0.1 + 1e-12) throw new Error(\"ARGUMENT: out of range\");\n  return Math.round(v * 10000);\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"ARGUMENT: need 2 channels\");\n    var a = checkVal(command[0]);\n    var b = checkVal(command[1]);\n    var payload = [0x10].concat(int16be(a), int16be(b));\n    return frameOf(payload);\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      var p;\n      if (command.position === \"down\") p = 0;\n      else if (command.position === \"up\") p = 1;\n      else throw new Error(\"ARGUMENT: lift position\");\n      return frameOf([0x20, p]);\n    }\n    if (command.op === \"grip\") {\n      var g;\n      if (command.state === \"open\") g = 0;\n      else if (command.state === \"closed\") g = 1;\n      else throw new Error(\"ARGUMENT: grip state\");\n      return frameOf([0x21, g]);\n    }\n  }\n  throw new Error(\"ARGUMENT: unsupported command\");\n}\n\nfunction errName(code) {\n  var names = { 1: \"FRAME\", 2: \"CHECKSUM\", 3: \"NOT_READY\", 4: \"LIMIT\", 5: \"OPCODE\", 6: \"ARGUMENT\", 7: \"COLLISION\" };\n  return names[code] || (\"UNKNOWN_\" + code);\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"FRAME: reply not string\");\n  var s = rawReply.trim().toLowerCase();\n  if (s.length < 8 || s.length % 2 !== 0) throw new Error(\"FRAME: bad length\");\n  if (!/^[0-9a-f]+$/.test(s)) throw new Error(\"FRAME: non-hex\");\n  var bytes = [];\n  for (var i = 0; i < s.length; i += 2) bytes.push(parseInt(s.substr(i, 2), 16));\n  if (bytes[0] !== 0xa5) throw new Error(\"FRAME: sync\");\n  var len = bytes[1];\n  if (bytes.length !== len + 3) throw new Error(\"FRAME: length mismatch\");\n  var x = len;\n  for (var k = 2; k < 2 + len; k++) x ^= bytes[k];\n  if (x !== bytes[len + 2]) throw new Error(\"CHECKSUM: mismatch\");\n  var payload = bytes.slice(2, 2 + len);\n  if (payload.length < 2) throw new Error(\"FRAME: short payload\");\n  var status = payload[0];\n  if (status !== 0) throw new Error(\"DEVICE: \" + errName(status));\n  var op = payload[1];\n  if (op === 0x10) {\n    if (payload.length !== 7) throw new Error(\"FRAME: step reply length\");\n    var a = s16(payload[2], payload[3]) / 10000;\n    var b = s16(payload[4], payload[5]) / 10000;\n    return { applied: [a, b], limited: (payload[6] & 1) === 1 };\n  }\n  if (op === 0x20) {\n    if (payload.length !== 4) throw new Error(\"FRAME: lift reply length\");\n    if (payload[2] !== 0 && payload[2] !== 1) throw new Error(\"FRAME: lift position\");\n    return { applied: { op: \"lift\", position: payload[2] === 1 ? \"up\" : \"down\" }, limited: (payload[3] & 1) === 1 };\n  }\n  if (op === 0x21) {\n    if (payload.length !== 4) throw new Error(\"FRAME: grip reply length\");\n    if (payload[2] !== 0 && payload[2] !== 1) throw new Error(\"FRAME: grip state\");\n    return { applied: { op: \"grip\", state: payload[2] === 1 ? \"closed\" : \"open\" }, limited: (payload[3] & 1) === 1 };\n  }\n  if (op === 0x01) {\n    if (payload.length < 6) throw new Error(\"FRAME: hello reply length\");\n    return {\n      applied: null,\n      limited: false,\n      protocolVersion: payload[2],\n      channels: payload[3],\n      maxStep: s16(payload[4], payload[5]) / 10000,\n      model: String.fromCharCode.apply(null, payload.slice(6))\n    };\n  }\n  throw new Error(\"OPCODE: unexpected reply \" + op);\n}\n",
+      "source": "g3-s3140-r1-claude.full.json.gz",
+      "actionRatioToBaseline": 0.96
+    },
+    {
+      "device": "VLAB-G3",
+      "seed": 8675,
+      "version": "B: + report-only two-link case (after PR #12)",
+      "completed": 0,
+      "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+      "modelCalls": 23,
+      "actions": 180,
+      "trialActions": [
+        180
+      ],
+      "truthPlaced": [
+        false
+      ],
+      "gateRatio": 0.92,
+      "twoLinkCase": {
+        "reached": true,
+        "actions": 77,
+        "referenceActions": 69,
+        "ratio": 1.12,
+        "failure": null
+      },
+      "medianStep": 0.091,
+      "decisionRejections": 2,
+      "bestOfflineBaseline": 152,
+      "fullReportSha256": "c6c21ed5ee983fb9b3eb84397e385262a80838806f9ed90ef99cc49c8e08ab82",
+      "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var target = state.target;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return {action: 'stop', reason: 'invalid pixel state'};\n  }\n  var e = [target[0] - tip[0], target[1] - tip[1]];\n  var err = Math.sqrt(e[0] * e[0] + e[1] * e[1]);\n  if (err <= state.tolerancePx) {\n    return {action: 'verify'};\n  }\n  if (typeof state.step === 'number' && typeof state.maxActions === 'number' && state.step >= state.maxActions) {\n    return {action: 'stop', reason: 'action budget exhausted'};\n  }\n\n  var h = state.history || [];\n  var start = Math.max(0, h.length - 20);\n  var M = [[0, 0], [0, 0]];\n  var N = [[0, 0], [0, 0]];\n  var used = 0;\n  for (var k = start; k < h.length; k++) {\n    var ent = h[k];\n    if (!ent || !ent.applied || !ent.delta) continue;\n    var c = ent.applied;\n    var d = ent.delta;\n    if (!isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    used++;\n    for (var i = 0; i < 2; i++) {\n      for (var j = 0; j < 2; j++) {\n        M[i][j] += d[i] * c[j];\n        N[i][j] += c[i] * c[j];\n      }\n    }\n  }\n\n  // Stuck detection: last two steps produced almost no image motion (e.g. at travel limit)\n  if (h.length >= 2) {\n    var a1 = h[h.length - 1], a2 = h[h.length - 2];\n    if (a1 && a2 && a1.delta && a2.delta && a1.command && a2.command) {\n      var m1 = Math.sqrt(a1.delta[0] * a1.delta[0] + a1.delta[1] * a1.delta[1]);\n      var m2 = Math.sqrt(a2.delta[0] * a2.delta[0] + a2.delta[1] * a2.delta[1]);\n      var cmdNZ = Math.abs(a1.command[0]) + Math.abs(a1.command[1]) > 0;\n      if (cmdNZ && m1 < 0.5 && m2 < 0.5 && err > state.tolerancePx) {\n        // back off along the channel with the larger last command, opposite sign\n        var sg = a1.command[0] !== 0 ? (a1.command[0] > 0 ? -1 : 1) : 0;\n        var sh = a1.command[1] !== 0 ? (a1.command[1] > 0 ? -1 : 1) : 0;\n        if (sg !== 0 || sh !== 0) {\n          var bu = [sg * 0.1, sh * 0.1];\n          if (Math.abs(bu[0]) > 0.1) bu[0] = 0.1 * (bu[0] > 0 ? 1 : -1);\n          return {action: 'move', u: [bu[0], bu[1]]};\n        }\n      }\n    }\n  }\n\n  var detN = N[0][0] * N[1][1] - N[0][1] * N[1][0];\n  var scaleN = Math.max(Math.abs(N[0][0]), Math.abs(N[1][1]), 1e-12);\n  if (used < 2 || N[0][0] < 1e-6 || N[1][1] < 1e-6 || Math.abs(detN) < 1e-6 * scaleN * scaleN) {\n    if (N[0][0] < 1e-6) return {action: 'move', u: [0.1, 0]};\n    if (N[1][1] < 1e-6) return {action: 'move', u: [0, 0.1]};\n    var lastC = h.length ? h[h.length - 1].applied : [0, 0];\n    if (lastC && lastC[1] > 0) return {action: 'move', u: [0, -0.1]};\n    return {action: 'move', u: [0, 0.1]};\n  }\n\n  var Ninv = [[N[1][1] / detN, -N[0][1] / detN], [-N[1][0] / detN, N[0][0] / detN]];\n  var J = [[0, 0], [0, 0]];\n  for (var r = 0; r < 2; r++) {\n    for (var s = 0; s < 2; s++) {\n      J[r][s] = M[r][0] * Ninv[0][s] + M[r][1] * Ninv[1][s];\n    }\n  }\n  var detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  var scaleJ = Math.max(Math.abs(J[0][0]), Math.abs(J[0][1]), Math.abs(J[1][0]), Math.abs(J[1][1]), 1e-12);\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-6 * scaleJ * scaleJ) {\n    return {action: 'move', u: [0.1, 0]};\n  }\n\n  var u0 = (J[1][1] * e[0] - J[0][1] * e[1]) / detJ;\n  var u1 = (-J[1][0] * e[0] + J[0][0] * e[1]) / detJ;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return {action: 'move', u: [0.1, 0]};\n  }\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) {\n    u0 = u0 * 0.1 / m;\n    u1 = u1 * 0.1 / m;\n  }\n  u0 = Math.max(-0.1, Math.min(0.1, Math.round(u0 * 10000) / 10000));\n  u1 = Math.max(-0.1, Math.min(0.1, Math.round(u1 * 10000) / 10000));\n  if (u0 === 0 && u1 === 0) {\n    return {action: 'verify'};\n  }\n  return {action: 'move', u: [u0, u1]};\n}\n",
+      "generatedDriverSource": "function frameBytes(payload) {\n  var bytes = [0xA5, payload.length].concat(payload);\n  var x = 0;\n  for (var i = 1; i < bytes.length; i++) x ^= bytes[i];\n  bytes.push(x & 0xff);\n  return bytes;\n}\n\nfunction toHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = (bytes[i] & 0xff).toString(16);\n    s += (h.length < 2 ? '0' : '') + h;\n  }\n  return s;\n}\n\nfunction s16(hi, lo) {\n  var v = ((hi & 0xff) << 8) | (lo & 0xff);\n  return v >= 0x8000 ? v - 0x10000 : v;\n}\n\nfunction errorName(code) {\n  var names = {1: 'FRAME', 2: 'CHECKSUM', 3: 'NOT_READY', 4: 'LIMIT', 5: 'OPCODE', 6: 'ARGUMENT', 7: 'COLLISION'};\n  return names[code] || ('UNKNOWN_' + code);\n}\n\nfunction encode(command) {\n  var payload;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('channels must have length 2');\n    var vals = command.map(function (v) {\n      if (typeof v !== 'number' || !isFinite(v)) throw new Error('channel value must be finite number');\n      if (Math.abs(v) > 0.1 + 1e-12) throw new Error('channel value out of range');\n      return Math.round(v * 10000);\n    });\n    payload = [0x10, (vals[0] >> 8) & 0xff, vals[0] & 0xff, (vals[1] >> 8) & 0xff, vals[1] & 0xff];\n  } else if (command !== null && typeof command === 'object') {\n    if (command.op === 'lift') {\n      if (command.position === 'up') payload = [0x20, 1];\n      else if (command.position === 'down') payload = [0x20, 0];\n      else throw new Error('invalid lift position');\n    } else if (command.op === 'grip') {\n      if (command.state === 'closed') payload = [0x21, 1];\n      else if (command.state === 'open') payload = [0x21, 0];\n      else throw new Error('invalid grip state');\n    } else {\n      throw new Error('unknown op');\n    }\n  } else {\n    throw new Error('unsupported command');\n  }\n  return toHex(frameBytes(payload));\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') throw new Error('reply must be string');\n  var hex = rawReply.trim().toLowerCase();\n  if (hex.length % 2 !== 0 || !/^[0-9a-f]*$/.test(hex)) throw new Error('FRAME: bad hex');\n  var bytes = [];\n  for (var i = 0; i < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));\n  if (bytes.length < 4) throw new Error('FRAME: too short');\n  if (bytes[0] !== 0xA5) throw new Error('FRAME: bad sync');\n  var len = bytes[1];\n  if (bytes.length !== len + 3) throw new Error('FRAME: length mismatch');\n  var x = 0;\n  for (var j = 1; j < len + 2; j++) x ^= bytes[j];\n  if ((x & 0xff) !== bytes[len + 2]) throw new Error('CHECKSUM: mismatch');\n  if (len < 2) throw new Error('FRAME: payload too short');\n  var p = bytes.slice(2, 2 + len);\n  var status = p[0];\n  if (status !== 0) throw new Error('device error ' + errorName(status));\n  var op = p[1];\n  if (op === 0x10) {\n    if (len < 7) throw new Error('FRAME: step reply too short');\n    return {\n      applied: [s16(p[2], p[3]) / 10000, s16(p[4], p[5]) / 10000],\n      limited: (p[6] & 1) === 1\n    };\n  }\n  if (op === 0x20) {\n    if (len < 4) throw new Error('FRAME: lift reply too short');\n    if (p[2] !== 0 && p[2] !== 1) throw new Error('ARGUMENT: bad lift position');\n    return {\n      applied: {op: 'lift', position: p[2] === 1 ? 'up' : 'down'},\n      limited: (p[3] & 1) === 1\n    };\n  }\n  if (op === 0x21) {\n    if (len < 4) throw new Error('FRAME: grip reply too short');\n    if (p[2] !== 0 && p[2] !== 1) throw new Error('ARGUMENT: bad grip state');\n    return {\n      applied: {op: 'grip', state: p[2] === 1 ? 'closed' : 'open'},\n      limited: (p[3] & 1) === 1\n    };\n  }\n  if (op === 0x01) {\n    if (len < 5) throw new Error('FRAME: hello reply too short');\n    var model = '';\n    for (var k = 6; k < len; k++) model += String.fromCharCode(p[k]);\n    return {\n      applied: null,\n      limited: false,\n      hello: {protocolVersion: p[2], channels: p[3], maxStep: s16(p[4], p[5]) / 10000, model: model}\n    };\n  }\n  throw new Error('OPCODE: unexpected reply opcode ' + op);\n}\n",
+      "source": "g3-s8675-r1-claude.full.json.gz",
+      "actionRatioToBaseline": null
+    }
+  ],
+  "g3s8675Failure": {
+    "what": "Trial 1 used all 180 actions oscillating about 13 px from the B zone; 0/5.",
+    "cause": "While carrying the object, the measured B-zone centre shifts with the tip (object occludes part of the blue marker): target alternated 400.4 <-> 413.6 px as the tip moved 400.6 <-> 413.8. The generated controller takes undamped full Newton steps (gain 1), so it chases the moving target in a 2-cycle. Tip measurement error vs truth stays about 0.5 px.",
+    "replay": "Same controller: 0/5 on G3 seeds 8675 and 3140, 284 actions on 2026. With gain 0.6 added: 146/137/136 actions, 5/5 on all three (baseline 152/146/143).",
+    "gateGap": "Synthetic gate cases measure the target exactly, so an undamped controller passes."
+  },
+  "p2EfficiencyAfterTwoLinkFeedback": "P2/8675 (version B) still 596 actions (2.07x); its two-link case reported 1.42x but the gate passed, so the model did not revise. Report-only feedback did not change behaviour."
+}
