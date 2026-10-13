@@ -72,7 +72,7 @@ async function main() {
     version: report?.version || '0.7.0', kind: 'live-model-run', provider: 'claude', model: report?.model || null,
     condition: { device: 'VLAB-G3', protocol: 'vlab-g3-bin/1', manualTemplate: false, controllerMode: 'generated', trials: 5, seed, maxCalls, minIntervalMs: 6000 },
     startedAt: started.toISOString(), finishedAt: new Date().toISOString(), runnerError: error,
-    done: report?.done ?? false, failure: report?.failure ?? null, completed: report?.suiteProgress?.totalCompleted ?? 0,
+    done: report?.done ?? false, failure: report?.failure ?? null, failureCategory: report?.failureCategory ?? null, completed: report?.suiteProgress?.totalCompleted ?? 0,
     modelCalls: report?.modelCalls ?? null, actionCount: report?.actionCount ?? null,
     provenance: report?.provenance ? { driverSource: report.provenance.driverSource, controllerSource: report.provenance.controllerSource, frontCalls: report.provenance.frontCalls, controlCalls: report.provenance.controlCalls, usage: report.provenance.usage } : null,
     driverTests: o.driverTests ? { passed: o.driverTests.passed, failed: (o.driverTests.tests || []).filter(t => !t.passed).map(t => t.name) } : null,

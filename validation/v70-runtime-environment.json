@@ -1,0 +1,12 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "3 consecutive startup/isolation timeouts stop onboarding as runtime-environment, 0 actions, environment recorded",
+    "2 transient timeouts followed by a successful compile reset the counter; trial completes 1/1",
+    "DRIVER_PROGRAM_ERROR keeps the existing front-decision limit and is not classified as environment"
+  ]
+}

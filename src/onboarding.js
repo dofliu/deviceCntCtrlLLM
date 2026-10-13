@@ -2,6 +2,19 @@
   'use strict';
   const copy=x=>x==null?x:JSON.parse(JSON.stringify(x));
   const TOOLS=['inspect_device','list_interfaces','read_manual','connect','handshake','write_driver','test_driver','write_controller','test_controller','start_control','stop'];
+  // Isolation/worker startup failures mean the generated source never reached
+  // the sandbox, so repeating the same tool cannot help; stop and classify as
+  // a local runtime environment failure instead of spending model calls.
+  const RUNTIME_ENVIRONMENT_CODES=['DRIVER_STARTUP_TIMEOUT','DRIVER_ISOLATION_TIMEOUT'],RUNTIME_ENVIRONMENT_LIMIT=3;
+  const RUNTIME_TOOLS=['write_driver','test_driver','write_controller','test_controller'];
+  function browserEnvironment(){
+    const nav=typeof navigator!=='undefined'?navigator:null,doc=typeof document!=='undefined'?document:null;
+    const brands=nav?.userAgentData?.brands;
+    return {userAgent:nav?String(nav.userAgent||'').slice(0,300):null,brands:Array.isArray(brands)?brands.map(b=>`${b.brand} ${b.version}`).slice(0,6):null,
+      platform:nav?String(nav.userAgentData?.platform||nav.platform||'').slice(0,60):null,hardwareConcurrency:Number(nav?.hardwareConcurrency)||null,
+      pageProtocol:typeof location!=='undefined'?String(location.protocol||''):null,visibilityState:doc?.visibilityState||null,hasFocus:typeof doc?.hasFocus==='function'?doc.hasFocus():null,
+      crossOriginIsolated:typeof crossOriginIsolated==='boolean'?crossOriginIsolated:null};
+  }
   const LABELS={inspect_device:'觀察設備與提出規格假設',list_interfaces:'列出可用通訊介面',read_manual:'查閱模擬設備手冊',connect:'建立通訊連線',handshake:'確認設備身分與能力',write_driver:'撰寫與編譯通訊驅動',test_driver:'測試通訊驅動',write_controller:'撰寫與編譯 XY 控制程式',test_controller:'隔離測試 XY 控制程式',start_control:'啟用視覺控制',stop:'停止實驗'};
   // Simulated host manual library. The experiment chooses one physical model;
   // the agent must still pick the matching document from the camera nameplate.
@@ -47,8 +60,12 @@
       this._plant=new VirtualPlant({seed:this.seed,width:640,height:480,kinematics:DEVICE_PRESETS[this.device].kinematics});
       this._link=new SimulatedDeviceLink({plant:this._plant,seed:this.seed,model:this.device,includeTemplate:this.manualTemplate});this._runtime=new DriverRuntime();
       this._controllerRuntime=this.controllerMode==='generated'?new DriverRuntime({kind:'controller'}):null;
-      this._history=[];this._events=[];this._truth=[];this._frontDecisions=0;this._frontCalls=0;this._controlCalls=0;this._decisionRecovery=new VlabDecisionRecovery();
+      this._history=[];this._events=[];this._truth=[];this._frontDecisions=0;this._runtimeEnvironmentFailures=0;this._visibility=[];this._frontCalls=0;this._controlCalls=0;this._decisionRecovery=new VlabDecisionRecovery();
       this._completed=new Set();this._lastResult=null;this._controlOffset=null;
+      if(!this._visibilityHandler&&typeof document!=='undefined'&&typeof document.addEventListener==='function'){
+        this._visibilityHandler=()=>{this._visibility.push({state:document.visibilityState,frontDecisions:this._frontDecisions,modelCalls:this._frontCalls+this._controlCalls,driverRequests:Number(this._runtime?.diagnostics?.requests)||0});if(this._visibility.length>40)this._visibility.shift();};
+        document.addEventListener('visibilitychange',this._visibilityHandler);
+      }
       this._onboarding={phase:'inspect_device',status:'idle',hypothesis:null,inventory:null,manual:null,connection:null,handshake:null,driverSource:null,driverTests:null,compileResult:null,traffic:[],ready:false,steps:[],completed:[],
         device:this.device,manualTemplate:this.manualTemplate,controllerMode:this.controllerMode,controllerSource:null,controllerCompile:null,controllerTests:null,controllerSourceOrigin:null,sourceLabel:['claude','gemini'].includes(this.strategy)?`${this.strategy==='gemini'?'Gemini':'Claude'} 依影像與工具回覆選擇步驟`:`離線規則策略；外觀判讀使用預設規則，驅動${this.manualTemplate?'採用手冊範本':'由規則式規格產生器產生'}${this.controllerMode==='generated'?'，XY 控制使用預寫參考模組':''}`};
       this._pngCache=new WeakMap();this._pngCanvas=document.createElement('canvas');this._pngContext=this._pngCanvas.getContext('2d');
@@ -211,10 +228,16 @@
           await this._control.initialize();if(epoch!==this._epoch||this._disposed)return this.snapshot();
           o.ready=true;o.status='ready';this._controlOffset=this._events.length+1;result={ok:true,driverSourceHash:o.driverTests.sourceHash||o.compileResult.sourceHash,actionCount:0};summary='前置工作完成。控制器尚不知道運動映射；接下來透過剛才產生與測試的通訊程式試動、觀察與自我校正。';
         }
-      }catch(error){if(epoch!==this._epoch||this._disposed)return this.snapshot();if(d.tool==='start_control'){this._control?.dispose();this._control=null;o.ready=false;}ok=false;result={ok:false,error:String(error.message||error).slice(0,300),...(error.diagnostic?{driverErrorCode:error.code,driverDiagnostic:copy(error.diagnostic)}:{})};summary=`工具未完成：${result.error}。手臂未因這個前置工具而移動。`;}
+      }catch(error){if(epoch!==this._epoch||this._disposed)return this.snapshot();if(d.tool==='start_control'){this._control?.dispose();this._control=null;o.ready=false;}ok=false;result={ok:false,error:String(error.message||error).slice(0,300),...(error.diagnostic?{driverErrorCode:error.code,driverDiagnostic:copy(error.diagnostic)}:{})};summary=`工具未完成：${result.error}。手臂未因這個前置工具而移動。`;
+        if(RUNTIME_ENVIRONMENT_CODES.includes(error.code)){this._runtimeEnvironmentFailures++;const env=browserEnvironment();result.environmentAtFailure={visibilityState:env.visibilityState,hasFocus:env.hasFocus};}}
       if(epoch!==this._epoch||this._disposed)return this.snapshot();
+      if(ok&&RUNTIME_TOOLS.includes(d.tool))this._runtimeEnvironmentFailures=0;
       if(ok)this._completed.add(d.tool);
       o.status=o.ready?'ready':ok?'passed':'failed';o.steps.push({tool:d.tool,ok,summary});this._lastResult={tool:d.tool,ok,summary,...(!ok?{error:result?.error}:{} )};
+      if(!ok&&this._runtimeEnvironmentFailures>=RUNTIME_ENVIRONMENT_LIMIT){
+        this._emit({kind:'onboarding-error',title:`工具結果：${LABELS[d.tool]}`,explanation:summary,decision:d,toolResult:{ok,summary,data:copy(result)},controllerPhase:d.tool,nextLabel:'實驗停止'});
+        return this._failure(`隔離執行環境連續 ${this._runtimeEnvironmentFailures} 次無法啟動（${result.driverErrorCode}），產生的程式未送入沙箱。這是本機瀏覽器執行環境錯誤，不是模型決策失敗；停止以免消耗呼叫額度。`,{failureCategory:'runtime-environment'});
+      }
       return this._emit({kind:o.ready?'control-ready':ok?'onboarding-result':'onboarding-error',title:`工具結果：${LABELS[d.tool]}`,explanation:summary,decision:d,toolResult:{ok,summary,data:copy(result)},controllerPhase:d.tool,nextLabel:o.ready?'下一步：請代理選擇控制工具':'下一步：請代理選擇工具'});
     }
     async _controlOperation(method,args){
@@ -233,9 +256,9 @@
         const decision=event.decision,provided=decision.expectedProvided!==false&&typeof decision.expected==='string'&&Boolean(decision.expected.trim());
         modelExpectationText[provided?'provided':'omitted']++;
       }
-      return {version:'0.7.0',strategy:this.strategy,experiment:{device:this.device,protocol:this._onboarding?.manual?.connection?.protocol||null,manualTemplate:this.manualTemplate,controllerMode:this.controllerMode},languageModel:['claude','gemini'].includes(this.strategy),model:['claude','gemini'].includes(this.strategy)?String(this.provider?.model||''):null,scope:'模擬設備：影像假設 → 介面與手冊 → 連線握手 → JavaScript 驅動 → 乾跑測試 → 平面視覺閉迴圈；沒有實體掃描或連線。',parameters:numerical?.parameters||{seed:this.seed,tolerancePx:7,inputLimit:.1,cameraPixels:[640,480]},scenario:numerical?.scenario||null,done:Boolean(this._state?.done),failure:this._state?.failure||null,checkpoints:copy(this._state?.checkpoints),actionCount:this._state?.actionCount||0,commandAttemptCount:this._state?.commandAttemptCount||0,unconfirmedActuationCount:this._state?.unconfirmedActuationCount||0,probeCount:this._state?.probeCount||0,recalibrations:this._state?.recalibrations||0,decisionCount:this._frontDecisions+(numerical?.decisionCount||0),modelCalls:this._frontCalls+this._controlCalls,provenance:{frontMode:['claude','gemini'].includes(this.strategy)?`${this.strategy}-tools`:'offline-preset-policy',driverSource:this._onboarding?.driverSourceOrigin||null,controllerSource:this.controllerMode==='generated'?this._onboarding?.controllerSourceOrigin||null:'builtin-numerical-controller',controllerTests:copy(this._onboarding?.controllerTests||null),frontCalls:this._frontCalls,controlCalls:this._controlCalls,usage,modelExpectationText,allActuationThroughDriver:true},onboarding:this._frontState(),driverRuntime:copy(this._runtime?.diagnostics||null),modelRuntime:copy(this.provider?.requestDiagnostics||null),controllerInputs:['camera width/height/RGBA','observed simulated inventory/manual/handshake','generated driver results','acknowledged applied inputs','user goal update'],decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events),evaluatorTruth:copy(this._truth)};
+      return {version:'0.7.0',strategy:this.strategy,experiment:{device:this.device,protocol:this._onboarding?.manual?.connection?.protocol||null,manualTemplate:this.manualTemplate,controllerMode:this.controllerMode},languageModel:['claude','gemini'].includes(this.strategy),model:['claude','gemini'].includes(this.strategy)?String(this.provider?.model||''):null,scope:'模擬設備：影像假設 → 介面與手冊 → 連線握手 → JavaScript 驅動 → 乾跑測試 → 平面視覺閉迴圈；沒有實體掃描或連線。',parameters:numerical?.parameters||{seed:this.seed,tolerancePx:7,inputLimit:.1,cameraPixels:[640,480]},scenario:numerical?.scenario||null,done:Boolean(this._state?.done),failure:this._state?.failure||null,failureCategory:this._state?.failureCategory||null,checkpoints:copy(this._state?.checkpoints),actionCount:this._state?.actionCount||0,commandAttemptCount:this._state?.commandAttemptCount||0,unconfirmedActuationCount:this._state?.unconfirmedActuationCount||0,probeCount:this._state?.probeCount||0,recalibrations:this._state?.recalibrations||0,decisionCount:this._frontDecisions+(numerical?.decisionCount||0),modelCalls:this._frontCalls+this._controlCalls,provenance:{frontMode:['claude','gemini'].includes(this.strategy)?`${this.strategy}-tools`:'offline-preset-policy',driverSource:this._onboarding?.driverSourceOrigin||null,controllerSource:this.controllerMode==='generated'?this._onboarding?.controllerSourceOrigin||null:'builtin-numerical-controller',controllerTests:copy(this._onboarding?.controllerTests||null),frontCalls:this._frontCalls,controlCalls:this._controlCalls,usage,modelExpectationText,allActuationThroughDriver:true},onboarding:this._frontState(),driverRuntime:copy(this._runtime?.diagnostics||null),environment:{...browserEnvironment(),visibilityChanges:copy(this._visibility||[])},modelRuntime:copy(this.provider?.requestDiagnostics||null),controllerInputs:['camera width/height/RGBA','observed simulated inventory/manual/handshake','generated driver results','acknowledged applied inputs','user goal update'],decisionRejections:VlabDecisionRecovery.count(this._events),decisionCorrectionLimit:2,trace:copy(this._events),evaluatorTruth:copy(this._truth)};
     }
-    dispose(){this._disposed=true;this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();this._controllerRuntime?.dispose();}
+    dispose(){if(this._visibilityHandler&&typeof document!=='undefined')document.removeEventListener('visibilitychange',this._visibilityHandler);this._visibilityHandler=null;this._disposed=true;this._epoch++;this.provider?.abort?.();this._control?.dispose();this._runtime?.dispose();this._controllerRuntime?.dispose();}
   }
   global.FullExperimentEngine=FullExperimentEngine;global.VLAB_DOCUMENTS=DOCUMENTS;global.validateFrontDecision=validateFrontDecision;
 })(globalThis);
