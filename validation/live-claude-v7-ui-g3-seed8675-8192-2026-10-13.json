@@ -1,0 +1,300 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (G3-8675-unknown-device-v7.0-experiment.json (device7.zip)); not run in this repo's cloud environment",
+  "recordedAt": "2026-10-13",
+  "exportSha256": "3821bcff34de64b9b0582101ad578b310702cb95c063344f23843d9467e06615",
+  "exportBytes": 13983096,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-G3",
+    "protocol": "vlab-g3-bin/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 8675,
+    "trials": 5,
+    "minIntervalMs": 6000,
+    "onboardingMaxTokens": 8192
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "brands": [
+      "Chromium 154",
+      "Google Chrome 154",
+      "Not A(Brand 99"
+    ],
+    "platform": "Windows",
+    "hardwareConcurrency": 32,
+    "pageProtocol": "file:",
+    "visibilityState": "visible",
+    "hasFocus": true,
+    "crossOriginIsolated": false,
+    "visibilityChanges": []
+  },
+  "result": {
+    "done": true,
+    "failure": null,
+    "failureCategory": null,
+    "completedTrials": 5,
+    "status": "complete",
+    "reusedDriver": true
+  },
+  "modelCalls": 83,
+  "frontCalls": 11,
+  "controlCalls": 72,
+  "usage": {
+    "input_tokens": 378786,
+    "output_tokens": 31250,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "rateLimitRetries": 0,
+  "decisionRejections": 1,
+  "actionCount": 145,
+  "xyActionCount": 105,
+  "auxiliaryActionCount": 40,
+  "unconfirmedActuationCount": 0,
+  "recalibrations": 0,
+  "driverRuntime": {
+    "requests": 314,
+    "retries": 0,
+    "failures": 0,
+    "programErrors": 6
+  },
+  "onboardingSteps": [
+    [
+      "inspect_device",
+      true
+    ],
+    [
+      "list_interfaces",
+      true
+    ],
+    [
+      "read_manual",
+      true
+    ],
+    [
+      "connect",
+      true
+    ],
+    [
+      "handshake",
+      true
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      true
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      true
+    ],
+    [
+      "start_control",
+      true
+    ]
+  ],
+  "failedAttempts": [
+    {
+      "tool": null,
+      "kind": "decision-rejected",
+      "summary": "Claude 回覆未通過檢查（INVALID_ARGUMENTS / invalid-arguments）：工具 args 的欄位、型別或數值範圍不符合契約；這次未執行動作。 本次沒有執行動作；保留目前進度，下一步請模型修正（第 1／2 次）。",
+      "failed": []
+    }
+  ],
+  "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+  },
+  "driverTests": {
+    "passed": true,
+    "protocol": "vlab-g3-bin/1",
+    "tests": [
+      [
+        "雙通道、零值與上下限的編碼及回覆往返",
+        true
+      ],
+      [
+        "升降與夾爪四種命令的實際編解碼",
+        true
+      ],
+      [
+        "設備受限回覆的解析",
+        true
+      ],
+      [
+        "驅動程式拒絕失敗或毀損回覆",
+        true
+      ],
+      [
+        "主機側限制阻擋超量及非有限輸入",
+        true
+      ],
+      [
+        "設備側限制與框架檢查",
+        true
+      ]
+    ]
+  },
+  "controllerTests": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "旋轉 0.3 rad、正向通道",
+        "passed": true,
+        "actions": 14
+      },
+      {
+        "name": "通道交換且 A 反向",
+        "passed": true,
+        "actions": 27
+      },
+      {
+        "name": "大角度旋轉與 B 反向",
+        "passed": true,
+        "actions": 28
+      },
+      {
+        "name": "位置相依的非線性映射",
+        "passed": true,
+        "actions": 28
+      },
+      {
+        "name": "到達後通道 A 反向的恢復",
+        "passed": true,
+        "actions": 32
+      },
+      {
+        "name": "起點貼近行程邊界",
+        "passed": true,
+        "actions": 21
+      }
+    ]
+  },
+  "trials": [
+    {
+      "trialNumber": 1,
+      "label": "遠距桌面取放",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 2.049015678335251,
+      "actionCount": 34,
+      "xyActionCount": 26,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 25,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 2.253
+      }
+    },
+    {
+      "trialNumber": 2,
+      "label": "更換物件位置・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 3.7722015796465866,
+      "actionCount": 30,
+      "xyActionCount": 22,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 3.913
+      }
+    },
+    {
+      "trialNumber": 3,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "success": true,
+      "failure": null,
+      "placementError": 2.3084496348500467,
+      "actionCount": 29,
+      "xyActionCount": 21,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.65,
+        "objectToDestinationPx": 2.011
+      }
+    },
+    {
+      "trialNumber": 4,
+      "label": "不同方向・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 1.7149140650791403,
+      "actionCount": 29,
+      "xyActionCount": 21,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 1.445
+      }
+    },
+    {
+      "trialNumber": 5,
+      "label": "回到桌面・另一組位置",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 6.064820958471864,
+      "actionCount": 23,
+      "xyActionCount": 15,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 6.028
+      }
+    }
+  ],
+  "generatedDriverSource": "var ERR_NAMES = {1:'FRAME',2:'CHECKSUM',3:'NOT_READY',4:'LIMIT',5:'OPCODE',6:'ARGUMENT',7:'COLLISION'};\n\nfunction hi16(v) { return (v >> 8) & 0xff; }\nfunction lo16(v) { return v & 0xff; }\n\nfunction toHexByte(b) {\n  var s = (b & 0xff).toString(16);\n  return s.length < 2 ? '0' + s : s;\n}\n\nfunction buildFrame(payload) {\n  var len = payload.length;\n  if (len > 255) throw new Error('payload too long');\n  var bytes = [0xa5, len].concat(payload);\n  var c = 0;\n  for (var i = 1; i < bytes.length; i++) c ^= bytes[i];\n  bytes.push(c & 0xff);\n  var out = '';\n  for (var j = 0; j < bytes.length; j++) out += toHexByte(bytes[j]);\n  return out;\n}\n\nfunction encode(command) {\n  var payload;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('ARGUMENT: need 2 channels');\n    var a = Math.round(Number(command[0]) * 10000);\n    var b = Math.round(Number(command[1]) * 10000);\n    if (!isFinite(a) || !isFinite(b)) throw new Error('ARGUMENT: not finite');\n    if (Math.abs(a) > 1000 || Math.abs(b) > 1000) throw new Error('ARGUMENT: out of range');\n    payload = [0x10, hi16(a), lo16(a), hi16(b), lo16(b)];\n  } else if (command && typeof command === 'object' && command.op === 'lift') {\n    if (command.position === 'up') payload = [0x20, 1];\n    else if (command.position === 'down') payload = [0x20, 0];\n    else throw new Error('ARGUMENT: lift position');\n  } else if (command && typeof command === 'object' && command.op === 'grip') {\n    if (command.state === 'closed') payload = [0x21, 1];\n    else if (command.state === 'open') payload = [0x21, 0];\n    else throw new Error('ARGUMENT: grip state');\n  } else {\n    throw new Error('ARGUMENT: unknown command');\n  }\n  return buildFrame(payload);\n}\n\nfunction s16(hi, lo) {\n  var v = ((hi & 0xff) << 8) | (lo & 0xff);\n  if (v & 0x8000) v -= 0x10000;\n  return v;\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') throw new Error('FRAME: not a string');\n  var hex = rawReply.trim().toLowerCase();\n  if (hex.length < 8 || hex.length % 2 !== 0 || !/^[0-9a-f]+$/.test(hex)) throw new Error('FRAME: bad hex');\n  var bytes = [];\n  for (var i = 0; i < hex.length; i += 2) bytes.push(parseInt(hex.substr(i, 2), 16));\n  if (bytes[0] !== 0xa5) throw new Error('FRAME: bad sync');\n  var len = bytes[1];\n  if (bytes.length !== len + 3) throw new Error('FRAME: length mismatch');\n  var c = 0;\n  for (var k = 1; k < len + 2; k++) c ^= bytes[k];\n  if ((c & 0xff) !== bytes[len + 2]) throw new Error('CHECKSUM: mismatch');\n  var payload = bytes.slice(2, 2 + len);\n  if (payload.length < 2) throw new Error('FRAME: payload too short');\n  var status = payload[0];\n  if (status !== 0) {\n    throw new Error((ERR_NAMES[status] || 'UNKNOWN') + ': device status ' + status);\n  }\n  var opcode = payload[1];\n  if (opcode === 0x10) {\n    if (len < 7) throw new Error('FRAME: step reply too short');\n    var a = s16(payload[2], payload[3]) / 10000;\n    var b = s16(payload[4], payload[5]) / 10000;\n    return { applied: [a, b], limited: (payload[6] & 1) === 1 };\n  }\n  if (opcode === 0x20) {\n    if (len < 4) throw new Error('FRAME: lift reply too short');\n    if (payload[2] !== 0 && payload[2] !== 1) throw new Error('ARGUMENT: bad lift position');\n    return { applied: { op: 'lift', position: payload[2] === 1 ? 'up' : 'down' }, limited: (payload[3] & 1) === 1 };\n  }\n  if (opcode === 0x21) {\n    if (len < 4) throw new Error('FRAME: grip reply too short');\n    if (payload[2] !== 0 && payload[2] !== 1) throw new Error('ARGUMENT: bad grip state');\n    return { applied: { op: 'grip', state: payload[2] === 1 ? 'closed' : 'open' }, limited: (payload[3] & 1) === 1 };\n  }\n  throw new Error('OPCODE: unexpected reply opcode ' + opcode);\n}\n",
+  "generatedControllerSource": "function clampU(v) {\n  if (!isFinite(v)) return 0;\n  if (v > 0.1) v = 0.1;\n  if (v < -0.1) v = -0.1;\n  return Math.round(v * 10000) / 10000;\n}\n\nfunction probeCmd(cc00, cc11) {\n  return cc00 <= cc11 ? [0.05, 0] : [0, 0.05];\n}\n\nfunction control(state) {\n  var tol = state.tolerancePx || 7;\n  var tip = state.tip, tgt = state.target;\n  var ex = tgt[0] - tip[0], ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: 'stop', reason: 'non-finite error' };\n  if (err <= tol) return { action: 'verify' };\n\n  var h = state.history || [];\n  var n = h.length;\n  var start = Math.max(0, n - 40);\n  var cc00 = 0, cc01 = 0, cc11 = 0;\n  var m00 = 0, m01 = 0, m10 = 0, m11 = 0;\n  for (var i = start; i < n; i++) {\n    var c = h[i].command, d = h[i].delta;\n    if (!c || !d) continue;\n    var c0 = c[0], c1 = c[1], dx = d[0], dy = d[1];\n    if (!isFinite(c0) || !isFinite(c1) || !isFinite(dx) || !isFinite(dy)) continue;\n    cc00 += c0 * c0; cc01 += c0 * c1; cc11 += c1 * c1;\n    m00 += dx * c0; m01 += dx * c1;\n    m10 += dy * c0; m11 += dy * c1;\n  }\n\n  var detC = cc00 * cc11 - cc01 * cc01;\n  if (n === 0 || !(detC > 1e-6 * Math.max(cc00, cc11, 1e-12) * Math.max(cc00, cc11, 1e-12) && detC > 1e-8)) {\n    var p = probeCmd(cc00, cc11);\n    return { action: 'move', u: p };\n  }\n\n  // J = M * inv(CC)\n  var i00 = cc11 / detC, i01 = -cc01 / detC, i10 = -cc01 / detC, i11 = cc00 / detC;\n  var j00 = m00 * i00 + m01 * i10;\n  var j01 = m00 * i01 + m01 * i11;\n  var j10 = m10 * i00 + m11 * i10;\n  var j11 = m10 * i01 + m11 * i11;\n  var detJ = j00 * j11 - j01 * j10;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-9) {\n    return { action: 'move', u: probeCmd(cc00, cc11) };\n  }\n\n  // u = inv(J) * err, damped\n  var k00 = j11 / detJ, k01 = -j01 / detJ, k10 = -j10 / detJ, k11 = j00 / detJ;\n  var gain = 0.5;\n  var u0 = gain * (k00 * ex + k01 * ey);\n  var u1 = gain * (k10 * ex + k11 * ey);\n  u0 = clampU(u0);\n  u1 = clampU(u1);\n  if (u0 === 0 && u1 === 0) {\n    return { action: 'move', u: probeCmd(cc00, cc11) };\n  }\n  return { action: 'move', u: [u0, u1] };\n}\n",
+  "fullExport": "kept outside the repo (14.0 MB)",
+  "note": "Run after onboarding max_tokens was raised to 8192 (user-reported; the export does not record the setting). Seeds 2026, 3140 and 8675 were not used in development.",
+  "controllerStepStats": {
+    "moves": 105,
+    "medianMaxAbsU": 0.1,
+    "shareAtLeast0_09": 0.781,
+    "singleChannelMoves": 3,
+    "inputLimit": 0.1
+  },
+  "decisionRejectionDetails": [
+    "Claude 回覆未通過檢查（INVALID_ARGUMENTS / invalid-arguments）：工具 args 的欄位、型別或數值範圍不符合契約；這次未執行動作。 本次沒有執行動作；保留目前進度，下一步請模型修正（第 1／2 次）。"
+  ]
+}

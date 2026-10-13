@@ -31,6 +31,16 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 真實模型第二批：前段 8192、seed 2026／3140／8675（使用者本機，2026-10-13）
+
+紀錄：`validation/live-claude-v7-ui-{p2,g3}-seed{2026,3140,8675}-8192-2026-10-13.json`；離線基準 `validation/v7-offline-baseline-seed3140-8675.json`。條件同前，前段 `max_tokens` 8192。
+
+- 6 組全部 5/5（30/30 回合），模擬器真值全部 placed；影像誤差最大 6.14 px。
+- 截斷回覆 0 次（先前 4096 下 6 次）；1 次參數格式拒絕，在修正上限內恢復。0 次 429、0 未確認動作。
+- 動作數 P2 287／546／572、G3 235／175／145；離線最佳基準 P2 289／282／288、G3 146／143／152（0.95–1.99×）。倍率與控制程式自訂步長高度相關（步長中位數 ≈0.1 時約 1×，≈0.05 時約 1.6–2.0×）。
+- P2 驅動三次皆在「拒絕失敗或毀損回覆」首次失敗後修正；G3 驅動三次皆首次通過。
+- 整理見 `_research/LIVE_EXPERIMENTS_V7.md` §4.5。每個設備 × seed 只有 1–2 次，仍非統計結論。
+
 ### 前段 max_tokens 4096 → 8192（2026-10-13）
 
 上述真實模型執行（R0–R4）都在前段 `max_tokens` 4096 下進行；截斷回覆全部發生在模型要撰寫驅動／控制程式時。之後前段改為 8192（控制階段維持 1400；橋接上限本為 8192；Gemini 原本即 8192）。`test_claude_provider.cjs` 新增上限斷言；Claude／Gemini provider、bridge、V6.3 模型報告／請求間隔、V6.1 預算、V7 協定／控制程式與執行環境測試皆通過。**此後的真實模型結果須與 R1–R4 分開報告。** 整理後的研究紀錄見 `_research/LIVE_EXPERIMENTS_V7.md`。

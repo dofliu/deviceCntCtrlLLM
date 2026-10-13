@@ -1,0 +1,291 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (G3-3140-unknown-device-v7.0-experiment.json (device7.zip)); not run in this repo's cloud environment",
+  "recordedAt": "2026-10-13",
+  "exportSha256": "3aac63263e74253b3da85dcc1bdc078d07709b557a6b5a870d56f28f1d51af6a",
+  "exportBytes": 15986006,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-G3",
+    "protocol": "vlab-g3-bin/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 3140,
+    "trials": 5,
+    "minIntervalMs": 6000,
+    "onboardingMaxTokens": 8192
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "brands": [
+      "Chromium 154",
+      "Google Chrome 154",
+      "Not A(Brand 99"
+    ],
+    "platform": "Windows",
+    "hardwareConcurrency": 32,
+    "pageProtocol": "file:",
+    "visibilityState": "visible",
+    "hasFocus": true,
+    "crossOriginIsolated": false,
+    "visibilityChanges": []
+  },
+  "result": {
+    "done": true,
+    "failure": null,
+    "failureCategory": null,
+    "completedTrials": 5,
+    "status": "complete",
+    "reusedDriver": true
+  },
+  "modelCalls": 85,
+  "frontCalls": 10,
+  "controlCalls": 75,
+  "usage": {
+    "input_tokens": 380644,
+    "output_tokens": 28791,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "rateLimitRetries": 0,
+  "decisionRejections": 0,
+  "actionCount": 175,
+  "xyActionCount": 135,
+  "auxiliaryActionCount": 40,
+  "unconfirmedActuationCount": 0,
+  "recalibrations": 0,
+  "driverRuntime": {
+    "requests": 374,
+    "retries": 0,
+    "failures": 0,
+    "programErrors": 6
+  },
+  "onboardingSteps": [
+    [
+      "inspect_device",
+      true
+    ],
+    [
+      "read_manual",
+      true
+    ],
+    [
+      "list_interfaces",
+      true
+    ],
+    [
+      "connect",
+      true
+    ],
+    [
+      "handshake",
+      true
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      true
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      true
+    ],
+    [
+      "start_control",
+      true
+    ]
+  ],
+  "failedAttempts": [],
+  "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+  },
+  "driverTests": {
+    "passed": true,
+    "protocol": "vlab-g3-bin/1",
+    "tests": [
+      [
+        "雙通道、零值與上下限的編碼及回覆往返",
+        true
+      ],
+      [
+        "升降與夾爪四種命令的實際編解碼",
+        true
+      ],
+      [
+        "設備受限回覆的解析",
+        true
+      ],
+      [
+        "驅動程式拒絕失敗或毀損回覆",
+        true
+      ],
+      [
+        "主機側限制阻擋超量及非有限輸入",
+        true
+      ],
+      [
+        "設備側限制與框架檢查",
+        true
+      ]
+    ]
+  },
+  "controllerTests": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "旋轉 0.3 rad、正向通道",
+        "passed": true,
+        "actions": 31
+      },
+      {
+        "name": "通道交換且 A 反向",
+        "passed": true,
+        "actions": 32
+      },
+      {
+        "name": "大角度旋轉與 B 反向",
+        "passed": true,
+        "actions": 35
+      },
+      {
+        "name": "位置相依的非線性映射",
+        "passed": true,
+        "actions": 47
+      },
+      {
+        "name": "到達後通道 A 反向的恢復",
+        "passed": true,
+        "actions": 57
+      },
+      {
+        "name": "起點貼近行程邊界",
+        "passed": true,
+        "actions": 30
+      }
+    ]
+  },
+  "trials": [
+    {
+      "trialNumber": 1,
+      "label": "遠距桌面取放",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 1.263500575944015,
+      "actionCount": 41,
+      "xyActionCount": 33,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 24,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 1.08
+      }
+    },
+    {
+      "trialNumber": 2,
+      "label": "更換物件位置・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 3.1243586026923764,
+      "actionCount": 33,
+      "xyActionCount": 25,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 3.056
+      }
+    },
+    {
+      "trialNumber": 3,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "success": true,
+      "failure": null,
+      "placementError": 0.8166485583307987,
+      "actionCount": 35,
+      "xyActionCount": 27,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.65,
+        "objectToDestinationPx": 0.699
+      }
+    },
+    {
+      "trialNumber": 4,
+      "label": "不同方向・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 1.2039246803313453,
+      "actionCount": 32,
+      "xyActionCount": 24,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 15,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 1.535
+      }
+    },
+    {
+      "trialNumber": 5,
+      "label": "回到桌面・另一組位置",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 2.8203148606925454,
+      "actionCount": 34,
+      "xyActionCount": 26,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 18,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 3.164
+      }
+    }
+  ],
+  "generatedDriverSource": "function hexByte(v) {\n  var s = (v & 0xff).toString(16);\n  return s.length < 2 ? '0' + s : s;\n}\n\nfunction int16be(n) {\n  var u = n < 0 ? n + 0x10000 : n;\n  return [(u >> 8) & 0xff, u & 0xff];\n}\n\nfunction buildFrame(payload) {\n  if (payload.length > 255) throw new Error('ARGUMENT: payload too long');\n  var len = payload.length;\n  var x = len;\n  for (var i = 0; i < payload.length; i++) x ^= payload[i];\n  var bytes = [0xa5, len].concat(payload, [x & 0xff]);\n  var out = '';\n  for (var j = 0; j < bytes.length; j++) out += hexByte(bytes[j]);\n  return out;\n}\n\nfunction quantizeChannel(v) {\n  var x = Number(v);\n  if (!isFinite(x)) throw new Error('ARGUMENT: non-finite channel');\n  var n = Math.round(x * 10000);\n  if (n < -1000 || n > 1000) throw new Error('ARGUMENT: channel out of range');\n  return n;\n}\n\nfunction encode(command) {\n  var payload;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('ARGUMENT: XY command needs 2 channels');\n    var a = quantizeChannel(command[0]);\n    var b = quantizeChannel(command[1]);\n    payload = [0x10].concat(int16be(a), int16be(b));\n  } else if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      if (command.position === 'up') payload = [0x20, 1];\n      else if (command.position === 'down') payload = [0x20, 0];\n      else throw new Error('ARGUMENT: lift position');\n    } else if (command.op === 'grip') {\n      if (command.state === 'closed') payload = [0x21, 1];\n      else if (command.state === 'open') payload = [0x21, 0];\n      else throw new Error('ARGUMENT: grip state');\n    } else {\n      throw new Error('OPCODE: unknown op');\n    }\n  } else {\n    throw new Error('ARGUMENT: unsupported command');\n  }\n  return buildFrame(payload);\n}\n\nvar ERROR_NAMES = {\n  1: 'FRAME',\n  2: 'CHECKSUM',\n  3: 'NOT_READY',\n  4: 'LIMIT',\n  5: 'OPCODE',\n  6: 'ARGUMENT',\n  7: 'COLLISION'\n};\n\nfunction readInt16(p, i) {\n  var u = (p[i] << 8) | p[i + 1];\n  return u >= 0x8000 ? u - 0x10000 : u;\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') throw new Error('FRAME: reply not string');\n  var s = rawReply.trim().toLowerCase();\n  if (s.length % 2 !== 0 || !/^[0-9a-f]*$/.test(s)) throw new Error('FRAME: bad hex');\n  var b = [];\n  for (var i = 0; i < s.length; i += 2) b.push(parseInt(s.substr(i, 2), 16));\n  if (b.length < 4) throw new Error('FRAME: too short');\n  if (b[0] !== 0xa5) throw new Error('FRAME: bad sync');\n  var len = b[1];\n  if (len < 2) throw new Error('FRAME: payload too short');\n  if (b.length !== len + 3) throw new Error('FRAME: length mismatch');\n  var x = 0;\n  for (var k = 1; k <= 1 + len; k++) x ^= b[k];\n  if (x !== b[len + 2]) throw new Error('CHECKSUM: mismatch');\n  var p = b.slice(2, 2 + len);\n  var status = p[0];\n  var op = p[1];\n  if (status !== 0) {\n    throw new Error((ERROR_NAMES[status] || 'UNKNOWN') + ': device status ' + status + ' op ' + op);\n  }\n  if (op === 0x10) {\n    if (len < 7) throw new Error('FRAME: step reply too short');\n    var fa = readInt16(p, 2) / 10000;\n    var fb = readInt16(p, 4) / 10000;\n    return { applied: [fa, fb], limited: (p[6] & 1) === 1 };\n  }\n  if (op === 0x20) {\n    if (len < 4) throw new Error('FRAME: lift reply too short');\n    if (p[2] !== 0 && p[2] !== 1) throw new Error('ARGUMENT: bad lift position');\n    return { applied: { op: 'lift', position: p[2] === 1 ? 'up' : 'down' }, limited: (p[3] & 1) === 1 };\n  }\n  if (op === 0x21) {\n    if (len < 4) throw new Error('FRAME: grip reply too short');\n    if (p[2] !== 0 && p[2] !== 1) throw new Error('ARGUMENT: bad grip state');\n    return { applied: { op: 'grip', state: p[2] === 1 ? 'closed' : 'open' }, limited: (p[3] & 1) === 1 };\n  }\n  throw new Error('OPCODE: unexpected reply opcode ' + op);\n}\n",
+  "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var target = state.target;\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: 'stop', reason: 'non-finite error' };\n  if (err <= state.tolerancePx) return { action: 'verify' };\n  if (state.maxActions !== null && state.maxActions !== undefined && state.step >= state.maxActions) {\n    return { action: 'stop', reason: 'action budget exhausted' };\n  }\n\n  var h = state.history || [];\n  var start = h.length > 12 ? h.length - 12 : 0;\n  var q00 = 0, q01 = 0, q11 = 0;\n  var m00 = 0, m01 = 0, m10 = 0, m11 = 0;\n  for (var i = start; i < h.length; i++) {\n    var e = h[i];\n    if (!e || !e.applied || !e.delta) continue;\n    var a0 = Number(e.applied[0]), a1 = Number(e.applied[1]);\n    var d0 = Number(e.delta[0]), d1 = Number(e.delta[1]);\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(d0) || !isFinite(d1)) continue;\n    q00 += a0 * a0; q01 += a0 * a1; q11 += a1 * a1;\n    m00 += d0 * a0; m01 += d0 * a1;\n    m10 += d1 * a0; m11 += d1 * a1;\n  }\n\n  // probe channels that have not been excited enough\n  if (q00 < 1e-5) return { action: 'move', u: [0.05, 0] };\n  if (q11 < 1e-5) return { action: 'move', u: [0, 0.05] };\n\n  var reg = 1e-9;\n  q00 += reg; q11 += reg;\n  var det = q00 * q11 - q01 * q01;\n  if (!isFinite(det) || Math.abs(det) < 1e-12) return { action: 'move', u: [0.05, 0] };\n  // Qinv\n  var i00 = q11 / det, i01 = -q01 / det, i11 = q00 / det;\n  // J = M * Qinv  (2x2), rows are pixel axes, cols are channels\n  var j00 = m00 * i00 + m01 * i01;\n  var j01 = m00 * i01 + m01 * i11;\n  var j10 = m10 * i00 + m11 * i01;\n  var j11 = m10 * i01 + m11 * i11;\n  var jdet = j00 * j11 - j01 * j10;\n  if (!isFinite(jdet) || Math.abs(jdet) < 1e-3) {\n    // poorly conditioned: excite the less-known direction\n    return { action: 'move', u: [0, 0.05] };\n  }\n\n  // desired pixel displacement, damped and capped\n  var dpx = ex, dpy = ey;\n  var dnorm = Math.sqrt(dpx * dpx + dpy * dpy);\n  var cap = 20;\n  if (dnorm > cap) { dpx = dpx * cap / dnorm; dpy = dpy * cap / dnorm; }\n  dpx *= 0.5; dpy *= 0.5;\n\n  // u = J^{-1} dp\n  var k00 = j11 / jdet, k01 = -j01 / jdet, k10 = -j10 / jdet, k11 = j00 / jdet;\n  var ua = k00 * dpx + k01 * dpy;\n  var ub = k10 * dpx + k11 * dpy;\n  if (!isFinite(ua) || !isFinite(ub)) return { action: 'move', u: [0.05, 0] };\n\n  var un = Math.sqrt(ua * ua + ub * ub);\n  if (un > 0.1) { ua = ua * 0.1 / un; ub = ub * 0.1 / un; }\n  ua = Math.max(-0.1, Math.min(0.1, ua));\n  ub = Math.max(-0.1, Math.min(0.1, ub));\n  return { action: 'move', u: [ua, ub] };\n}\n",
+  "fullExport": "kept outside the repo (16.0 MB)",
+  "note": "Run after onboarding max_tokens was raised to 8192 (user-reported; the export does not record the setting). Seeds 2026, 3140 and 8675 were not used in development.",
+  "controllerStepStats": {
+    "moves": 135,
+    "medianMaxAbsU": 0.068,
+    "shareAtLeast0_09": 0.0,
+    "singleChannelMoves": 2,
+    "inputLimit": 0.1
+  },
+  "decisionRejectionDetails": []
+}
