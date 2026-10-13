@@ -56,6 +56,15 @@ function main() {
     assert.equal(full.suiteProgress.totalCompleted, 1);
     checks.push('offline G3 one-trial CLI run: summary with truth check, efficiency, step stats; gzipped full report');
 
+    const replay = spawnSync(process.execPath, [path.join(root, 'tests', 'replay_controller.cjs'), '--source', path.join(tmp, 'ref.js'), '--device', 'G3', '--seeds', '7', '--trials', '1', '--compare-reference', '--json', path.join(tmp, 'replay.json')],
+      { cwd: root, encoding: 'utf8', timeout: 600000, input: '' , env: process.env, stdio: 'pipe', ...(fs.writeFileSync(path.join(tmp, 'ref.js'), g.VlabControllerModule.REFERENCE_SOURCE), {}) });
+    assert.equal(replay.status, 0, replay.stderr);
+    const replayed = JSON.parse(fs.readFileSync(path.join(tmp, 'replay.json'), 'utf8')).rows;
+    assert.equal(replayed.length, 2);
+    assert.equal(replayed[0].actions, replayed[1].actions, 'replaying the reference source must equal the built-in reference run');
+    assert.equal(replayed[0].actions, summary.actionCount, 'replay must equal the offline CLI run for the same device, seed and controller');
+    checks.push('replay_controller.cjs reproduces the offline CLI action count for the same controller, device and seed');
+
     const env = { ...process.env }; delete env.ANTHROPIC_API_KEY;
     const live = runner(['--device', 'P2', '--seed', '2026', '--trials', '1', '--out-dir', tmp, '--label', 'nokey', '--port', '8795'], env);
     assert.equal(live.status, 1); assert.equal(live.result.ok, false); assert.equal(live.result.modelCalls, 0);

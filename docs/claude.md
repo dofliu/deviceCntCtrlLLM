@@ -47,6 +47,7 @@ python run_experiments.py --devices P2,G3 --seeds 2026,3140,8675 --model claude-
 - 預算：每組有單組上限（預設 150），整批另有總上限；每次真正送出的請求都計入，用量不明時以單組上限扣除；剩餘額度不足 `--min-calls-to-start`（預設 60）就不再開始新的一組。真實模式開始前會要求輸入 `yes` 確認（`--yes` 可略過）。
 - 金鑰：只由橋接讀取 `ANTHROPIC_API_KEY`（或 `--key-env ANTHROPIC_API_KEY_Extra`）；找不到時整批停止，沒有送出任何請求。
 - 輸出：`artifacts/live-runs/batch-<時間>/`（不進 repo）內有每組 `*.summary.json`（數十 KB，含自產程式、步長、效率倍率、模擬器真值核對、git commit）、`*.full.json.gz`（完整紀錄壓縮檔），以及 `batch-summary.json`／`batch-summary.csv` 總表。分享時壓縮 summary 與 batch 檔即可。
+- 離線重播：`node tests/replay_controller.cjs --summary <檔案> --seeds ... --compare-reference`，不呼叫 API。
 - **與瀏覽器版的差異**：影像以軟體畫布繪製（無瀏覽器抗鋸齒），產生的程式在 Node vm 沙箱而非 iframe／Worker 執行。成功門檻、測試關卡與模型流程相同，但結果須與瀏覽器實驗分開記錄。
 
 ## 決策與動作的區分
