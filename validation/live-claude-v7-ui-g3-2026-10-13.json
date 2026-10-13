@@ -1,0 +1,327 @@
+{
+  "version": "0.7.0",
+  "kind": "live-model-run",
+  "source": "user-local browser UI export (unknown-device-v7.0-experiment_2.json) plus device-driver_1.js; not run in this repo's cloud environment",
+  "recordedAt": "2026-10-13",
+  "exportSha256": "8068058f9dde85b5af118797c0f2740004a11274554e4484597c18948cbef880",
+  "exportBytes": 13849170,
+  "provider": "claude",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "device": "VLAB-G3",
+    "protocol": "vlab-g3-bin/1",
+    "manualTemplate": false,
+    "controllerMode": "generated",
+    "seed": 42,
+    "trials": 5,
+    "minIntervalMs": 6000
+  },
+  "note": "seed 42 was also used to develop G3 offline, so this is a development case, not unseen-seed evidence.",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "brands": [
+      "Chromium 154",
+      "Google Chrome 154",
+      "Not A(Brand 99"
+    ],
+    "platform": "Windows",
+    "hardwareConcurrency": 32,
+    "pageProtocol": "file:",
+    "visibilityState": "visible",
+    "hasFocus": true,
+    "crossOriginIsolated": false,
+    "visibilityChanges": [
+      {
+        "state": "hidden",
+        "frontDecisions": 10,
+        "modelCalls": 83,
+        "driverRequests": 310
+      },
+      {
+        "state": "visible",
+        "frontDecisions": 10,
+        "modelCalls": 83,
+        "driverRequests": 310
+      },
+      {
+        "state": "hidden",
+        "frontDecisions": 10,
+        "modelCalls": 83,
+        "driverRequests": 310
+      },
+      {
+        "state": "visible",
+        "frontDecisions": 10,
+        "modelCalls": 83,
+        "driverRequests": 310
+      }
+    ]
+  },
+  "result": {
+    "done": true,
+    "failure": null,
+    "failureCategory": null,
+    "completedTrials": 5,
+    "reusedDriver": true
+  },
+  "modelCalls": 83,
+  "frontCalls": 12,
+  "controlCalls": 71,
+  "usage": {
+    "input_tokens": 382393,
+    "output_tokens": 34706,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+  },
+  "rateLimitRetries": 0,
+  "decisionRejections": 2,
+  "decisionRejectionReason": "INVALID_TOOL_RESPONSE / stop-reason (reply did not end in a complete tool decision, possibly truncated); twice during onboarding, corrected within the 2-correction limit, no action executed",
+  "actionCount": 143,
+  "xyActionCount": 103,
+  "auxiliaryActionCount": 40,
+  "unconfirmedActuationCount": 0,
+  "recalibrations": 0,
+  "driverRuntime": {
+    "requests": 310,
+    "retries": 0,
+    "failures": 0,
+    "programErrors": 6
+  },
+  "onboardingSteps": [
+    [
+      "inspect_device",
+      true
+    ],
+    [
+      "read_manual",
+      true
+    ],
+    [
+      "list_interfaces",
+      true
+    ],
+    [
+      "connect",
+      true
+    ],
+    [
+      "handshake",
+      true
+    ],
+    [
+      "write_driver",
+      true
+    ],
+    [
+      "test_driver",
+      true
+    ],
+    [
+      "write_controller",
+      true
+    ],
+    [
+      "test_controller",
+      true
+    ],
+    [
+      "start_control",
+      true
+    ]
+  ],
+  "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+  },
+  "driverTests": {
+    "passed": true,
+    "protocol": "vlab-g3-bin/1",
+    "sourceHash": "fnv1a-7e2094e1",
+    "tests": [
+      [
+        "雙通道、零值與上下限的編碼及回覆往返",
+        true
+      ],
+      [
+        "升降與夾爪四種命令的實際編解碼",
+        true
+      ],
+      [
+        "設備受限回覆的解析",
+        true
+      ],
+      [
+        "驅動程式拒絕失敗或毀損回覆",
+        true
+      ],
+      [
+        "主機側限制阻擋超量及非有限輸入",
+        true
+      ],
+      [
+        "設備側限制與框架檢查",
+        true
+      ]
+    ]
+  },
+  "controllerTests": {
+    "passed": true,
+    "cases": [
+      {
+        "name": "旋轉 0.3 rad、正向通道",
+        "passed": true,
+        "actions": 15,
+        "finalErrorPx": 5.953
+      },
+      {
+        "name": "通道交換且 A 反向",
+        "passed": true,
+        "actions": 30,
+        "finalErrorPx": 6.442
+      },
+      {
+        "name": "大角度旋轉與 B 反向",
+        "passed": true,
+        "actions": 32,
+        "finalErrorPx": 3.501
+      },
+      {
+        "name": "位置相依的非線性映射",
+        "passed": true,
+        "actions": 29,
+        "finalErrorPx": 5.153
+      },
+      {
+        "name": "到達後通道 A 反向的恢復",
+        "passed": true,
+        "actions": 34,
+        "finalErrorPx": 4.577
+      },
+      {
+        "name": "起點貼近行程邊界",
+        "passed": true,
+        "actions": 23,
+        "finalErrorPx": 6.333
+      }
+    ]
+  },
+  "trials": [
+    {
+      "trialNumber": 1,
+      "label": "遠距桌面取放",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 3.0965676206741692,
+      "actionCount": 34,
+      "xyActionCount": 26,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 27,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 3.347
+      }
+    },
+    {
+      "trialNumber": 2,
+      "label": "更換物件位置・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 4.397954092137512,
+      "actionCount": 27,
+      "xyActionCount": 19,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 4.263
+      }
+    },
+    {
+      "trialNumber": 3,
+      "label": "更換物件位置・高平台",
+      "destinationHeight": 0.65,
+      "success": true,
+      "failure": null,
+      "placementError": 2.6978632309710684,
+      "actionCount": 29,
+      "xyActionCount": 21,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.65,
+        "objectToDestinationPx": 2.507
+      }
+    },
+    {
+      "trialNumber": 4,
+      "label": "不同方向・低平台",
+      "destinationHeight": 0.35,
+      "success": true,
+      "failure": null,
+      "placementError": 1.1820349240016936,
+      "actionCount": 28,
+      "xyActionCount": 20,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0.35,
+        "objectToDestinationPx": 1.617
+      }
+    },
+    {
+      "trialNumber": 5,
+      "label": "回到桌面・另一組位置",
+      "destinationHeight": 0,
+      "success": true,
+      "failure": null,
+      "placementError": 2.830022219762123,
+      "actionCount": 25,
+      "xyActionCount": 17,
+      "auxiliaryActionCount": 8,
+      "unconfirmedActuationCount": 0,
+      "recalibrations": 0,
+      "modelCalls": 14,
+      "evaluatorTruth": {
+        "placed": true,
+        "attached": false,
+        "objectHeight": 0,
+        "objectToDestinationPx": 3.024
+      }
+    }
+  ],
+  "offlineBaselineSameSeed": {
+    "source": "validation/v7-offline-matrix.json (headless software canvas; not identical rendering)",
+    "G3_notemplate_builtin": {
+      "totalActions": 147
+    },
+    "G3_notemplate_offlineReferenceModule": {
+      "totalActions": 152
+    }
+  },
+  "generatedDriverSource": "function xorSum(bytes) {\n  var c = 0;\n  for (var i = 0; i < bytes.length; i++) c ^= bytes[i];\n  return c & 0xff;\n}\n\nfunction hex2(b) {\n  var s = (b & 0xff).toString(16);\n  return s.length < 2 ? '0' + s : s;\n}\n\nfunction frame(payload) {\n  var body = [payload.length].concat(payload);\n  var c = xorSum(body);\n  var out = [0xA5].concat(body, [c]);\n  var s = '';\n  for (var i = 0; i < out.length; i++) s += hex2(out[i]);\n  return s;\n}\n\nfunction i16(v) {\n  var n = Math.round(v * 10000);\n  if (n < 0) n += 65536;\n  return [(n >> 8) & 0xff, n & 0xff];\n}\n\nfunction s16(hi, lo) {\n  var v = ((hi & 0xff) << 8) | (lo & 0xff);\n  if (v >= 32768) v -= 65536;\n  return v;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('step needs 2 channels');\n    var a = command[0], b = command[1];\n    if (typeof a !== 'number' || typeof b !== 'number' || !isFinite(a) || !isFinite(b)) throw new Error('non-finite');\n    if (Math.abs(a) > 0.1 + 1e-9 || Math.abs(b) > 0.1 + 1e-9) throw new Error('out of range');\n    var pa = i16(a), pb = i16(b);\n    return frame([0x10, pa[0], pa[1], pb[0], pb[1]]);\n  }\n  if (command && command.op === 'lift') {\n    var lv;\n    if (command.position === 'up') lv = 1;\n    else if (command.position === 'down') lv = 0;\n    else throw new Error('bad lift position');\n    return frame([0x20, lv]);\n  }\n  if (command && command.op === 'grip') {\n    var gv;\n    if (command.state === 'closed') gv = 1;\n    else if (command.state === 'open') gv = 0;\n    else throw new Error('bad grip state');\n    return frame([0x21, gv]);\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string' || rawReply.length % 2 !== 0 || !/^[0-9a-f]*$/.test(rawReply)) throw new Error('FRAME: bad hex');\n  var bytes = [];\n  for (var i = 0; i < rawReply.length; i += 2) bytes.push(parseInt(rawReply.substr(i, 2), 16));\n  if (bytes.length < 4) throw new Error('FRAME: too short');\n  if (bytes[0] !== 0xA5) throw new Error('FRAME: bad sync');\n  var len = bytes[1];\n  if (bytes.length !== len + 3) throw new Error('FRAME: bad length');\n  var body = bytes.slice(1, 2 + len);\n  if (xorSum(body) !== bytes[bytes.length - 1]) throw new Error('CHECKSUM');\n  var payload = bytes.slice(2, 2 + len);\n  var status = payload[0];\n  if (status !== 0) throw new Error('device error status ' + status);\n  var op = payload[1];\n  if (op === 0x10) {\n    if (len !== 7) throw new Error('FRAME: bad step length');\n    var a = s16(payload[2], payload[3]) / 10000;\n    var b = s16(payload[4], payload[5]) / 10000;\n    return { applied: [a, b], limited: (payload[6] & 1) === 1 };\n  }\n  if (op === 0x20) {\n    if (len !== 4) throw new Error('FRAME: bad lift length');\n    var pos;\n    if (payload[2] === 1) pos = 'up';\n    else if (payload[2] === 0) pos = 'down';\n    else throw new Error('bad lift state');\n    return { applied: { op: 'lift', position: pos }, limited: (payload[3] & 1) === 1 };\n  }\n  if (op === 0x21) {\n    if (len !== 4) throw new Error('FRAME: bad grip length');\n    var st;\n    if (payload[2] === 1) st = 'closed';\n    else if (payload[2] === 0) st = 'open';\n    else throw new Error('bad grip state');\n    return { applied: { op: 'grip', state: st }, limited: (payload[3] & 1) === 1 };\n  }\n  throw new Error('OPCODE: unexpected reply opcode ' + op);\n}\n",
+  "generatedControllerSource": "function control(state) {\n  if (!state || !Array.isArray(state.tip) || !Array.isArray(state.target)) return { action: 'stop', reason: 'missing state' };\n  var ex = state.target[0] - state.tip[0];\n  var ey = state.target[1] - state.tip[1];\n  var e = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(e)) return { action: 'stop', reason: 'non-finite error' };\n  var tol = (typeof state.tolerancePx === 'number' && isFinite(state.tolerancePx)) ? state.tolerancePx : 7;\n  if (e <= tol) return { action: 'verify' };\n\n  var h = Array.isArray(state.history) ? state.history : [];\n  var start = Math.max(0, h.length - 12);\n  var saa00 = 0, saa01 = 0, saa11 = 0;\n  var sda00 = 0, sda01 = 0, sda10 = 0, sda11 = 0;\n  var n = 0;\n  for (var i = start; i < h.length; i++) {\n    var r = h[i];\n    if (!r || !Array.isArray(r.applied) || !Array.isArray(r.delta)) continue;\n    var a0 = r.applied[0], a1 = r.applied[1], d0 = r.delta[0], d1 = r.delta[1];\n    if (![a0, a1, d0, d1].every(function (v) { return typeof v === 'number' && isFinite(v); })) continue;\n    saa00 += a0 * a0; saa01 += a0 * a1; saa11 += a1 * a1;\n    sda00 += d0 * a0; sda01 += d0 * a1;\n    sda10 += d1 * a0; sda11 += d1 * a1;\n    n++;\n  }\n\n  function probe() {\n    // alternate excitation of each channel when information is insufficient\n    if (saa00 <= saa11) return { action: 'move', u: [0.05, 0] };\n    return { action: 'move', u: [0, 0.05] };\n  }\n\n  if (n < 3) return probe();\n\n  var ridge = 1e-9;\n  var A00 = saa00 + ridge, A01 = saa01, A11 = saa11 + ridge;\n  var detA = A00 * A11 - A01 * A01;\n  if (!isFinite(detA) || detA <= 1e-7) return probe();\n  var iA00 = A11 / detA, iA01 = -A01 / detA, iA11 = A00 / detA;\n\n  // J maps applied input -> pixel delta: delta = J * applied\n  var J00 = sda00 * iA00 + sda01 * iA01;\n  var J01 = sda00 * iA01 + sda01 * iA11;\n  var J10 = sda10 * iA00 + sda11 * iA01;\n  var J11 = sda10 * iA01 + sda11 * iA11;\n  var detJ = J00 * J11 - J01 * J10;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-3) return probe();\n\n  // solve J u = e, with damping gain\n  var gain = 0.5;\n  var u0 = (J11 * ex - J01 * ey) / detJ * gain;\n  var u1 = (-J10 * ex + J00 * ey) / detJ * gain;\n  if (!isFinite(u0) || !isFinite(u1)) return probe();\n\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) { u0 = u0 * 0.1 / m; u1 = u1 * 0.1 / m; }\n  if (m < 1e-4) return probe();\n  return { action: 'move', u: [u0, u1] };\n}\n",
+  "interpretation": [
+    "Real model wrote a binary-frame (A5 sync, length, XOR checksum, int16 x1e-4) driver for vlab-g3-bin/1 from protocolSpec only, and a control(state) module; both passed the unchanged gates on the first attempt.",
+    "5/5 trials; simulator truth independently confirms placement. Total actions 143 vs offline baselines 147/152 on the same seed.",
+    "Development seed and single run; task preconditions and image verifiers remain pre-written. Not unseen-device or generalization evidence."
+  ],
+  "fullExport": "kept outside the repo (13.2 MB)"
+}

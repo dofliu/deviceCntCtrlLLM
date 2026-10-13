@@ -31,6 +31,16 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 真實模型 G3 5/5（使用者本機瀏覽器，2026-10-13）
+
+紀錄：`validation/live-claude-v7-ui-g3-2026-10-13.json`（含模型產生的驅動與控制程式原始碼；完整 13.2 MB 匯出留在 repo 外）。
+
+- 條件：`claude-haiku-5-5`、**VLAB-G3**（十六進位二進位框架）、無範本、產生控制程式、seed 42（G3 離線開發也用過）。Windows Chrome 154，`file:`。
+- 結果：**5/5 完成**，影像誤差 3.10／4.40／2.70／1.18／2.83 px；模擬器真值 5 回合皆 `placed`，物件與目標 1.6–4.3 px。
+- 驅動（A5 同步、長度、XOR 檢查碼、int16×1e-4）與 `control(state)` 都是模型只依 protocolSpec 寫出，**第一次就通過**未修改的閘門（6/6、6/6）。
+- 83 次呼叫（前段 12、控制 71）、0 次 429；2 次回覆疑似截斷（`INVALID_TOOL_RESPONSE / stop-reason`），在 2 次修正上限內恢復、未執行動作。143 次動作（XY 103）、0 未確認；同 seed 離線基準 147（內建）／152（參考模組）。
+- 界線：開發 seed、單次執行；任務前提與影像驗證器仍預寫，不是未見設備或泛化證據。
+
 ### 真實模型 5/5（使用者本機瀏覽器，2026-10-13）
 
 紀錄：`validation/live-claude-v7-ui-p2-2026-10-13.json`（含模型產生的驅動與控制程式原始碼；完整 28.9 MB 匯出留在 repo 外，記 SHA-256）。
