@@ -31,6 +31,13 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 橋接工具白名單修正（2026-10-13）
+
+使用者以 `run_experiments.py` 執行真實模式時，每組在驅動測試通過後的第 10 次請求以 HTTP 400 停止。原因：`claude_bridge.py`、`gemini_bridge.py` 的工具白名單沒有 V7 新增的 `write_controller`、`test_controller`，橋接在本機拒絕該請求（未送到供應商）。先前的瀏覽器實驗用直接連線、未經橋接，所以沒有暴露。
+- 兩個橋接加入這兩個工具；`VlabAgentContract.toolNames` 匯出 provider 的工具清單。
+- 新測試 `tests/test_v70_bridge_tool_parity.py`：provider 的每個工具都在兩個橋接白名單內；以假 fetch 擷取 Claude／Gemini provider 在 onboarding／control／mission 三階段、含 30,000 字元驅動與控制程式原始碼的實際請求，皆通過橋接驗證。修正前 3 項皆失敗、修正後皆通過。
+- Claude／Gemini 橋接、V6.3 橋接限制、V6.1 橋接預算、provider、效率、命令列執行器測試皆通過。
+
 ### 命令列批次實驗（2026-10-13，離線 Node）
 
 紀錄：`validation/v70-cli-runner.json`。新增 `run_experiments.py`（批次、總預算）並改寫 `tests/live_claude_v7.cjs`（設備／seed／條件參數、`--offline`、摘要與 gzip 完整紀錄）。

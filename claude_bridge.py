@@ -26,7 +26,7 @@ AUTHORIZED_KEY_NAMES = (KEY_NAME, "ANTHROPIC_API_KEY_Extra")
 UPSTREAM = "https://api.anthropic.com/v1"
 MAX_BODY = 6 * 1024 * 1024
 MAX_RESPONSE = 4 * 1024 * 1024
-TOOLS = frozenset("inspect_device list_interfaces read_manual connect handshake write_driver test_driver start_control observe probe fit_model move reset_model verify inspect_scene select_goal lift grip verify_grasp verify_place stop".split())
+TOOLS = frozenset("inspect_device list_interfaces read_manual connect handshake write_driver test_driver write_controller test_controller start_control observe probe fit_model move reset_model verify inspect_scene select_goal lift grip verify_grasp verify_place stop".split())
 
 
 def read_authorized_key(key_name: str = KEY_NAME) -> str:
