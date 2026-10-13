@@ -23,6 +23,7 @@
 | V6.1 影像定位聚焦回歸 | validation/v61-marker-regression.json | 已執行；本輪未重跑 |
 | 初步相關研究地圖 | REFERENCES.md | 出處已核實；非完整系統性回顧 |
 | 貢獻、協定及 repo 移轉建議 | CONTRIBUTION.md、PROTOCOL.md、REPO_PLAN.md | 草擬 |
+| V7 真實模型先導實驗整理 | LIVE_EXPERIMENTS_V7.md | 開發先導紀錄（R0–R4），非凍結協定 |
 
 ## 已知限制
 - 任務先決條件及影像驗證器由專案預寫。V7 起 XY 控制可改為通過隔離測試的 control(state) 模組，但離線模式提交的是預寫參考模組；尚無模型產生的控制程式結果。
@@ -75,3 +76,5 @@
 2026-10-13（seed 2026 離線基準）：P2／G3 × 內建／參考模組（無範本）皆 5/5，總動作 299／289／146／151。存 validation/v7-offline-baseline-seed2026.json，作為使用者 seed 2026 真實模型實驗的對照。
 
 2026-10-13（真實 Claude seed 2026）：P2、G3 皆 5/5，模擬器真值確認；P2 330 動作、G3 236 動作，高於同 seed 離線基準（299／289、146／151）。驅動與控制程式皆由模型產生，多數在第一次測試失敗後依回饋修正。觀察：每次執行都有 1–3 次回覆被截斷（INVALID_TOOL_RESPONSE / stop-reason），可能與撰寫程式時的輸出長度上限有關，待查。下一步：每條件重複多次、加入第三個未見 seed，並凍結主指標後再做正式比較。
+
+2026-10-13（max_tokens 與實驗整理）：依使用者同意，Claude 前段 max_tokens 由 4096 改為 8192，相關模擬測試通過；整理 R0–R4 為 _research/LIVE_EXPERIMENTS_V7.md（設定、閘門、結果、自產程式分析、問題、宣稱界線、效度威脅、下一步）。

@@ -38,12 +38,12 @@ async function rejects(call,code){await assert.rejects(call,e=>e.code===code);}
   provider=new Provider({minIntervalMs:0,maxRateLimitRetries:0,apiKey:key,model:'claude-mock-1'});result=await provider.decide(front,frame);
   assert.equal(result.tool,'write_driver');assert(result.args.source.includes('function encode'));
   const text=sent.messages[0].content[1].text;assert(text.includes('driverContract'));assert(text.includes('vlab-p2-json/1'));assert(text.includes('Wrong return'));
-  assert(!text.includes('PRIVILEGED_'));counts.push('complete manual preserved and privileged front fields omitted');
+  assert(!text.includes('PRIVILEGED_'));assert.equal(sent.max_tokens,8192,'onboarding replies may carry a full driver or controller');counts.push('complete manual preserved and privileged front fields omitted');
 
   const mission={phase:'mission',allowedTools:['lift','inspect_scene','stop'],observed:{tip:[100,80],object:[101,81],destination:[200,160],objectPixels:81,destinationPixels:160,raisedOffsetError:1.4,held:'PRIVILEGED_HELD_CANARY'},actuator:{lift:'down',gripper:'closed'},taskProgress:{phase:'raise-object',objectDetected:true,atObject:true,graspVerified:false,coMotionVerified:false,atDestination:false,released:false,cleared:false,completed:false,attempts:1,placementError:null},lastResult:{tool:'grip',ok:true,summary:'已閉合，尚未驗證'},budgets:base.budgets,nextSuggested:{tool:'PRIVILEGED_OFFLINE_POLICY'},diagnostics:{truth:'PRIVILEGED_MISSION_CANARY'}};
   Provider=setup(async(url,options)=>{sent=JSON.parse(options.body);return good(answer('lift',{position:'up'}));});
   result=await new Provider({minIntervalMs:0,maxRateLimitRetries:0,apiKey:key,model:'claude-mock-1'}).decide(mission,frame);
-  assert.equal(result.tool,'lift');assert.equal(result.args.position,'up');
+  assert.equal(result.tool,'lift');assert.equal(result.args.position,'up');assert.equal(sent.max_tokens,1400);
   let evidence=sent.messages[0].content[1].text;
   assert(evidence.includes('simulated-pick-place'));assert(evidence.includes('raisedOffsetError'));assert(evidence.includes('coMotionVerified'));assert(!evidence.includes('PRIVILEGED_'));assert(!evidence.includes('nextSuggested'));
   assert.deepEqual(sent.tools.map(t=>t.name),['inspect_scene','lift','stop']);

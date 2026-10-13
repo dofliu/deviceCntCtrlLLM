@@ -83,6 +83,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 
 **V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
 
+**2026-10-13 前段 max_tokens 調為 8192**：先前截斷回覆都發生在撰寫驅動／控制程式時；之後的真實模型結果須與先前分開記錄。四次真實模型實驗的整理見 `_research/LIVE_EXPERIMENTS_V7.md`。
+
 **2026-10-13 真實 Claude seed 2026（未用於開發）P2、G3 皆 5/5**（`validation/live-claude-v7-ui-*-seed2026-2026-10-13.json`）：無範本驅動與 XY 控制程式皆由 `claude-haiku-5-5` 產生並通過原閘門，模擬器真值確認；動作數 P2 330、G3 236，高於同 seed 離線基準（299／289、146／151）。每條件 1 次，仍非統計結論。
 
 **2026-10-13 使用者本機真實 Claude G3 5/5**（`validation/live-claude-v7-ui-g3-2026-10-13.json`）：`claude-haiku-5-5` 只依 protocolSpec 寫出 G3 二進位框架驅動與 XY `control(state)`，第一次就通過原閘門；五回合皆完成，模擬器真值確認，143 次動作（同 seed 離線基準 147／152）。seed 42 為開發資料、單次執行，不構成泛化證據。
