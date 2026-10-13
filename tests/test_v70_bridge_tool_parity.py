@@ -51,7 +51,7 @@ const {createRuntime}=require('./tests/headless-runtime.cjs');
 class BridgeToolParity(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        result = subprocess.run(["node", "-e", NODE], cwd=ROOT, capture_output=True, text=True, timeout=120, check=True)
+        result = subprocess.run(["node", "-e", NODE], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=120, check=True)
         cls.data = json.loads(result.stdout.strip().splitlines()[-1])
 
     def test_01_every_provider_tool_is_allowlisted(self):

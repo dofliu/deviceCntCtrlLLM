@@ -71,7 +71,10 @@ function startBridge() {
   const html = path.join(root, 'unknown-device-v7.0.html');
   if (!fs.existsSync(html)) throw new Error('Run python build.py first.');
   const python = process.platform === 'win32' ? 'python' : 'python3';
-  bridge = spawn(python, [path.join(root, 'claude_bridge.py'), '--port', String(port), '--max-calls', String(maxCalls), '--key-env', keyEnv, '--html', html], { stdio: ['ignore', 'pipe', 'pipe'] });
+  // -u / PYTHONUNBUFFERED: stdout is a pipe here, and Python would otherwise
+  // block-buffer the "available" startup line until the 15 s timeout fires.
+  bridge = spawn(python, ['-u', path.join(root, 'claude_bridge.py'), '--port', String(port), '--max-calls', String(maxCalls), '--key-env', keyEnv, '--html', html],
+    { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PYTHONUNBUFFERED: '1' } });
   return new Promise((resolve, reject) => {
     let out = '';
     const timer = setTimeout(() => reject(new Error('Bridge did not start.')), 15000);

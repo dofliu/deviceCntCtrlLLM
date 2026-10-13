@@ -85,4 +85,6 @@
 
 2026-10-13（命令列批次實驗）：依使用者要求新增 run_experiments.py 與通用化的 tests/live_claude_v7.cjs，可不開網頁批次執行並控制總呼叫預算。修正舊執行器的 URL 墊片與 PNG 編碼缺陷（舊版實際無法完成真實模型實驗）。離線批次結果與既有基準完全相同；真實模式以替身上游驗證流程，未呼叫真實 API。命令列結果須與瀏覽器結果分開記錄。
 
+2026-10-13（命令列橋接啟動修正）：使用者首次真實批次 6 組皆「Bridge did not start.」、0 次模型呼叫。原因：Node 以管線讀取 claude_bridge.py 的啟動訊息，而 Python 對管線的 stdout 採區塊緩衝，「available」一行在 15 秒逾時前未送出。修正：執行器以 `python -u` 並設定 PYTHONUNBUFFERED 啟動橋接，橋接啟動訊息加 flush。驗證：以不呼叫 API 的啟動探針重現（修正前逾時、修正後約 0.7 秒就緒），test_v70_cli_runner、test_claude_bridge、test_v63_bridge_limits 通過（v70 驗證檔已還原）。該次失敗批次未產生真實模型結果；真實批次尚未重跑。
+
 2026-10-13（橋接白名單）：命令列真實模式在第 10 次請求 HTTP 400，定位為兩個橋接的工具白名單缺 write_controller／test_controller（V7 新增時未同步）。已修正並加上 provider 與橋接的工具對齊測試。該批失敗執行每組約 9 次實際 API 請求，屬基礎設施失敗，不計為模型失敗。

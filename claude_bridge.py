@@ -322,7 +322,7 @@ def main():
     with BridgeServer(args.port, args.html.resolve(), key, args.max_calls, key_name=args.key_env) as server:
         print(f"Open {server.origin}/")
         print(f"{args.key_env}: {'available' if key else 'not found; set this exact variable and restart'}")
-        print(f"At most {args.max_calls} Claude decisions per bridge session. Ctrl+C stops the server.")
+        print(f"At most {args.max_calls} Claude decisions per bridge session. Ctrl+C stops the server.", flush=True)
         if args.open_browser:
             webbrowser.open(server.origin + "/", new=2)
         try:
