@@ -116,7 +116,7 @@ function decode(rawReply) {
       return {
         documentId:'VLAB-P2', model:'VLAB-P2', title:'VLAB-P2 模擬設備通訊手冊', simulated:true,
         disclaimer:'這是虛擬設備的內建測試手冊，並非實體產品規格。相機只提供外觀假設，連線身分須由握手確認。',
-        deviceClass:'兩個未知旋轉通道，搭配已知升降與夾爪命令的桌面手臂', channels:2,
+        deviceClass:'兩個未知旋轉通道，搭配已知升降與夾爪命令的桌面手臂', channels:2, channelKind:'rotary',
         manipulation:{lift:['up','down'],grip:['open','closed'],
           constraints:'夾爪僅在下降、靠近物件、高度一致且由開轉閉時可能抓住物件。閉爪回覆不代表抓取成功；必須從影像驗證提起與跟隨。張開時物件垂直落至當地桌面或平台，位置不會吸附至 B。低於平台頂面的平面穿越會整筆拒絕，不執行任何通道。',
           liftSemantics:'up 是固定安全高度 1；down 是設備內建的順應式下降，停止於夾具 XY 正下方的支撐面，可能是桌面 0 或已設置的平台。這是已知設備功能，並非代理學會任意 Z 軸控制。ACK 只確認指令，不回傳平台、物件或實际抓取高度。',
@@ -141,7 +141,7 @@ function decode(rawReply) {
       return {
         documentId:'VLAB-G3', model:'VLAB-G3', title:'VLAB-G3 模擬龍門設備通訊手冊', simulated:true,
         disclaimer:'這是虛擬設備的內建測試手冊，並非實體產品規格。相機只提供外觀假設，連線身分須由握手確認。',
-        deviceClass:'兩個未知直線軸（龍門／直角座標），搭配已知升降與夾爪命令', channels:2,
+        deviceClass:'兩個未知直線軸（龍門／直角座標），搭配已知升降與夾爪命令', channels:2, channelKind:'linear',
         manipulation:{lift:['up','down'],grip:['open','closed'],
           constraints:'夾爪僅在下降、靠近物件、高度一致且由開轉閉時可能抓住物件。閉爪回覆不代表抓取成功；必須從影像驗證提起與跟隨。張開時物件垂直落至當地桌面或平台。低於平台頂面的平面穿越會整筆拒絕，不執行任何通道。',
           liftSemantics:'up 是固定安全高度 1；down 停止於夾具 XY 正下方的支撐面（桌面 0 或平台）。這是已知設備功能，不是任意 Z 軸控制。',

@@ -17,7 +17,7 @@
     '回傳 {action:"move", u:[a,b]}（|a|,|b| ≤ 0.1 的有限數值）、{action:"verify"}（認為已在 tolerancePx 內，主機會重新拍攝驗證）或 {action:"stop", reason}。',
     '違反格式、超出範圍或拋出例外時主機不送出任何動作並停止。設備遇行程限制會回覆較小的 applied 與 limited:true。',
     'inputLimit（0.1）是每個通道每步的上限，可以使用到上限；設備在行程邊界會自行縮小並回覆 limited，不會因此損壞。動作數是評估指標：遠離目標時應讓 u 的最大分量接近 0.1，接近目標時再縮小；不要另設更小的固定步長上限。',
-    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制與中途反向），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過；其中「二連桿長距離多目標」只回報效率（efficiency.nonlinearArm），反映映射隨位置改變的設備上的表現。'
+    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制、中途反向，以及接近目標時目標量測會偏移），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過；「二連桿長距離多目標」在手冊 channelKind 為 rotary（旋轉通道）的設備上必須到達，其他設備只回報（efficiency.nonlinearArm）。'
   ].join('\n');
 
   // Offline reference controller. It is a hand-written baseline used by the
@@ -106,9 +106,15 @@
     // Two-link arm crossing its workspace: the local mapping rotates as the
     // joints move, so one linear fit over a long history is biased. Joint
     // targets keep every point reachable; the elbow has a travel limit.
-    // Reported only (gate:false): it predicts efficiency on two-link arms but
-    // would reject controllers that are efficient on linear devices.
-    {name: '二連桿長距離多目標（僅回報效率）', gate: false, maxCalls: 260, arm: {base: [320, 240], lengths: [95, 75], gains: [1.25, -1.15], swap: true, view: 0.3,
+    // Occlusion-like target bias: within 25 px the measured target is pushed
+    // to the mirror side of the tip (observed = true - (tip - true)). An
+    // undamped full Newton step then bounces in a two-point cycle; any step
+    // gain clearly below 1 converges. Mirrors a live G3 failure.
+    {name: '接近目標時目標量測偏移', theta: 0.5, gains: [150, 160], swap: false, signs: [1, -1], curvature: 0.3, start: [150, 360], targets: [[420, 160]], targetBias: {radius: 25, k: 1}},
+    // Required only for devices whose manual declares rotary channels
+    // (channelKind 'rotary'); reported only otherwise, because it would reject
+    // controllers that are efficient on linear devices.
+    {name: '二連桿長距離多目標', rotaryOnly: true, maxCalls: 260, arm: {base: [320, 240], lengths: [95, 75], gains: [1.25, -1.15], swap: true, view: 0.3,
       q0: [-2.0, 1.0], targetQ: [[-0.6, 1.9], [-1.9, 2.3], [-0.9, 0.7], [-2.2, 1.6]], elbow: [0.25, 2.85]}}
   ];
   for (const spec of CASES) if (spec.arm) {
@@ -182,6 +188,7 @@
   // decided only by reaching every target; efficiency is informational.
   async function isolationTest(decide, options = {}) {
     const result = await runCases(decide, options), reference = await referenceCounts();
+    result.channelKind = options.channelKind === 'rotary' ? 'rotary' : options.channelKind === 'linear' ? 'linear' : null;
     let actions = 0, referenceActions = 0;
     result.cases.forEach((c, i) => {
       const ref = reference[i];
@@ -189,14 +196,14 @@
       c.actionRatio = c.passed && ref ? Number((c.actions / ref).toFixed(2)) : null;
       if (c.gate && c.passed && ref) { actions += c.actions; referenceActions += ref; }
     });
-    const arm = result.cases.find(c => !c.gate);
+    const arm = result.cases.find((c, i) => CASES[i].rotaryOnly);
     result.efficiency = {actions, referenceActions, ratio: referenceActions ? Number((actions / referenceActions).toFixed(2)) : null,
-      nonlinearArm: arm ? {reached: arm.passed, actions: arm.actions, referenceActions: arm.referenceActions, ratio: arm.actionRatio, failure: arm.failure} : null,
-      note: 'ratio = gate cases that passed; nonlinearArm = report-only two-link case; reference = offline hand-written module; neither is a pass criterion'};
+      nonlinearArm: arm ? {required: arm.gate, reached: arm.passed, actions: arm.actions, referenceActions: arm.referenceActions, ratio: arm.actionRatio, failure: arm.failure} : null,
+      note: 'ratio = required cases that passed; nonlinearArm = two-link case, required only when the manual declares rotary channels; reference = offline hand-written module; ratios are not pass criteria'};
     return result;
   }
 
-  async function runCases(decide, {maxActionsPerTarget = 60, maxCallsPerCase = 160} = {}) {
+  async function runCases(decide, {maxActionsPerTarget = 60, maxCallsPerCase = 160, channelKind = null} = {}) {
     const cases = [];
     for (const spec of CASES) {
       const plant = simulateCase(spec), history = [];
@@ -209,7 +216,12 @@
           if (goalActions >= maxActionsPerTarget) { failure = `目標 ${t + 1} 未在 ${maxActionsPerTarget} 次動作內到達`; break; }
           calls++;
           let decision;
-          try { decision = validateDecision(await decide(state({tip, target, history, step: goalActions, maxActions: maxActionsPerTarget}))); }
+          let seen = target;
+          if (spec.targetBias) {
+            const off = [tip[0] - target[0], tip[1] - target[1]];
+            if (Math.hypot(off[0], off[1]) < spec.targetBias.radius) seen = [target[0] - spec.targetBias.k * off[0], target[1] - spec.targetBias.k * off[1]];
+          }
+          try { decision = validateDecision(await decide(state({tip, target: seen, history, step: goalActions, maxActions: maxActionsPerTarget}))); }
           catch (error) { failure = String(error.message || error).slice(0, 240); break; }
           if (decision.action === 'stop') { failure = '控制程式選擇停止：' + decision.reason; break; }
           if (decision.action === 'verify') {
@@ -225,7 +237,7 @@
         }
         if (done && spec.flipAfterFirst != null && t === 0) plant.signs[spec.flipAfterFirst] *= -1;
       }
-      cases.push({name: spec.name, gate: spec.gate !== false, passed: !failure && reached.length === spec.targets.length, actions, calls, reached, failure});
+      cases.push({name: spec.name, gate: spec.rotaryOnly ? channelKind === 'rotary' : spec.gate !== false, passed: !failure && reached.length === spec.targets.length, actions, calls, reached, failure});
     }
     return {passed: cases.filter(c => c.gate).every(c => c.passed), cases, tolerancePx: TOLERANCE, maxActionsPerTarget,
       scope: 'synthetic host simulation only; no device command was sent'};

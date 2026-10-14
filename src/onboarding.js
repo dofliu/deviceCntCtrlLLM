@@ -212,9 +212,9 @@
         }else if(d.tool==='test_controller'){
           if(!o.controllerCompile?.ok)throw new Error('請先編譯控制程式。');
           const runtime=this._controllerRuntime;
-          result=await VlabControllerModule.isolationTest(state=>runtime.control(state));result.sourceHash=o.controllerCompile.sourceHash;
+          result=await VlabControllerModule.isolationTest(state=>runtime.control(state),{channelKind:o.manual?.channelKind||null});result.sourceHash=o.controllerCompile.sourceHash;
           o.controllerTests=copy(result);ok=Boolean(result.passed);
-          const gated=result.cases.filter(x=>x.gate!==false),arm=result.efficiency?.nonlinearArm;summary=ok?`控制程式通過 ${gated.length} 組合成設備隔離測試${arm?`；二連桿效率案例${arm.reached?` ${arm.ratio}×`:'未到達'}（僅回報）`:''}；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${gated.filter(x=>!x.passed).map(x=>x.name).join('、')}。必須修正後重新測試。`;
+          const gated=result.cases.filter(x=>x.gate!==false),arm=result.efficiency?.nonlinearArm;summary=ok?`控制程式通過 ${gated.length} 組合成設備隔離測試${arm?`；二連桿案例${arm.reached?` ${arm.ratio}×`:'未到達'}${arm.required?'':'（僅回報）'}`:''}；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${gated.filter(x=>!x.passed).map(x=>x.name).join('、')}。必須修正後重新測試。`;
         }else if(d.tool==='test_driver'){
           result=await this._runtime.test(this._link);o.driverTests=copy(result);ok=Boolean(result?.passed);
           summary=ok?'驅動程式測試通過。測試未移動手臂，後續真實模擬動作會重用這份程式。':'驅動程式測試未通過；保留測試結果，必須修正程式後重新驗證。';

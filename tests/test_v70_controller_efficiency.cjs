@@ -46,15 +46,19 @@ async function run() {
     assert.equal(long.passed, true, 'report-only case must not change the pass decision: ' + JSON.stringify(long.cases.filter(c => c.gate && !c.passed)));
     const arm = long.efficiency.nonlinearArm;
     assert.ok(arm && (!arm.reached || arm.ratio >= 1.3), 'long-window fit should be flagged on the two-link case: ' + JSON.stringify(arm));
+    assert.equal(arm.required, false);
+    const asRotary = await (async () => { const rt2 = new g.DriverRuntime({ kind: 'controller' }); try { await rt2.compile(longWindow); return plain(await g.VlabControllerModule.isolationTest(s => rt2.control(s), { channelKind: 'rotary' })); } finally { rt2.dispose(); } })();
+    assert.equal(asRotary.passed, false, 'with a rotary manual the two-link case is required and rejects this controller');
+    assert.equal(asRotary.efficiency.nonlinearArm.required, true);
     assert.equal(reference.efficiency.nonlinearArm.ratio, 1);
-    checks.push(`live P2 controller with a whole-history linear fit passes the gate (ratio ${long.efficiency.ratio}) but the report-only two-link case flags it (${arm.reached ? arm.ratio + 'x' : 'not reached'})`);
+    checks.push(`live P2 controller with a whole-history linear fit passes without a rotary manual (two-link case reported: ${arm.reached ? arm.ratio + 'x' : 'not reached'}) and is rejected when the manual declares rotary channels`);
 
     assert.match(M.CONTRACT, /可以使用到上限/);
     assert.match(M.CONTRACT, /不影響是否通過/);
     const safe = plain(g.VlabAgentContract.allowContext({ phase: 'onboarding', allowedTools: ['test_controller'], controllerMode: 'generated', controllerContract: M.CONTRACT, controllerSource: 'function control(s){}', controllerTests: slow }));
     assert.equal(safe.controllerTests.efficiency.ratio, slow.efficiency.ratio);
     assert.equal(safe.controllerTests.cases[0].actionRatio, slow.cases[0].actionRatio);
-    assert.deepEqual(Object.keys(safe.controllerTests.efficiency.nonlinearArm).sort(), ['actions', 'failure', 'ratio', 'reached', 'referenceActions']);
+    assert.deepEqual(Object.keys(safe.controllerTests.efficiency.nonlinearArm).sort(), ['actions', 'failure', 'ratio', 'reached', 'referenceActions', 'required']);
     assert.equal(safe.controllerTests.cases.at(-1).gate, false);
     assert.equal(Object.hasOwn(safe.controllerTests.efficiency, 'note'), false);
     checks.push('contract states the 0.1 step guidance; model context keeps per-case and total ratios');

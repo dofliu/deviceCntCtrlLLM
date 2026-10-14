@@ -69,9 +69,9 @@
   }
 
   class AutonomousEngine {
-    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,plant=null,actuator=null,frameGetter=null,preserveTarget=false,controller=null}={}) {
+    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,plant=null,actuator=null,frameGetter=null,preserveTarget=false,controller=null,fixTarget=false}={}) {
       if(!['adaptive','baseline','gemini','claude'].includes(strategy))throw new Error('未知策略。');
-      this._injectedPlant=plant;this._actuator=actuator;this._frameGetter=frameGetter;this._preserveTarget=Boolean(preserveTarget);
+      this._injectedPlant=plant;this._actuator=actuator;this._fixTarget=Boolean(fixTarget);this._frameGetter=frameGetter;this._preserveTarget=Boolean(preserveTarget);
       // Optional tested controller module {decide(state),origin,sourceHash}. When
       // present it replaces per-step XY tool decisions; actuation, ACK handling,
       // camera verification and budgets stay on the host.
@@ -290,14 +290,16 @@
       return this._emit({stage:'change',kind:'device-change',title:'觀察者已手動改變設備',explanation:'尚未執行的提案已取消。代理沒有收到改變訊息，下次決策仍需以影像與實際動作結果判斷。',observation,beforeFrame,beforeTip,afterTip:observation.tip});
       }finally{if(epoch===this._epoch)this._busy=false;}
     }
-    async setTargetPixel(x,y){
+    async setTargetPixel(x,y,{fixTarget=this._fixTarget}={}){
       if(!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>=640||y<0||y>=480)throw new Error('目標需位於相機影像範圍內。');
       if(!this._state)await this.initialize();if(this._busy)throw new Error('請先暫停並等待當前步驟結束。');
       this._busy=true;const epoch=this._epoch;
       try {
       this._proposal=null;this._mode='decide';this._decisionRecovery.accept();this.challenge=false;this._scenario.challenge=false;
       this._checkpoints={firstReach:null,changed:false,preChangeMismatch:false,mismatchSeen:false,recovered:null};this._changed=false;
-      this._plant.setTargetPixel(x,y);this._scenario.target1=[x,y];this._frame=(this._frameGetter?this._frameGetter():this._plant.frame());this._ctx=await this._agent.call('goal',this._payload());this._episodeActions=0;this._episodeDecisions=0;
+      this._plant.setTargetPixel(x,y);this._scenario.target1=[x,y];this._frame=(this._frameGetter?this._frameGetter():this._plant.frame());
+      // fixTarget: the agent measures the goal ring once in this frame and holds it.
+      this._ctx=await this._agent.call('goal',{...this._payload(),...(fixTarget?{holdTarget:true,requestedTarget:[x,y]}:{})});this._episodeActions=0;this._episodeDecisions=0;
       if(epoch!==this._epoch||this._disposed)return this.snapshot();
       return this._emit({stage:'intro',kind:'observation',title:'新目標已指定，保留已學會的映射',explanation:'代理將自行決定下一步。點選位置可能超出設備可達範圍；未到達會保留真實失敗結果。'});
       }finally{if(epoch===this._epoch)this._busy=false;}

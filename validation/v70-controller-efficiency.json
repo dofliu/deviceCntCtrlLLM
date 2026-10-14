@@ -5,10 +5,10 @@
   "node": "v22.22.0",
   "passed": true,
   "checks": [
-    "reference module: ratio 1.00 on all 7 cases (169 actions)",
-    "half-step (0.05) controller passes with ratio 1.8; efficiency does not change the pass decision",
+    "reference module: ratio 1.00 on all 8 cases (195 actions)",
+    "half-step (0.05) controller passes with ratio 1.76; efficiency does not change the pass decision",
     "failed cases carry no ratio and are excluded from the total",
-    "live P2 controller with a whole-history linear fit passes the gate (ratio 1.67) but the report-only two-link case flags it (not reached)",
+    "live P2 controller with a whole-history linear fit passes without a rotary manual (two-link case reported: not reached) and is rejected when the manual declares rotary channels",
     "contract states the 0.1 step guidance; model context keeps per-case and total ratios"
   ]
 }

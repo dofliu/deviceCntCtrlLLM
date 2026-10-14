@@ -48,6 +48,7 @@ def parse_args():
     p.add_argument("--out-dir", type=Path, default=None, help="Default: artifacts/live-runs/batch-<timestamp>")
     p.add_argument("--offline", action="store_true", help="Offline rule policy; no bridge, no API call, no cost.")
     p.add_argument("--no-full", action="store_true", help="Skip the gzipped full report per run.")
+    p.add_argument("--legacy-target", action="store_true", help="Re-measure the goal marker every step (behaviour before 2026-10-13); default holds the select_goal measurement.")
     p.add_argument("--stop-on-failure", action="store_true", help="Stop the batch after the first run that does not finish all trials.")
     p.add_argument("--yes", action="store_true", help="Skip the confirmation prompt for live runs.")
     return p.parse_args()
@@ -64,6 +65,8 @@ def run_one(args, device, seed, rep, max_calls, out_dir):
                 "--key-env", args.key_env, "--port", str(args.port)]
     if args.no_full:
         cmd.append("--no-full")
+    if args.legacy_target:
+        cmd.append("--legacy-target")
     print(f"\n=== {label} (cap {0 if args.offline else max_calls} calls) ===", flush=True)
     result = None
     with subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, text=True, encoding="utf-8", errors="replace") as proc:
@@ -165,7 +168,7 @@ def main():
     batch = {
         "kind": "offline-cli-batch" if args.offline else "live-model-batch", "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node)",
         "createdAt": dt.datetime.now().isoformat(timespec="seconds"), "model": None if args.offline else args.model,
-        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials,
+        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal",
                       "minIntervalMs": None if args.offline else args.min_interval_ms},
         "budget": None if args.offline else {"perRun": per_run, "total": args.total_max_calls, "remaining": remaining},
         "planned": len(plan), "ran": len(rows), "stopped": stopped, "runs": rows,

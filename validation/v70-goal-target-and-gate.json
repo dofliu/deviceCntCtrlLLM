@@ -1,0 +1,708 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-13",
+  "node": "v22.22.0",
+  "modelCalls": 0,
+  "label": "C version: B-zone goal held fixed; target-bias gate case; two-link case required for rotary manuals",
+  "changes": [
+    "select_goal destination: agent measures the B-zone marker once in the goal frame and holds it until the next goal; object and clearance goals re-measured every step (holding all three left the builtin controller short of the 16 px clearance check on G3 seeds 42/8675; thresholds unchanged)",
+    "isolation gate: new required case 接近目標時目標量測偏移 (within 25 px the controller sees target - 1.0*(tip - target); reach judged on the true target)",
+    "two-link case 二連桿長距離多目標 required when manual channelKind is rotary (P2); report-only for linear (G3)"
+  ],
+  "gateReevaluation": {
+    "note": "Post-hoc re-evaluation of every live-model controller under the new gate; does not change the recorded results of those runs. cli-A sources come from user-uploaded summaries not committed to the repo (identified by sha256 prefix).",
+    "rows": [
+      {
+        "controller": "live-claude-v7-ui-g3-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "linear",
+        "sha256": "30f942617726190d",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 22
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 66,
+          "referenceActions": 69,
+          "ratio": 0.96,
+          "failure": null
+        },
+        "ratio": 0.95
+      },
+      {
+        "controller": "live-claude-v7-ui-g3-seed2026-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "linear",
+        "sha256": "4ac2f19708d02e80",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 43
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": false,
+          "actions": 60,
+          "referenceActions": 69,
+          "ratio": null,
+          "failure": "目標 1 未在 60 次動作內到達"
+        },
+        "ratio": 1.78
+      },
+      {
+        "controller": "live-claude-v7-ui-g3-seed2026-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "linear",
+        "sha256": "a68e1ab3f3d3dc9f",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 44
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 123,
+          "referenceActions": 69,
+          "ratio": 1.78,
+          "failure": null
+        },
+        "ratio": 1.76
+      },
+      {
+        "controller": "live-claude-v7-ui-g3-seed3140-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "linear",
+        "sha256": "09d279ff3931bb7a",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 35
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 76,
+          "referenceActions": 69,
+          "ratio": 1.1,
+          "failure": null
+        },
+        "ratio": 1.37
+      },
+      {
+        "controller": "live-claude-v7-ui-g3-seed8675-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "linear",
+        "sha256": "5a0950652f61044d",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 20
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": false,
+          "actions": 60,
+          "referenceActions": 69,
+          "ratio": null,
+          "failure": "目標 1 未在 60 次動作內到達"
+        },
+        "ratio": 0.87
+      },
+      {
+        "controller": "live-claude-v7-ui-p2-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "rotary",
+        "sha256": "df0c05668703ca0c",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 38
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 111,
+          "referenceActions": 69,
+          "ratio": 1.61,
+          "failure": null
+        },
+        "ratio": 1.63
+      },
+      {
+        "controller": "live-claude-v7-ui-p2-seed2026-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "rotary",
+        "sha256": "8def4ce86ae8bcae",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 22
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 79,
+          "referenceActions": 69,
+          "ratio": 1.14,
+          "failure": null
+        },
+        "ratio": 1.04
+      },
+      {
+        "controller": "live-claude-v7-ui-p2-seed2026-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "rotary",
+        "sha256": "42205de6047018af",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 23
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 75,
+          "referenceActions": 69,
+          "ratio": 1.09,
+          "failure": null
+        },
+        "ratio": 0.99
+      },
+      {
+        "controller": "live-claude-v7-ui-p2-seed3140-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "rotary",
+        "sha256": "cb843cc14541a1f6",
+        "passed": false,
+        "failedGateCases": [
+          "二連桿長距離多目標"
+        ],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 38
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": false,
+          "actions": 60,
+          "referenceActions": 69,
+          "ratio": null,
+          "failure": "目標 1 未在 60 次動作內到達"
+        },
+        "ratio": 1.64
+      },
+      {
+        "controller": "live-claude-v7-ui-p2-seed8675-8192-2026-10-13.json",
+        "batch": "browser",
+        "channelKind": "rotary",
+        "sha256": "b5b9553e15d8f91e",
+        "passed": false,
+        "failedGateCases": [
+          "二連桿長距離多目標"
+        ],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 39
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": false,
+          "actions": 60,
+          "referenceActions": 69,
+          "ratio": null,
+          "failure": "目標 1 未在 60 次動作內到達"
+        },
+        "ratio": 1.69
+      },
+      {
+        "controller": "live-cli-batch-2026-10-13.json:VLAB-P2/8675",
+        "batch": "cli-B",
+        "channelKind": "rotary",
+        "sha256": "8f9b7e9234ad150e",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 21
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 98,
+          "referenceActions": 69,
+          "ratio": 1.42,
+          "failure": null
+        },
+        "ratio": 1.02
+      },
+      {
+        "controller": "live-cli-batch-2026-10-13.json:VLAB-G3/3140",
+        "batch": "cli-B",
+        "channelKind": "linear",
+        "sha256": "5077149a7a19573b",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 21
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 74,
+          "referenceActions": 69,
+          "ratio": 1.07,
+          "failure": null
+        },
+        "ratio": 0.88
+      },
+      {
+        "controller": "live-cli-batch-2026-10-13.json:VLAB-G3/8675",
+        "batch": "cli-B",
+        "channelKind": "linear",
+        "sha256": "3b7e071147da6e10",
+        "passed": false,
+        "failedGateCases": [
+          "接近目標時目標量測偏移"
+        ],
+        "targetBiasCase": {
+          "passed": false,
+          "actions": 60
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 77,
+          "referenceActions": 69,
+          "ratio": 1.12,
+          "failure": null
+        },
+        "ratio": 0.92
+      },
+      {
+        "controller": "user summary (not in repo) VLAB-P2/2026",
+        "batch": "cli-A",
+        "channelKind": "rotary",
+        "sha256": "30c62a8f9be4ddc9",
+        "passed": false,
+        "failedGateCases": [
+          "二連桿長距離多目標"
+        ],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 22
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": false,
+          "actions": 60,
+          "referenceActions": 69,
+          "ratio": null,
+          "failure": "目標 1 未在 60 次動作內到達"
+        },
+        "ratio": 0.88
+      },
+      {
+        "controller": "user summary (not in repo) VLAB-P2/3140",
+        "batch": "cli-A",
+        "channelKind": "rotary",
+        "sha256": "535981b24b91b7dc",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 21
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 115,
+          "referenceActions": 69,
+          "ratio": 1.67,
+          "failure": null
+        },
+        "ratio": 1.16
+      },
+      {
+        "controller": "user summary (not in repo) VLAB-P2/8675",
+        "batch": "cli-A",
+        "channelKind": "rotary",
+        "sha256": "f747886daa64f875",
+        "passed": false,
+        "failedGateCases": [
+          "接近目標時目標量測偏移"
+        ],
+        "targetBiasCase": {
+          "passed": false,
+          "actions": 60
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 98,
+          "referenceActions": 69,
+          "ratio": 1.42,
+          "failure": null
+        },
+        "ratio": 1.04
+      },
+      {
+        "controller": "reference module",
+        "batch": "reference",
+        "channelKind": "rotary",
+        "sha256": "c32c1db436e8ba31",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 26
+        },
+        "nonlinearArm": {
+          "required": true,
+          "reached": true,
+          "actions": 69,
+          "referenceActions": 69,
+          "ratio": 1,
+          "failure": null
+        },
+        "ratio": 1
+      },
+      {
+        "controller": "reference module",
+        "batch": "reference",
+        "channelKind": "linear",
+        "sha256": "c32c1db436e8ba31",
+        "passed": true,
+        "failedGateCases": [],
+        "targetBiasCase": {
+          "passed": true,
+          "actions": 26
+        },
+        "nonlinearArm": {
+          "required": false,
+          "reached": true,
+          "actions": 69,
+          "referenceActions": 69,
+          "ratio": 1,
+          "failure": null
+        },
+        "ratio": 1
+      }
+    ]
+  },
+  "replay": {
+    "note": "tests/replay_controller.cjs --ignore-gate (analysis only): the live G3/8675 controller with the fixed B-zone goal vs the legacy re-measured goal. Legacy result from the same runner with --legacy-target.",
+    "fixedGoal": [
+      {
+        "kind": "g3_8675_new.js",
+        "seed": 2026,
+        "completed": 5,
+        "actions": 136,
+        "trialActions": [
+          29,
+          28,
+          28,
+          26,
+          25
+        ]
+      },
+      {
+        "kind": "reference",
+        "seed": 2026,
+        "completed": 5,
+        "actions": 149,
+        "trialActions": [
+          33,
+          30,
+          31,
+          28,
+          27
+        ]
+      },
+      {
+        "kind": "g3_8675_new.js",
+        "seed": 3140,
+        "completed": 5,
+        "actions": 132,
+        "trialActions": [
+          31,
+          24,
+          26,
+          26,
+          25
+        ]
+      },
+      {
+        "kind": "reference",
+        "seed": 3140,
+        "completed": 5,
+        "actions": 147,
+        "trialActions": [
+          34,
+          29,
+          29,
+          28,
+          27
+        ]
+      },
+      {
+        "kind": "g3_8675_new.js",
+        "seed": 8675,
+        "completed": 5,
+        "actions": 144,
+        "trialActions": [
+          34,
+          30,
+          29,
+          27,
+          24
+        ]
+      },
+      {
+        "kind": "reference",
+        "seed": 8675,
+        "completed": 5,
+        "actions": 157,
+        "trialActions": [
+          38,
+          33,
+          30,
+          30,
+          26
+        ]
+      }
+    ],
+    "legacyGoal": [
+      {
+        "seed": 2026,
+        "completed": 5,
+        "actions": 284
+      },
+      {
+        "seed": 3140,
+        "completed": 0,
+        "actions": 180
+      },
+      {
+        "seed": 8675,
+        "completed": 0,
+        "actions": 180
+      }
+    ]
+  },
+  "offlineBaselineFixedGoal": {
+    "note": "tests/baseline_v7_seed.cjs, no template, five trials; compare with validation/v7-offline-baseline-seed2026.json and -seed3140-8675.json (legacy target, kept unchanged).",
+    "rows": [
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "generated",
+        "seed": 2026,
+        "passed": true,
+        "totalActions": 281,
+        "trialActions": [
+          62,
+          54,
+          59,
+          53,
+          53
+        ],
+        "maxPlacementErrorPx": 5.3
+      },
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "generated",
+        "seed": 8675,
+        "passed": true,
+        "totalActions": 282,
+        "trialActions": [
+          65,
+          56,
+          60,
+          51,
+          50
+        ],
+        "maxPlacementErrorPx": 4.69
+      },
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "generated",
+        "seed": 3140,
+        "passed": true,
+        "totalActions": 277,
+        "trialActions": [
+          64,
+          49,
+          56,
+          54,
+          54
+        ],
+        "maxPlacementErrorPx": 5.72
+      },
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "builtin",
+        "seed": 2026,
+        "passed": true,
+        "totalActions": 296,
+        "trialActions": [
+          65,
+          53,
+          60,
+          59,
+          59
+        ],
+        "maxPlacementErrorPx": 5.99
+      },
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "builtin",
+        "seed": 3140,
+        "passed": true,
+        "totalActions": 298,
+        "trialActions": [
+          69,
+          51,
+          57,
+          60,
+          61
+        ],
+        "maxPlacementErrorPx": 6.02
+      },
+      {
+        "device": "VLAB-P2",
+        "controllerMode": "builtin",
+        "seed": 8675,
+        "passed": true,
+        "totalActions": 309,
+        "trialActions": [
+          69,
+          52,
+          64,
+          61,
+          63
+        ],
+        "maxPlacementErrorPx": 6.6
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "generated",
+        "seed": 2026,
+        "passed": true,
+        "totalActions": 149,
+        "trialActions": [
+          33,
+          30,
+          31,
+          28,
+          27
+        ],
+        "maxPlacementErrorPx": 5.76
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "generated",
+        "seed": 3140,
+        "passed": true,
+        "totalActions": 147,
+        "trialActions": [
+          34,
+          29,
+          29,
+          28,
+          27
+        ],
+        "maxPlacementErrorPx": 6.03
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "generated",
+        "seed": 8675,
+        "passed": true,
+        "totalActions": 157,
+        "trialActions": [
+          38,
+          33,
+          30,
+          30,
+          26
+        ],
+        "maxPlacementErrorPx": 4.92
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "builtin",
+        "seed": 2026,
+        "passed": true,
+        "totalActions": 145,
+        "trialActions": [
+          32,
+          28,
+          30,
+          29,
+          26
+        ],
+        "maxPlacementErrorPx": 6.75
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "builtin",
+        "seed": 3140,
+        "passed": true,
+        "totalActions": 142,
+        "trialActions": [
+          33,
+          25,
+          29,
+          27,
+          28
+        ],
+        "maxPlacementErrorPx": 6.51
+      },
+      {
+        "device": "VLAB-G3",
+        "controllerMode": "builtin",
+        "seed": 8675,
+        "passed": true,
+        "totalActions": 150,
+        "trialActions": [
+          36,
+          32,
+          29,
+          29,
+          24
+        ],
+        "maxPlacementErrorPx": 6.08
+      }
+    ]
+  },
+  "regression": {
+    "passed": [
+      "all tests/test_*.cjs (incl. test_v7_offline_matrix 12/12 and test_v70_goal_target)",
+      "tests/browser_v7_smoke.cjs (headless Chromium, NODE_PATH to global playwright)",
+      "test_claude_bridge, test_gemini_bridge, test_v61_bridge_budgets, test_v63_bridge_limits, test_v70_bridge_tool_parity"
+    ],
+    "notRun": [
+      "test_mission, test_plant_driver_v5, test_recovery_budget, test_decision_recovery_workflow, test_gemini_workflow, test_gemini_ui: Python playwright not installed in this environment (same on main)"
+    ],
+    "restoredHistoricalFiles": [
+      "v62-driver-runtime.json",
+      "v62-runtime-reporting.json",
+      "v63-provider-pacing.json",
+      "v7-browser-smoke.json",
+      "v7-offline-matrix.json"
+    ]
+  }
+}

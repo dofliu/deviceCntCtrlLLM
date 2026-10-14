@@ -31,14 +31,21 @@
       this.trust=.09;this.errors=[];this.baselineAck=[0,0];this.baselineResult=null;this.baselineRecal=0;
     }
     goal() {
-      this.actions=0;this.decisions=0;this.verified=false;this.errors=[];
+      this.heldTarget=null;this.actions=0;this.decisions=0;this.verified=false;this.errors=[];
       this.baseline.setGoal();this.baselineAck=[0,0];this.baselineRecal=0;this.baselineResult=null;
       this.baselineBackup=null;
       // Retain the model. Goal updates never announce a device change.
     }
     inspect(frame) {return VisualController.inspect(frame);}
     observe(frame) {
-      this.observation=this.inspect(frame);this.observed=true;
+      const seen=this.inspect(frame);
+      // holdTarget on the goal frame: measure the goal marker once from the
+      // camera and hold it until the next goal, so a carried object that later
+      // occludes the marker cannot drag the target. Fallback: requested pixel.
+      const valid=v=>Array.isArray(v)&&v.length===2&&v.every(Number.isFinite);
+      if(frame?.holdTarget&&!this.heldTarget)this.heldTarget=valid(seen.target)?seen.target.slice():valid(frame.requestedTarget)?frame.requestedTarget.slice():null;
+      if(this.heldTarget){seen.target=this.heldTarget.slice();seen.error=seen.tip?norm(sub(seen.target,seen.tip)):null;seen.targetSource='held-goal';}
+      this.observation=seen;this.observed=true;
       return copy(this.observation);
     }
     quality() {

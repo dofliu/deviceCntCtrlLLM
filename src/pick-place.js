@@ -244,7 +244,9 @@
             await this._navigation.initialize();
           }
           if(epoch!==this._epoch||this._disposed)return this.snapshot();
-          await this._navigation.setTargetPixel(...target);if(epoch!==this._epoch||this._disposed)return this.snapshot();
+          // Only the B-zone goal is held fixed: the carried object occludes its ring
+          // while approaching. Object and clearance goals keep per-step measurement.
+          await this._navigation.setTargetPixel(...target,{fixTarget:this.fixedGoalTarget!==false&&d.args.target==='destination'});if(epoch!==this._epoch||this._disposed)return this.snapshot();
           this._navActive=true;this._navGoal=d.args.target;summary=`已依相機量測指定${d.args.target==='object'?'物件位置':d.args.target==='destination'?'B 區中心':'退出位置'}。平面控制器將自行試動、建立映射並逐步靠近。`;
           data={target:d.args.target,pixel:target,source:'camera-segmentation'};
         }else if(d.tool==='lift'||d.tool==='grip'){
@@ -338,7 +340,8 @@
   }
   class PickPlaceExperimentEngine extends FullExperimentEngine {
     constructor(options={}){
-      super({...options,challenge:false,controlFactory:config=>new PickPlaceController({...config,requireSurfaceEvidence:true})});
+      super({...options,challenge:false,controlFactory:config=>new PickPlaceController({...config,requireSurfaceEvidence:true,fixedGoalTarget:options.fixedGoalTarget!==false})});
+      this.fixedGoalTarget=options.fixedGoalTarget!==false;
       this.trialCount=this._validateTrialCount(options.trialCount??1);
     }
     _validateTrialCount(value){if(value!==1&&value!==5)throw new Error('請選擇單回合或五回合連續測試。');return value;}
@@ -415,7 +418,7 @@
     }
     report(){
       const report=super.report(),mission=this._control?.report();
-      return {...report,version:'0.7.0',scope:`模擬 ${this.device==='VLAB-G3'?'VLAB-G3 直角座標龍門（十六進位二進位框架協定）':'VLAB-P2 2R 平面手臂（JSON 單行協定）'}搭配離散升降／夾爪介面${this.manualTemplate?'':'；手冊不含驅動範本'}${this.controllerMode==='generated'?'；XY 由通過隔離測試的控制程式執行':''}：首次設備辨識、連線與驅動產生；同工作站後續回合重新握手、沿用驅動與映射，重新驗證取放。高度為模擬平台接觸；未包含跨工作站、真實硬體、6 軸姿態或完整接觸動力學。`,taskProgress:copy(this._state?.taskProgress||initialProgress()),xyActionCount:mission?.xyActionCount||0,auxiliaryActionCount:mission?.auxiliaryActionCount||0,missionEvidence:copy(mission?.evidence||null),suiteProgress:this._suiteView(),trialScenario:copy(this._trialScenario),trials:copy(this._trialResults||[]),trialCounts:copy(this._control?._trialCounts?.()||{}),suiteParameters:{trialCount:this.trialCount,maxActionsPerTrial:this.maxActions,driverReuse:'same-link-runtime-and-source',modelReuse:'same-navigation-worker; image residuals can trigger recalibration',connectionIdentity:'same retained endpoint plus model/protocol/channels; no unique hardware ID'},trafficStorage:{complete:'onboarding.traffic',eventSnapshots:'latest 15 packets per event'}};
+      return {...report,version:'0.7.0',scope:`模擬 ${this.device==='VLAB-G3'?'VLAB-G3 直角座標龍門（十六進位二進位框架協定）':'VLAB-P2 2R 平面手臂（JSON 單行協定）'}搭配離散升降／夾爪介面${this.manualTemplate?'':'；手冊不含驅動範本'}${this.controllerMode==='generated'?'；XY 由通過隔離測試的控制程式執行':''}：首次設備辨識、連線與驅動產生；同工作站後續回合重新握手、沿用驅動與映射，重新驗證取放。高度為模擬平台接觸；未包含跨工作站、真實硬體、6 軸姿態或完整接觸動力學。`,taskProgress:copy(this._state?.taskProgress||initialProgress()),xyActionCount:mission?.xyActionCount||0,auxiliaryActionCount:mission?.auxiliaryActionCount||0,missionEvidence:copy(mission?.evidence||null),suiteProgress:this._suiteView(),trialScenario:copy(this._trialScenario),trials:copy(this._trialResults||[]),trialCounts:copy(this._control?._trialCounts?.()||{}),suiteParameters:{trialCount:this.trialCount,maxActionsPerTrial:this.maxActions,driverReuse:'same-link-runtime-and-source',modelReuse:'same-navigation-worker; image residuals can trigger recalibration',connectionIdentity:'same retained endpoint plus model/protocol/channels; no unique hardware ID',goalTarget:this.fixedGoalTarget===false?'re-measured every step (legacy)':'B-zone goal measured once by camera at select_goal, then held fixed; object and clearance goals re-measured every step'},trafficStorage:{complete:'onboarding.traffic',eventSnapshots:'latest 15 packets per event'}};
     }
   }
   global.inspectTaskFrame=inspectTaskFrame;global.validateMissionDecision=validateMissionDecision;
