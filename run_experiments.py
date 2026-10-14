@@ -38,7 +38,8 @@ def parse_args():
     p.add_argument("--model", default="claude-haiku-5-5", help="Claude model ID (default claude-haiku-5-5, as in earlier runs).")
     p.add_argument("--max-calls-per-run", type=int, default=150, help="Model-call cap for one run, <=500 (default 150).")
     p.add_argument("--total-max-calls", type=int, default=600, help="Model-call budget for the whole batch (default 600).")
-    p.add_argument("--min-calls-to-start", type=int, default=60, help="Do not start a run with less remaining budget (default 60).")
+    p.add_argument("--min-calls-to-start", type=int, default=100,
+                   help="Do not start a run with less remaining budget (default 100; a five-trial run has used 77-92 calls).")
     p.add_argument("--manual-template", choices=("on", "off"), default="off")
     p.add_argument("--controller-mode", choices=("generated", "builtin"), default="generated")
     p.add_argument("--trials", type=int, choices=(1, 5), default=5)

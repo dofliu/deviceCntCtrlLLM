@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### C 版重複執行（2026-10-14，使用者本機＋離線重播）
+
+紀錄：`validation/live-cli-batch-C-repeats-2026-10-14.json`。6 組中 3 組 5/5；其餘為逾時（P2/8675）、HTTP 502（P2/3140）、批次預算（G3/8675，開跑時只剩 77 次）中斷，沒有控制或放置失敗。6 支控制程式離線重播皆 5/5、對基準 0.90–1.12×。`run_experiments.py` 的 `--min-calls-to-start` 預設改為 100。命令列結果，與瀏覽器結果分開。
+
 ### C 版命令列真實模型批次（2026-10-14，使用者本機）
 
 紀錄：`validation/live-cli-batch-C-2026-10-14.json`。P2/2026 5/5（254，0.90×）、G3/2026 5/5（137，0.92×）、P2/3140 4/5（480，第 5 回合模型請求逾時，屬基礎設施；離線重播可完成）、G3/3140 5/5（131，0.89×）；補跑 P2/8675 5/5（266，0.94×）、G3/8675 5/5（159，1.01×；B 版為 0/5）。合計 29/30 回合，六組離線重播動作數皆相同。倍率對固定 B 區的離線基準。命令列結果，與瀏覽器結果分開。另修正命令列摘要：補上 `channelKind`、各案例 `gate` 與二連桿結果（`twoLinkRatio`），`test_v70_cli_runner` 通過。
