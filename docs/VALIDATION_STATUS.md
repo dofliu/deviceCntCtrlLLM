@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### C 版三次重複完成（2026-10-14，使用者本機）
+
+紀錄：`validation/live-cli-batch-C-repeats2-2026-10-14.json`。seed 3140 第 3 次、seed 2026 第 2／3 次共 6 組皆 5/5，離線重播動作數相同。C 版 18 組累計 80/90 回合（缺的 10 回合皆基礎設施／預算）；G3 9 支 0.89–1.01×；P2 9 支中 6 支 ≤1.12×、3 支 1.61–1.73×，與二連桿倍率相關 0.95。命令列結果。
+
 ### C 版重複執行（2026-10-14，使用者本機＋離線重播）
 
 紀錄：`validation/live-cli-batch-C-repeats-2026-10-14.json`。6 組中 3 組 5/5；其餘為逾時（P2/8675）、HTTP 502（P2/3140）、批次預算（G3/8675，開跑時只剩 77 次）中斷，沒有控制或放置失敗。6 支控制程式離線重播皆 5/5、對基準 0.90–1.12×。`run_experiments.py` 的 `--min-calls-to-start` 預設改為 100。命令列結果，與瀏覽器結果分開。

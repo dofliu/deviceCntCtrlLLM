@@ -1,0 +1,466 @@
+{
+  "kind": "live-model-batch",
+  "version": "C",
+  "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node, command line; report separately from browser runs)",
+  "source": "user local machine, batch-20261014-174116 (seed 3140) and batch-20261014-180627 (seed 2026 x2); zip uploaded 2026-10-14; commit 3ee3180",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "manualTemplate": "off",
+    "controllerMode": "generated",
+    "trials": 5
+  },
+  "planned": 6,
+  "ran": 6,
+  "runs": [
+    {
+      "batch": "batch-20261014-174116",
+      "label": "g3-s3140-r1-claude",
+      "device": "VLAB-G3",
+      "seed": 3140,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 87,
+      "frontCalls": 14,
+      "actions": 138,
+      "trialActions": [
+        32,
+        26,
+        27,
+        27,
+        26
+      ],
+      "placementErrorPx": [
+        4.91,
+        0.66,
+        2.91,
+        0.33,
+        3.4
+      ],
+      "ratioToBaseline": 0.94,
+      "controllerTestRatio": 1.02,
+      "twoLink": {
+        "required": false,
+        "reached": true,
+        "actions": 65,
+        "referenceActions": 69,
+        "ratio": 0.94,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。"
+      ],
+      "driverTestAttempts": [
+        false,
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function probe(h, axisSums, lastSample) {\n  var axis = axisSums[0] <= axisSums[1] ? 0 : 1;\n  var sign = 1;\n  if (lastSample && lastSample.limited && lastSample.command) {\n    var cv = lastSample.command[axis];\n    if (Math.abs(cv) > 1e-9) sign = cv > 0 ? -1 : 1;\n  }\n  var u = axis === 0 ? [0.1 * sign, 0] : [0, 0.1 * sign];\n  return { action: 'move', u: u };\n}\n\nfunction control(state) {\n  var tip = state.tip, tg = state.target;\n  var ex = tg[0] - tip[0], ey = tg[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: 'stop', reason: 'non-finite error' };\n  if (err <= state.tolerancePx) return { action: 'verify' };\n  var h = state.history || [];\n  if (state.maxActions && h.length >= state.maxActions) return { action: 'stop', reason: 'action budget reached' };\n\n  var start = h.length > 12 ? h.length - 12 : 0;\n  var M = [[0, 0], [0, 0]];\n  var D = [[0, 0], [0, 0]];\n  var n = 0;\n  var axisSums = [0, 0];\n  var lastSample = h.length ? h[h.length - 1] : null;\n  for (var i = start; i < h.length; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var c = s.applied, d = s.delta;\n    if (!isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    axisSums[0] += Math.abs(c[0]);\n    axisSums[1] += Math.abs(c[1]);\n    if (Math.abs(c[0]) + Math.abs(c[1]) < 1e-6) continue;\n    n++;\n    for (var p = 0; p < 2; p++) {\n      for (var q = 0; q < 2; q++) M[p][q] += c[p] * c[q];\n    }\n    for (var r = 0; r < 2; r++) {\n      for (var j = 0; j < 2; j++) D[r][j] += d[r] * c[j];\n    }\n  }\n\n  var scale = M[0][0] + M[1][1];\n  if (!(scale > 0)) return probe(h, axisSums, lastSample);\n  var lam = 1e-6 * scale;\n  M[0][0] += lam; M[1][1] += lam;\n  var detM = M[0][0] * M[1][1] - M[0][1] * M[1][0];\n  var scale2 = M[0][0] + M[1][1];\n  if (n < 3 || !(detM > 0.01 * scale2 * scale2)) return probe(h, axisSums, lastSample);\n\n  var Minv = [[M[1][1] / detM, -M[0][1] / detM], [-M[1][0] / detM, M[0][0] / detM]];\n  var J = [[0, 0], [0, 0]];\n  for (var a = 0; a < 2; a++) {\n    for (var b = 0; b < 2; b++) {\n      J[a][b] = D[a][0] * Minv[0][b] + D[a][1] * Minv[1][b];\n    }\n  }\n  var detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-6) return probe(h, axisSums, lastSample);\n\n  var c0 = (J[1][1] * ex - J[0][1] * ey) / detJ;\n  var c1 = (-J[1][0] * ex + J[0][0] * ey) / detJ;\n  if (!isFinite(c0) || !isFinite(c1)) return probe(h, axisSums, lastSample);\n\n  var m = Math.max(Math.abs(c0), Math.abs(c1));\n  if (m > 0.1) { c0 = c0 * 0.1 / m; c1 = c1 * 0.1 / m; }\n  return { action: 'move', u: [c0, c1] };\n}\n"
+    },
+    {
+      "batch": "batch-20261014-174116",
+      "label": "p2-s3140-r1-claude",
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 86,
+      "frontCalls": 14,
+      "actions": 476,
+      "trialActions": [
+        126,
+        68,
+        107,
+        79,
+        96
+      ],
+      "placementErrorPx": [
+        6.75,
+        6.79,
+        6.51,
+        5.19,
+        6.06
+      ],
+      "ratioToBaseline": 1.72,
+      "controllerTestRatio": 1.03,
+      "twoLink": {
+        "required": true,
+        "reached": true,
+        "actions": 101,
+        "referenceActions": 69,
+        "ratio": 1.46,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。"
+      ],
+      "driverTestAttempts": [
+        false,
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var target = state.target;\n  var LIM = 0.1;\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n\n  if (state.maxActions !== undefined && state.maxActions !== null && state.step >= state.maxActions) {\n    return { action: \"stop\", reason: \"action budget reached\" };\n  }\n  if (err <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n\n  var h = state.history || [];\n\n  // 是否連續多步幾乎不動（可能貼近行程邊界或 Jacobian 失準）\n  var stuck = false;\n  if (h.length >= 3) {\n    stuck = true;\n    for (var j = h.length - 3; j < h.length; j++) {\n      var r = h[j];\n      if (!r || !r.delta || !r.applied) { stuck = false; break; }\n      var mag = Math.sqrt(r.delta[0] * r.delta[0] + r.delta[1] * r.delta[1]);\n      var cmag = Math.abs(r.applied[0]) + Math.abs(r.applied[1]);\n      if (cmag === 0 || mag >= 0.5) { stuck = false; break; }\n    }\n  }\n\n  var m00 = 0, m01 = 0, m11 = 0;\n  var b00 = 0, b01 = 0, b10 = 0, b11 = 0;\n  var n = 0;\n  for (var i = 0; i < h.length; i++) {\n    var rec = h[i];\n    if (!rec || !rec.applied || !rec.delta) continue;\n    var c0 = rec.applied[0], c1 = rec.applied[1];\n    var d0 = rec.delta[0], d1 = rec.delta[1];\n    if (!isFinite(c0) || !isFinite(c1) || !isFinite(d0) || !isFinite(d1)) continue;\n    if (c0 === 0 && c1 === 0) continue;\n    m00 += c0 * c0; m01 += c0 * c1; m11 += c1 * c1;\n    b00 += d0 * c0; b01 += d0 * c1;\n    b10 += d1 * c0; b11 += d1 * c1;\n    n++;\n  }\n\n  // 小量正則化，避免奇異\n  var lam = 1e-5;\n  m00 += lam; m11 += lam;\n\n  // 探測序列：包含正負兩個方向，避免只在單側被行程限制卡住\n  var pats = [[LIM, 0], [0, LIM], [-LIM, 0], [0, -LIM]];\n  var probeIdx = h.length % 4;\n  if (stuck) {\n    probeIdx = (probeIdx + 2) % 4;\n  }\n  var u = null;\n\n  if (!stuck && n >= 2) {\n    var detM = m00 * m11 - m01 * m01;\n    var traceM = m00 + m11;\n    if (traceM > 0 && Math.abs(detM) > 1e-6 * traceM * traceM) {\n      var inv00 = m11 / detM, inv01 = -m01 / detM;\n      var inv10 = -m01 / detM, inv11 = m00 / detM;\n      var J00 = b00 * inv00 + b01 * inv10;\n      var J01 = b00 * inv01 + b01 * inv11;\n      var J10 = b10 * inv00 + b11 * inv10;\n      var J11 = b10 * inv01 + b11 * inv11;\n      var detJ = J00 * J11 - J01 * J10;\n      var scaleJ = Math.max(Math.abs(J00), Math.abs(J01), Math.abs(J10), Math.abs(J11), 1e-12);\n      if (isFinite(detJ) && Math.abs(detJ) > 1e-4 * scaleJ * scaleJ) {\n        var iD = 1 / detJ;\n        var u0 = (J11 * ex - J01 * ey) * iD;\n        var u1 = (-J10 * ex + J00 * ey) * iD;\n        if (isFinite(u0) && isFinite(u1)) {\n          var mx = Math.max(Math.abs(u0), Math.abs(u1));\n          if (mx > 0) {\n            var s = Math.min(1, err / 25);\n            var k = LIM / mx;\n            if (k > 1) k = 1;\n            u = [u0 * k * s, u1 * k * s];\n          }\n        }\n      }\n    }\n  }\n\n  if (u === null) {\n    u = pats[probeIdx];\n  }\n\n  var a = Math.max(-LIM, Math.min(LIM, u[0]));\n  var b = Math.max(-LIM, Math.min(LIM, u[1]));\n  if (!isFinite(a) || !isFinite(b)) {\n    return { action: \"stop\", reason: \"non-finite control output\" };\n  }\n  return { action: \"move\", u: [a, b] };\n}\n"
+    },
+    {
+      "batch": "batch-20261014-180627",
+      "label": "g3-s2026-r1-claude",
+      "device": "VLAB-G3",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 82,
+      "frontCalls": 12,
+      "actions": 140,
+      "trialActions": [
+        32,
+        28,
+        28,
+        27,
+        25
+      ],
+      "placementErrorPx": [
+        3.39,
+        2.39,
+        4.91,
+        2.47,
+        5.96
+      ],
+      "ratioToBaseline": 0.94,
+      "controllerTestRatio": 0.91,
+      "twoLink": {
+        "required": false,
+        "reached": true,
+        "actions": 84,
+        "referenceActions": 69,
+        "ratio": 1.22,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。"
+      ],
+      "driverTestAttempts": [
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function clip(v) { if (v > 0.1) return 0.1; if (v < -0.1) return -0.1; return v; }\n\nfunction probe(n) {\n  var k = n % 4;\n  if (k === 0) return [0.08, 0];\n  if (k === 1) return [-0.08, 0];\n  if (k === 2) return [0, 0.08];\n  return [0, -0.08];\n}\n\nfunction control(state) {\n  var tip = state.tip, target = state.target;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: 'stop', reason: 'non-finite error' };\n  if (err <= state.tolerancePx) return { action: 'verify' };\n\n  var h = state.history || [];\n  var n = h.length;\n  var start = n > 40 ? n - 40 : 0;\n\n  // 上一步若被行程限制，改為探測以避免卡在邊界\n  if (n > 0 && h[n - 1].limited) return { action: 'move', u: probe(n) };\n\n  var M = [[0, 0], [0, 0]];\n  var R = [[0, 0], [0, 0]];\n  for (var i = start; i < n; i++) {\n    var c = h[i].applied, d = h[i].delta;\n    if (!c || !d || !isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    for (var a = 0; a < 2; a++) {\n      for (var b = 0; b < 2; b++) M[a][b] += c[a] * c[b];\n      for (var j = 0; j < 2; j++) R[a][j] += c[a] * d[j];\n    }\n  }\n\n  var det = M[0][0] * M[1][1] - M[0][1] * M[1][0];\n  var scale = M[0][0] + M[1][1];\n  if (M[0][0] < 1e-4) return { action: 'move', u: probe(n) };\n  if (M[1][1] < 1e-4) return { action: 'move', u: probe(n) };\n  if (!(Math.abs(det) > 1e-6 * scale * scale)) return { action: 'move', u: probe(n) };\n\n  var Minv = [[M[1][1] / det, -M[0][1] / det], [-M[1][0] / det, M[0][0] / det]];\n  var J = [[0, 0], [0, 0]];\n  for (var jj = 0; jj < 2; jj++) {\n    for (var aa = 0; aa < 2; aa++) {\n      J[jj][aa] = R[0][jj] * Minv[0][aa] + R[1][jj] * Minv[1][aa];\n    }\n  }\n\n  var A00 = J[0][0] * J[0][0] + J[0][1] * J[0][1];\n  var A01 = J[0][0] * J[1][0] + J[0][1] * J[1][1];\n  var A11 = J[1][0] * J[1][0] + J[1][1] * J[1][1];\n  var lam = 1e-3 * (A00 + A11) + 1e-9;\n  A00 += lam; A11 += lam;\n  var adet = A00 * A11 - A01 * A01;\n  if (!(Math.abs(adet) > 1e-12)) return { action: 'move', u: probe(n) };\n  var w0 = (A11 * ex - A01 * ey) / adet;\n  var w1 = (-A01 * ex + A00 * ey) / adet;\n  var u0 = J[0][0] * w0 + J[1][0] * w1;\n  var u1 = J[0][1] * w0 + J[1][1] * w1;\n  if (!isFinite(u0) || !isFinite(u1)) return { action: 'move', u: probe(n) };\n\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m === 0) return { action: 'move', u: probe(n) };\n  var f;\n  if (err > 30) {\n    f = 0.1 / m;\n  } else {\n    f = Math.min(0.1 / m, 0.6);\n  }\n  var v0 = clip(Math.round(u0 * f * 10000) / 10000);\n  var v1 = clip(Math.round(u1 * f * 10000) / 10000);\n  return { action: 'move', u: [v0, v1] };\n}\n"
+    },
+    {
+      "batch": "batch-20261014-180627",
+      "label": "g3-s2026-r2-claude",
+      "device": "VLAB-G3",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 86,
+      "frontCalls": 13,
+      "actions": 139,
+      "trialActions": [
+        30,
+        27,
+        28,
+        28,
+        26
+      ],
+      "placementErrorPx": [
+        6.76,
+        3.1,
+        4.94,
+        5.92,
+        3.95
+      ],
+      "ratioToBaseline": 0.93,
+      "controllerTestRatio": 0.88,
+      "twoLink": {
+        "required": false,
+        "reached": true,
+        "actions": 82,
+        "referenceActions": 69,
+        "ratio": 1.19,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。"
+      ],
+      "driverTestAttempts": [
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function control(state) {\n  var lim = (state && state.inputLimit) ? state.inputLimit : 0.1;\n  var tol = (state && state.tolerancePx) ? state.tolerancePx : 7;\n  var tip = state.tip;\n  var tgt = state.target;\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) {\n    return { action: 'stop', reason: 'non-finite error' };\n  }\n  if (err <= tol) {\n    return { action: 'verify' };\n  }\n\n  var h = state.history || [];\n  var n = h.length;\n  var s00 = 0, s01 = 0, s11 = 0;\n  var m00 = 0, m01 = 0, m10 = 0, m11 = 0;\n  var usable = 0;\n  var stuck = [false, false];\n  var lastSign = [1, 1];\n  for (var i = 0; i < n; i++) {\n    var rec = h[i];\n    var c = rec.applied || rec.command;\n    var cmd = rec.command;\n    var d = rec.delta;\n    if (cmd && c && cmd.length >= 2 && c.length >= 2) {\n      for (var k = 0; k < 2; k++) {\n        if (isFinite(cmd[k]) && Math.abs(cmd[k]) > 1e-6) {\n          lastSign[k] = cmd[k] > 0 ? 1 : -1;\n          stuck[k] = Math.abs(c[k]) < 1e-6;\n        }\n      }\n    }\n    if (!c || !d || c.length < 2 || d.length < 2) continue;\n    var c0 = c[0], c1 = c[1], d0 = d[0], d1 = d[1];\n    if (!isFinite(c0) || !isFinite(c1) || !isFinite(d0) || !isFinite(d1)) continue;\n    if (Math.abs(c0) + Math.abs(c1) < 1e-6) continue;\n    var w = 1 + (i + 1) / Math.max(1, n);\n    usable++;\n    s00 += w * c0 * c0;\n    s01 += w * c0 * c1;\n    s11 += w * c1 * c1;\n    m00 += w * d0 * c0;\n    m01 += w * d0 * c1;\n    m10 += w * d1 * c0;\n    m11 += w * d1 * c1;\n  }\n\n  var sdet = s00 * s11 - s01 * s01;\n  var illCond = usable < 2 || s00 <= 0 || s11 <= 0 || sdet <= 1e-4 * s00 * s11;\n  if (illCond) {\n    var pick;\n    if (s00 < s11) pick = 0;\n    else if (s11 < s00) pick = 1;\n    else pick = n % 2;\n    if (stuck[pick] && !stuck[1 - pick]) pick = 1 - pick;\n    var sg = stuck[pick] ? -lastSign[pick] : lastSign[pick];\n    var pu = [0, 0];\n    pu[pick] = sg * lim;\n    return { action: 'move', u: [pu[0], pu[1]] };\n  }\n\n  var inv00 = s11 / sdet, inv01 = -s01 / sdet, inv11 = s00 / sdet;\n  var j00 = m00 * inv00 + m01 * inv01;\n  var j01 = m00 * inv01 + m01 * inv11;\n  var j10 = m10 * inv00 + m11 * inv01;\n  var j11 = m10 * inv01 + m11 * inv11;\n  if (!isFinite(j00) || !isFinite(j01) || !isFinite(j10) || !isFinite(j11)) {\n    return { action: 'move', u: [lim, 0] };\n  }\n\n  var a00 = j00 * j00 + j10 * j10;\n  var a01 = j00 * j01 + j10 * j11;\n  var a11 = j01 * j01 + j11 * j11;\n  var mu = 1e-9 * (a00 + a11) + 1e-12;\n  a00 += mu;\n  a11 += mu;\n  var b0 = j00 * ex + j10 * ey;\n  var b1 = j01 * ex + j11 * ey;\n  var adet = a00 * a11 - a01 * a01;\n  if (!isFinite(adet) || Math.abs(adet) < 1e-18) {\n    return { action: 'move', u: [lim, 0] };\n  }\n  var u0 = (a11 * b0 - a01 * b1) / adet;\n  var u1 = (-a01 * b0 + a00 * b1) / adet;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: 'move', u: [lim, 0] };\n  }\n\n  // block commands pushing into a channel that is at its travel limit\n  if (stuck[0] && u0 * lastSign[0] > 0) u0 = 0;\n  if (stuck[1] && u1 * lastSign[1] > 0) u1 = 0;\n\n  var mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (mx === 0) {\n    var fb = [0, 0];\n    if (stuck[0]) fb[0] = -lastSign[0] * lim;\n    else if (stuck[1]) fb[1] = -lastSign[1] * lim;\n    else fb[0] = lim;\n    return { action: 'move', u: [fb[0], fb[1]] };\n  }\n  if (mx > lim) {\n    var sc = lim / mx;\n    u0 *= sc;\n    u1 *= sc;\n    mx = lim;\n  }\n  var gain = (err < 3 * tol) ? 0.5 : 1;\n  u0 *= gain;\n  u1 *= gain;\n  mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (mx < 0.01) {\n    var s2 = 0.01 / mx;\n    u0 *= s2;\n    u1 *= s2;\n  }\n  var q0 = Math.round(u0 * 10000) / 10000;\n  var q1 = Math.round(u1 * 10000) / 10000;\n  if (q0 > lim) q0 = lim;\n  if (q0 < -lim) q0 = -lim;\n  if (q1 > lim) q1 = lim;\n  if (q1 < -lim) q1 = -lim;\n  return { action: 'move', u: [q0, q1] };\n}\n"
+    },
+    {
+      "batch": "batch-20261014-180627",
+      "label": "p2-s2026-r1-claude",
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 84,
+      "frontCalls": 12,
+      "actions": 312,
+      "trialActions": [
+        60,
+        54,
+        73,
+        61,
+        64
+      ],
+      "placementErrorPx": [
+        4.18,
+        4.81,
+        5.79,
+        3.72,
+        4.67
+      ],
+      "ratioToBaseline": 1.11,
+      "controllerTestRatio": 0.94,
+      "twoLink": {
+        "required": true,
+        "reached": true,
+        "actions": 76,
+        "referenceActions": 69,
+        "ratio": 1.1,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        true
+      ],
+      "controllerGateFailures": [],
+      "driverTestAttempts": [
+        false,
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function control(state) {\n  var LIM = 0.1;\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: \"stop\", reason: \"invalid tip or target\" };\n  }\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var e = Math.sqrt(ex * ex + ey * ey);\n  var tol = (typeof state.tolerancePx === \"number\") ? state.tolerancePx : 7;\n  if (e <= tol) {\n    return { action: \"verify\" };\n  }\n  var h = state.history || [];\n  var start = Math.max(0, h.length - 16);\n  var g00 = 0, g01 = 0, g11 = 0;\n  var h00 = 0, h01 = 0, h10 = 0, h11 = 0;\n  for (var i = start; i < h.length; i++) {\n    var ent = h[i];\n    if (!ent || !ent.command || !ent.delta) continue;\n    var a = ent.command[0], b = ent.command[1];\n    var dx = ent.delta[0], dy = ent.delta[1];\n    if (!isFinite(a) || !isFinite(b) || !isFinite(dx) || !isFinite(dy)) continue;\n    g00 += a * a;\n    g01 += a * b;\n    g11 += b * b;\n    h00 += a * dx;\n    h01 += a * dy;\n    h10 += b * dx;\n    h11 += b * dy;\n  }\n  // Excitation check: probe channels that have not been excited yet\n  if (g00 < 1e-6 && g11 < 1e-6) {\n    return { action: \"move\", u: [LIM, 0] };\n  }\n  if (g00 < 1e-6) {\n    return { action: \"move\", u: [LIM, 0] };\n  }\n  if (g11 < 1e-6) {\n    return { action: \"move\", u: [0, LIM] };\n  }\n  var det = g00 * g11 - g01 * g01;\n  if (!(det > 1e-3 * g00 * g11)) {\n    // Near-collinear past commands: excite the weaker channel\n    if (g00 <= g11) {\n      return { action: \"move\", u: [LIM, 0] };\n    }\n    return { action: \"move\", u: [0, LIM] };\n  }\n  // W = Ginv * H, where delta ~= W^T * command\n  var i00 = g11 / det, i01 = -g01 / det, i10 = -g01 / det, i11 = g00 / det;\n  var w00 = i00 * h00 + i01 * h10;\n  var w01 = i00 * h01 + i01 * h11;\n  var w10 = i10 * h00 + i11 * h10;\n  var w11 = i10 * h01 + i11 * h11;\n  // J = W^T : output r from input c\n  var J00 = w00, J01 = w10, J10 = w01, J11 = w11;\n  // M = J J^T\n  var m00 = J00 * J00 + J01 * J01;\n  var m01 = J00 * J10 + J01 * J11;\n  var m11 = J10 * J10 + J11 * J11;\n  var tr = m00 + m11;\n  var lam = 1e-6 * (tr > 0 ? tr : 1);\n  m00 += lam;\n  m11 += lam;\n  var md = m00 * m11 - m01 * m01;\n  if (!(Math.abs(md) > 1e-18)) {\n    return { action: \"move\", u: [LIM, 0] };\n  }\n  // y = (M)^{-1} e\n  var y0 = (m11 * ex - m01 * ey) / md;\n  var y1 = (-m01 * ex + m00 * ey) / md;\n  // x = J^T y\n  var x0 = J00 * y0 + J10 * y1;\n  var x1 = J01 * y0 + J11 * y1;\n  if (!isFinite(x0) || !isFinite(x1)) {\n    return { action: \"move\", u: [LIM, 0] };\n  }\n  var mx = Math.max(Math.abs(x0), Math.abs(x1));\n  if (mx < 1e-12) {\n    return { action: \"move\", u: [LIM, 0] };\n  }\n  var s = 1;\n  if (mx > LIM) {\n    s = LIM / mx;\n  }\n  if (e < 20) {\n    s = s * 0.7;\n  }\n  var u0 = x0 * s;\n  var u1 = x1 * s;\n  if (u0 > LIM) u0 = LIM;\n  if (u0 < -LIM) u0 = -LIM;\n  if (u1 > LIM) u1 = LIM;\n  if (u1 < -LIM) u1 = -LIM;\n  return { action: \"move\", u: [u0, u1] };\n}\n"
+    },
+    {
+      "batch": "batch-20261014-180627",
+      "label": "p2-s2026-r2-claude",
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 91,
+      "frontCalls": 16,
+      "actions": 453,
+      "trialActions": [
+        114,
+        69,
+        88,
+        96,
+        86
+      ],
+      "placementErrorPx": [
+        0.87,
+        5.68,
+        5.17,
+        1.22,
+        6.28
+      ],
+      "ratioToBaseline": 1.61,
+      "controllerTestRatio": 1.05,
+      "twoLink": {
+        "required": true,
+        "reached": true,
+        "actions": 92,
+        "referenceActions": 69,
+        "ratio": 1.33,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。"
+      ],
+      "driverTestAttempts": [
+        false,
+        false,
+        true
+      ],
+      "git": {
+        "commit": "3ee3180",
+        "dirtySourceOrTests": false
+      },
+      "generatedControllerSource": "function control(state) {\n  var tip = state && state.tip;\n  var tgt = state && state.target;\n  if (!tip || !tgt || tip.length !== 2 || tgt.length !== 2) return { action: \"stop\", reason: \"bad state\" };\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: \"stop\", reason: \"non-finite error\" };\n  if (err <= state.tolerancePx) return { action: \"verify\" };\n\n  var h = state.history || [];\n  var n = h.length;\n\n  // Weighted least squares delta ~= J * applied (recent samples weigh more)\n  var lam = 1e-6;\n  var a00 = lam, a01 = 0, a11 = lam;\n  var bx0 = 0, bx1 = 0, by0 = 0, by1 = 0;\n  var c0 = 0, c1 = 0;\n  for (var i = 0; i < n; i++) {\n    var r = h[i];\n    if (!r || !r.applied || !r.delta) continue;\n    var a0 = r.applied[0], a1 = r.applied[1];\n    var dx = r.delta[0], dy = r.delta[1];\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(dx) || !isFinite(dy)) continue;\n    var w = 1 + i / Math.max(1, n);\n    a00 += w * a0 * a0;\n    a01 += w * a0 * a1;\n    a11 += w * a1 * a1;\n    bx0 += w * dx * a0;\n    bx1 += w * dx * a1;\n    by0 += w * dy * a0;\n    by1 += w * dy * a1;\n    if (Math.abs(a0) > 0.02) c0++;\n    if (Math.abs(a1) > 0.02) c1++;\n  }\n\n  // Detect channels blocked at travel limit from the most recent sample\n  var blocked = [0, 0];\n  if (n > 0 && h[n - 1] && h[n - 1].command && h[n - 1].applied) {\n    var last = h[n - 1];\n    for (var k = 0; k < 2; k++) {\n      var cmd = last.command[k], app = last.applied[k];\n      if (typeof cmd === \"number\" && typeof app === \"number\" && isFinite(cmd) && isFinite(app)) {\n        if (cmd !== 0 && Math.abs(app) < 0.5 * Math.abs(cmd)) blocked[k] = cmd > 0 ? 1 : -1;\n      }\n    }\n  }\n\n  // Probe when a channel is not yet sufficiently excited\n  if (c0 < 2 || c1 < 2 || n < 2) {\n    var ch = (c0 <= c1) ? 0 : 1;\n    var s = blocked[ch] !== 0 ? -blocked[ch] : 1;\n    var pu = [0, 0];\n    pu[ch] = 0.1 * s;\n    return { action: \"move\", u: pu };\n  }\n\n  var det = a00 * a11 - a01 * a01;\n  if (!(det > 1e-12) || !isFinite(det)) {\n    var pc = (c0 <= c1) ? 0 : 1;\n    var pv = [0, 0];\n    pv[pc] = (blocked[pc] !== 0 ? -blocked[pc] : 1) * 0.1;\n    return { action: \"move\", u: pv };\n  }\n\n  var jx0 = (a11 * bx0 - a01 * bx1) / det;\n  var jx1 = (-a01 * bx0 + a00 * bx1) / det;\n  var jy0 = (a11 * by0 - a01 * by1) / det;\n  var jy1 = (-a01 * by0 + a00 * by1) / det;\n\n  // Minimum-norm solution of J u = e: u = J^T (J J^T)^-1 e\n  var g00 = jx0 * jx0 + jx1 * jx1 + 1e-9;\n  var g01 = jx0 * jy0 + jx1 * jy1;\n  var g11 = jy0 * jy0 + jy1 * jy1 + 1e-9;\n  var gdet = g00 * g11 - g01 * g01;\n  if (!(Math.abs(gdet) > 1e-18) || !isFinite(gdet)) {\n    var pq = (c0 <= c1) ? 0 : 1;\n    var pw = [0, 0];\n    pw[pq] = (blocked[pq] !== 0 ? -blocked[pq] : 1) * 0.1;\n    return { action: \"move\", u: pw };\n  }\n  var z0 = (g11 * ex - g01 * ey) / gdet;\n  var z1 = (-g01 * ex + g00 * ey) / gdet;\n  var u0 = jx0 * z0 + jy0 * z1;\n  var u1 = jx1 * z0 + jy1 * z1;\n\n  // If a channel is blocked at its limit in the commanded direction, move only the other channel\n  var bU = [u0, u1];\n  var anyBlocked = false;\n  for (var b = 0; b < 2; b++) {\n    if (blocked[b] !== 0 && bU[b] * blocked[b] > 0) {\n      anyBlocked = true;\n      var o = 1 - b;\n      var col0 = (o === 0) ? jx0 : jx1;\n      var col1 = (o === 0) ? jy0 : jy1;\n      var den = col0 * col0 + col1 * col1;\n      var uo = 0;\n      if (den > 1e-12) uo = (ex * col0 + ey * col1) / den;\n      var uf = [0, 0];\n      uf[b] = 0;\n      uf[o] = uo;\n      bU = uf;\n    }\n  }\n  u0 = bU[0];\n  u1 = bU[1];\n\n  u0 *= 0.8;\n  u1 *= 0.8;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: \"move\", u: [0.1, 0] };\n  }\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 1e-6) {\n    // Model gives no usable motion; probe the less-excited channel\n    var pp = (c0 <= c1) ? 0 : 1;\n    var pr = [0, 0];\n    pr[pp] = (blocked[pp] !== 0 ? -blocked[pp] : 1) * 0.1;\n    return { action: \"move\", u: pr };\n  }\n  if (m > 0.1) {\n    u0 = u0 * 0.1 / m;\n    u1 = u1 * 0.1 / m;\n  }\n  return { action: \"move\", u: [u0, u1] };\n}\n"
+    }
+  ],
+  "notes": [
+    "All six runs 5/5 with simulator truth; offline replay reproduces every action count.",
+    "With validation/live-cli-batch-C-2026-10-14.json and -repeats-2026-10-14.json, every device/seed now has three C-version runs (18 runs, 80/90 live trials completed; all 10 missing trials stopped on timeout, HTTP 502 or batch budget).",
+    "Across the nine P2 controllers the report-only two-link ratio tracks the full-run action ratio (Pearson 0.95, n=9): two-link >=1.33 -> 1.61-1.73x; <=1.23 -> 0.90-1.12x. G3 stays 0.89-1.01x regardless of two-link ratio."
+  ],
+  "cVersionOverview": {
+    "note": "Full five-trial actions per generated controller: live where the run finished, otherwise offline replay (marked).",
+    "rows": [
+      {
+        "device": "VLAB-P2",
+        "seed": 2026,
+        "baseline": 281,
+        "controllers": [
+          {
+            "actions": 254,
+            "source": "live",
+            "ratio": 0.9
+          },
+          {
+            "actions": 312,
+            "source": "live",
+            "ratio": 1.11
+          },
+          {
+            "actions": 453,
+            "source": "live",
+            "ratio": 1.61
+          }
+        ]
+      },
+      {
+        "device": "VLAB-P2",
+        "seed": 3140,
+        "baseline": 277,
+        "controllers": [
+          {
+            "actions": 480,
+            "source": "live 4/5, replay 480",
+            "ratio": 1.73
+          },
+          {
+            "actions": 269,
+            "source": "replay; live 1/5",
+            "ratio": 0.97
+          },
+          {
+            "actions": 476,
+            "source": "live",
+            "ratio": 1.72
+          }
+        ]
+      },
+      {
+        "device": "VLAB-P2",
+        "seed": 8675,
+        "baseline": 282,
+        "controllers": [
+          {
+            "actions": 266,
+            "source": "live",
+            "ratio": 0.94
+          },
+          {
+            "actions": 315,
+            "source": "replay; live 1/5",
+            "ratio": 1.12
+          },
+          {
+            "actions": 268,
+            "source": "live",
+            "ratio": 0.95
+          }
+        ]
+      },
+      {
+        "device": "VLAB-G3",
+        "seed": 2026,
+        "baseline": 149,
+        "controllers": [
+          {
+            "actions": 137,
+            "source": "live",
+            "ratio": 0.92
+          },
+          {
+            "actions": 140,
+            "source": "live",
+            "ratio": 0.94
+          },
+          {
+            "actions": 139,
+            "source": "live",
+            "ratio": 0.93
+          }
+        ]
+      },
+      {
+        "device": "VLAB-G3",
+        "seed": 3140,
+        "baseline": 147,
+        "controllers": [
+          {
+            "actions": 131,
+            "source": "live",
+            "ratio": 0.89
+          },
+          {
+            "actions": 140,
+            "source": "live",
+            "ratio": 0.95
+          },
+          {
+            "actions": 138,
+            "source": "live",
+            "ratio": 0.94
+          }
+        ]
+      },
+      {
+        "device": "VLAB-G3",
+        "seed": 8675,
+        "baseline": 157,
+        "controllers": [
+          {
+            "actions": 159,
+            "source": "live",
+            "ratio": 1.01
+          },
+          {
+            "actions": 143,
+            "source": "live",
+            "ratio": 0.91
+          },
+          {
+            "actions": 142,
+            "source": "replay; live 4/5",
+            "ratio": 0.9
+          }
+        ]
+      }
+    ]
+  }
+}
