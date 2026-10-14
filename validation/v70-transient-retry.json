@@ -1,0 +1,25 @@
+{
+  "version": "0.6.3",
+  "scope": "Focused offline tests of actual production provider code with canned HTTP and a virtual clock. No API keys, network, browser, device actuation, or complete five-trial experiment.",
+  "passed": true,
+  "providers": [
+    "claude",
+    "gemini"
+  ],
+  "groups": 11,
+  "checks": [
+    "Start-to-start spacing, BUSY while waiting, and no added delay after a slow response",
+    "429 honors Retry-After seconds and HTTP dates before returning one validated proposal",
+    "At most two retries; every generation attempt consumes the existing call budget",
+    "Bridge call budget is terminal and cannot be retried as a temporary 429",
+    "Daily, spending, and zero quota signals are terminal without automatic retries",
+    "Server waits over 180 seconds stop explicitly and are never shortened into an early retry",
+    "Abort during cooldown or spacing cancels waiting and prevents another fetch",
+    "Cooldown is outside the HTTP timeout; actual request timeout remains enforced",
+    "A recovered HTTP request still obeys tool bounds; invalid decisions receive no transport retry",
+    "Claude resends a model request once after a timeout or HTTP 5xx (500/502/504/529), counted in the call budget; 4xx, an exhausted budget, maxTransientRetries 0 and Gemini get no resend",
+    "Request diagnostics and wait status remain bounded and omit keys and raw HTTP errors"
+  ],
+  "note": "Copy of the tests/test_v63_provider_pacing.cjs output after the 2026-10-14 transient-retry change; validation/v63-provider-pacing.json is kept as the historical record.",
+  "date": "2026-10-14"
+}

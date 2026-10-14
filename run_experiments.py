@@ -49,6 +49,10 @@ def parse_args():
     p.add_argument("--out-dir", type=Path, default=None, help="Default: artifacts/live-runs/batch-<timestamp>")
     p.add_argument("--offline", action="store_true", help="Offline rule policy; no bridge, no API call, no cost.")
     p.add_argument("--no-full", action="store_true", help="Skip the gzipped full report per run.")
+    p.add_argument("--gate", choices=("C", "D"), default="D",
+                   help="Controller gate: D (default) also limits the two-link case to 1.3x reference actions on rotary manuals; C is reach-only.")
+    p.add_argument("--no-transient-retry", action="store_true",
+                   help="Do not resend a model request after a timeout or HTTP 500/502/504/529 (default: one retry, counted in the budget).")
     p.add_argument("--legacy-target", action="store_true", help="Re-measure the goal marker every step (behaviour before 2026-10-13); default holds the select_goal measurement.")
     p.add_argument("--stop-on-failure", action="store_true", help="Stop the batch after the first run that does not finish all trials.")
     p.add_argument("--yes", action="store_true", help="Skip the confirmation prompt for live runs.")
@@ -68,6 +72,9 @@ def run_one(args, device, seed, rep, max_calls, out_dir):
         cmd.append("--no-full")
     if args.legacy_target:
         cmd.append("--legacy-target")
+    cmd += ["--gate", args.gate]
+    if args.no_transient_retry and not args.offline:
+        cmd.append("--no-transient-retry")
     print(f"\n=== {label} (cap {0 if args.offline else max_calls} calls) ===", flush=True)
     result = None
     with subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, text=True, encoding="utf-8", errors="replace") as proc:
@@ -98,7 +105,7 @@ def row_for(label, device, seed, rep, code, result, summary):
         "completedTrials": res.get("completedTrials"), "allTruthPlaced": res.get("allTruthPlaced"),
         "failure": res.get("failure"), "failureCategory": res.get("failureCategory"),
         "modelCalls": s.get("modelCalls"), "frontCalls": s.get("frontCalls"), "decisionRejections": s.get("decisionRejections"),
-        "rateLimitRetries": s.get("rateLimitRetries"), "actions": s.get("actionCount"), "xyActions": s.get("xyActionCount"),
+        "rateLimitRetries": s.get("rateLimitRetries"), "transientRetries": s.get("transientRetries"), "actions": s.get("actionCount"), "xyActions": s.get("xyActionCount"),
         "unconfirmed": s.get("unconfirmedActuationCount"), "maxPlacementErrorPx": max(errs) if errs else None,
         "controllerTestRatio": (ct.get("efficiency") or {}).get("ratio"), "twoLinkRatio": ((ct.get("efficiency") or {}).get("nonlinearArm") or {}).get("ratio"), "medianStep": step.get("medianMaxAbsU"),
         "driverFirstTry": None if not s.get("onboardingSteps") else not any(t == "test_driver" and not ok for t, ok in s["onboardingSteps"]),
@@ -169,7 +176,8 @@ def main():
     batch = {
         "kind": "offline-cli-batch" if args.offline else "live-model-batch", "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node)",
         "createdAt": dt.datetime.now().isoformat(timespec="seconds"), "model": None if args.offline else args.model,
-        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal",
+        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal", "gate": args.gate,
+                      "transientRetry": None if args.offline else not args.no_transient_retry,
                       "minIntervalMs": None if args.offline else args.min_interval_ms},
         "budget": None if args.offline else {"perRun": per_run, "total": args.total_max_calls, "remaining": remaining},
         "planned": len(plan), "ran": len(rows), "stopped": stopped, "runs": rows,

@@ -37,7 +37,9 @@
     return d;
   }
   class FullExperimentEngine {
-    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null,device='VLAB-P2',manualTemplate=true,controllerMode='builtin'}={}){
+    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null,device='VLAB-P2',manualTemplate=true,controllerMode='builtin',twoLinkMaxRatio}={}){
+      // undefined: the module default (D version, 1.3); null: reach-only (C version).
+      this.twoLinkMaxRatio=twoLinkMaxRatio;
       if(!['adaptive','claude','gemini','baseline'].includes(strategy))throw new Error('完整流程支援離線策略、Claude 或 Gemini。');
       Object.assign(this,{seed:Number(seed)>>>0,strategy,provider,challenge:Boolean(challenge),recordFrames:Boolean(recordFrames),maxActions,maxDecisions,maxFrontDecisions,controlFactory});
       this._setExperimentOptions({device,manualTemplate,controllerMode});
@@ -128,7 +130,7 @@
       const runtime=this._runtime?.diagnostics;
       const driverRuntime=runtime?{requests:runtime.requests,retries:runtime.retries,failures:runtime.failures,programErrors:runtime.programErrors,last:copy(runtime.recent.at(-1)||null)}:null;
       const requests=this.provider?.requestDiagnostics;
-      const modelRuntime=requests?{minIntervalMs:requests.minIntervalMs,requests:requests.requests,rateLimitRetries:requests.rateLimitRetries,waitMs:requests.waitMs,last:copy(requests.recent.at(-1)||null)}:null;
+      const modelRuntime=requests?{minIntervalMs:requests.minIntervalMs,requests:requests.requests,rateLimitRetries:requests.rateLimitRetries,transientRetries:requests.transientRetries??0,waitMs:requests.waitMs,last:copy(requests.recent.at(-1)||null)}:null;
       const state={...defaults,...fields,onboarding,driverRuntime,modelRuntime,eventIndex:this._events.length};
       const {frame:rawFrame,beforeFrame,diagnostics,events,historyLength,reviewing,...meta}=state;
       // Full wire traffic is exported once by report(). Event snapshots retain
@@ -212,9 +214,9 @@
         }else if(d.tool==='test_controller'){
           if(!o.controllerCompile?.ok)throw new Error('請先編譯控制程式。');
           const runtime=this._controllerRuntime;
-          result=await VlabControllerModule.isolationTest(state=>runtime.control(state),{channelKind:o.manual?.channelKind||null});result.sourceHash=o.controllerCompile.sourceHash;
+          result=await VlabControllerModule.isolationTest(state=>runtime.control(state),{channelKind:o.manual?.channelKind||null,twoLinkMaxRatio:this.twoLinkMaxRatio});result.sourceHash=o.controllerCompile.sourceHash;
           o.controllerTests=copy(result);ok=Boolean(result.passed);
-          const gated=result.cases.filter(x=>x.gate!==false),arm=result.efficiency?.nonlinearArm;summary=ok?`控制程式通過 ${gated.length} 組合成設備隔離測試${arm?`；二連桿案例${arm.reached?` ${arm.ratio}×`:'未到達'}${arm.required?'':'（僅回報）'}`:''}；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${gated.filter(x=>!x.passed).map(x=>x.name).join('、')}。必須修正後重新測試。`;
+          const gated=result.cases.filter(x=>x.gate!==false),arm=result.efficiency?.nonlinearArm;summary=ok?`控制程式通過 ${gated.length} 組合成設備隔離測試${arm?`；二連桿案例${arm.reached?` ${arm.ratio}×`:'未到達'}${arm.required?'':'（僅回報）'}`:''}；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${gated.filter(x=>!x.passed).map(x=>x.reachedAll?`${x.name}（${x.failure}）`:x.name).join('、')}。必須修正後重新測試。`;
         }else if(d.tool==='test_driver'){
           result=await this._runtime.test(this._link);o.driverTests=copy(result);ok=Boolean(result?.passed);
           summary=ok?'驅動程式測試通過。測試未移動手臂，後續真實模擬動作會重用這份程式。':'驅動程式測試未通過；保留測試結果，必須修正程式後重新驗證。';
