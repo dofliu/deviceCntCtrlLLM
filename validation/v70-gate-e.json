@@ -1,0 +1,566 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-14",
+  "modelCalls": 0,
+  "scope": "E-version gate case 二連桿肘關節極限繞行 (rotary manuals). Ground truth: every live P2 controller collected so far (C 9, D 7; deduplicated by source) replayed offline over five trials on seeds 2026/3140/8675 with the offline policy for high-level steps (tests/replay_controller.cjs --ignore-gate).",
+  "caseOrigin": "Built from the live D-version P2/3140 trial-3 failure (seed 3140 geometry, trials 2-3 legs, joint targets from inverse kinematics). The case was then checked against the ground truth below before any live E run.",
+  "summary": {
+    "controllers": 16,
+    "failInFullTaskOnSomeSeed": [
+      "C-8675-e992dd15",
+      "D-3140-3003b3b4",
+      "D-3140-f5b9f810"
+    ],
+    "gateD_passed": [
+      "C-2026-0c220e62",
+      "C-2026-eec0ec18",
+      "C-3140-b1e60c0b",
+      "C-8675-07549369",
+      "C-8675-db37cce2",
+      "C-8675-e992dd15",
+      "D-2026-ab65845c",
+      "D-2026-abe0c583",
+      "D-2026-d36131e2",
+      "D-3140-3003b3b4",
+      "D-3140-f5b9f810",
+      "D-3140-fe26697e",
+      "D-8675-0a5a6015"
+    ],
+    "gateE_passed": [
+      "C-2026-0c220e62",
+      "C-2026-eec0ec18",
+      "C-3140-b1e60c0b",
+      "C-8675-07549369",
+      "C-8675-db37cce2",
+      "D-2026-ab65845c",
+      "D-2026-abe0c583",
+      "D-2026-d36131e2",
+      "D-3140-fe26697e",
+      "D-8675-0a5a6015"
+    ],
+    "amongGateDPassed": {
+      "rejectedByE_thatCompleteAllSeeds": 0,
+      "acceptedByE_thatFail": 0
+    }
+  },
+  "notes": [
+    "Among the 13 controllers the D gate accepts, the new case rejects exactly the 3 that fail the full task on at least one seed (both live D P2/3140 failures and a C P2/8675 controller that succeeded live on 8675 but fails trial 3 on seeds 2026 and 3140) and accepts all 10 that complete every seed.",
+    "The three slow C controllers also fail the new case (target 4 not reached within 60 actions); the D efficiency limit already rejects them.",
+    "The case is derived from one observed failure; it is validated on 16 controllers x 3 seeds, not on unseen failure types."
+  ],
+  "rows": [
+    {
+      "controller": "C-2026-0c220e62",
+      "sha1": "0c220e62",
+      "twoLinkRatio": 0.94,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 254,
+          "trialActions": "55/49/53/49/48"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 248,
+          "trialActions": "54/47/52/48/47"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 255,
+          "trialActions": "57/47/55/48/48"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 82,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "C-2026-da5fbc6b",
+      "sha1": "da5fbc6b",
+      "twoLinkRatio": 1.33,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 453,
+          "trialActions": "114/69/88/96/86"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 450,
+          "trialActions": "109/67/88/95/91"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 451,
+          "trialActions": "110/69/90/93/89"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": false,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 133,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "C-2026-eec0ec18",
+      "sha1": "eec0ec18",
+      "twoLinkRatio": 1.1,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 312,
+          "trialActions": "60/54/73/61/64"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 307,
+          "trialActions": "60/52/73/62/60"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 292,
+          "trialActions": "61/54/64/57/56"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 100,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "C-3140-a2f44450",
+      "sha1": "a2f44450",
+      "twoLinkRatio": 1.46,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 490,
+          "trialActions": "130/78/90/98/94"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 476,
+          "trialActions": "126/68/107/79/96"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 479,
+          "trialActions": "127/75/106/77/94"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": false,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 134,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "C-3140-b1e60c0b",
+      "sha1": "b1e60c0b",
+      "twoLinkRatio": 0.97,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 278,
+          "trialActions": "57/59/58/52/52"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 269,
+          "trialActions": "58/53/55/54/49"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 277,
+          "trialActions": "63/52/59/51/52"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 89,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "C-3140-ef1c4cba",
+      "sha1": "ef1c4cba",
+      "twoLinkRatio": 1.48,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 532,
+          "trialActions": "134/77/120/108/93"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 480,
+          "trialActions": "124/68/102/92/94"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 463,
+          "trialActions": "120/73/103/77/90"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": false,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 133,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "C-8675-07549369",
+      "sha1": "07549369",
+      "twoLinkRatio": 0.87,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 268,
+          "trialActions": "60/49/56/53/50"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 264,
+          "trialActions": "59/46/55/53/51"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 266,
+          "trialActions": "59/49/54/53/51"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 81,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "C-8675-db37cce2",
+      "sha1": "db37cce2",
+      "twoLinkRatio": 0.87,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 267,
+          "trialActions": "60/49/55/53/50"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 261,
+          "trialActions": "59/45/53/53/51"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 268,
+          "trialActions": "59/49/55/54/51"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 80,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "C-8675-e992dd15",
+      "sha1": "e992dd15",
+      "twoLinkRatio": 1.23,
+      "replay": {
+        "2026": {
+          "completed": 2,
+          "actions": 303,
+          "trialActions": "62/61/180"
+        },
+        "3140": {
+          "completed": 2,
+          "actions": 301,
+          "trialActions": "67/54/180"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 315,
+          "trialActions": "68/57/73/58/59"
+        }
+      },
+      "completesAllSeeds": false,
+      "gateC": true,
+      "gateD": true,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 119,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "D-2026-ab65845c",
+      "sha1": "ab65845c",
+      "twoLinkRatio": 0.99,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 271,
+          "trialActions": "57/49/61/53/51"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 268,
+          "trialActions": "59/47/59/52/51"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 273,
+          "trialActions": "62/52/57/51/51"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 91,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "D-2026-abe0c583",
+      "sha1": "abe0c583",
+      "twoLinkRatio": 0.97,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 278,
+          "trialActions": "57/59/57/54/51"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 278,
+          "trialActions": "61/48/63/54/52"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 275,
+          "trialActions": "63/52/57/51/52"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 89,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "D-2026-d36131e2",
+      "sha1": "d36131e2",
+      "twoLinkRatio": 1.1,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 320,
+          "trialActions": "63/61/71/67/58"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 325,
+          "trialActions": "70/59/69/68/59"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 331,
+          "trialActions": "68/62/74/66/61"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 104,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "D-3140-3003b3b4",
+      "sha1": "3003b3b4",
+      "twoLinkRatio": 1.04,
+      "replay": {
+        "2026": {
+          "completed": 2,
+          "actions": 292,
+          "trialActions": "59/53/180"
+        },
+        "3140": {
+          "completed": 2,
+          "actions": 293,
+          "trialActions": "60/53/180"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 288,
+          "trialActions": "64/55/61/53/55"
+        }
+      },
+      "completesAllSeeds": false,
+      "gateC": true,
+      "gateD": true,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 113,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "D-3140-f5b9f810",
+      "sha1": "f5b9f810",
+      "twoLinkRatio": 0.93,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 246,
+          "trialActions": "52/47/51/47/49"
+        },
+        "3140": {
+          "completed": 2,
+          "actions": 279,
+          "trialActions": "55/44/180"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 250,
+          "trialActions": "59/47/51/46/47"
+        }
+      },
+      "completesAllSeeds": false,
+      "gateC": true,
+      "gateD": true,
+      "gateE": false,
+      "elbowCase": {
+        "passed": false,
+        "actions": 107,
+        "referenceActions": 85,
+        "failure": "目標 4 未在 60 次動作內到達"
+      }
+    },
+    {
+      "controller": "D-3140-fe26697e",
+      "sha1": "fe26697e",
+      "twoLinkRatio": 1.07,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 279,
+          "trialActions": "58/52/63/54/52"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 300,
+          "trialActions": "75/51/58/57/59"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 283,
+          "trialActions": "67/54/58/51/53"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 85,
+        "referenceActions": 85,
+        "failure": null
+      }
+    },
+    {
+      "controller": "D-8675-0a5a6015",
+      "sha1": "0a5a6015",
+      "twoLinkRatio": 0.91,
+      "replay": {
+        "2026": {
+          "completed": 5,
+          "actions": 263,
+          "trialActions": "56/51/55/51/50"
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 256,
+          "trialActions": "56/45/55/49/51"
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 265,
+          "trialActions": "60/51/56/49/49"
+        }
+      },
+      "completesAllSeeds": true,
+      "gateC": true,
+      "gateD": true,
+      "gateE": true,
+      "elbowCase": {
+        "passed": true,
+        "actions": 82,
+        "referenceActions": 85,
+        "failure": null
+      }
+    }
+  ]
+}

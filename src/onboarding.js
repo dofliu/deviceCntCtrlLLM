@@ -39,7 +39,9 @@
     return d;
   }
   class FullExperimentEngine {
-    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null,device='VLAB-P2',manualTemplate=true,controllerMode='builtin',twoLinkMaxRatio,includeHoldout=false}={}){
+    constructor({seed=42,strategy='adaptive',provider=null,challenge=true,recordFrames=true,maxActions=180,maxDecisions=300,maxFrontDecisions=40,controlFactory=null,device='VLAB-P2',manualTemplate=true,controllerMode='builtin',twoLinkMaxRatio,elbowLimitCase,includeHoldout=false}={}){
+      // undefined: required (E version); false: report-only (C and D versions).
+      this.elbowLimitCase=elbowLimitCase;
       this.includeHoldout=Boolean(includeHoldout);
       // undefined: the module default (D version, 1.3); null: reach-only (C version).
       this.twoLinkMaxRatio=twoLinkMaxRatio;
@@ -219,7 +221,7 @@
         }else if(d.tool==='test_controller'){
           if(!o.controllerCompile?.ok)throw new Error('請先編譯控制程式。');
           const runtime=this._controllerRuntime;
-          result=await VlabControllerModule.isolationTest(state=>runtime.control(state),{channelKind:o.manual?.channelKind||null,twoLinkMaxRatio:this.twoLinkMaxRatio});result.sourceHash=o.controllerCompile.sourceHash;
+          result=await VlabControllerModule.isolationTest(state=>runtime.control(state),{channelKind:o.manual?.channelKind||null,twoLinkMaxRatio:this.twoLinkMaxRatio,elbowLimitCase:this.elbowLimitCase});result.sourceHash=o.controllerCompile.sourceHash;
           o.controllerTests=copy(result);ok=Boolean(result.passed);
           const gated=result.cases.filter(x=>x.gate!==false),arm=result.efficiency?.nonlinearArm;summary=ok?`控制程式通過 ${gated.length} 組合成設備隔離測試${arm?`；二連桿案例${arm.reached?` ${arm.ratio}×`:'未到達'}${arm.required?'':'（僅回報）'}`:''}；測試未送出任何設備命令。`:`控制程式未通過隔離測試：${gated.filter(x=>!x.passed).map(x=>x.reachedAll?`${x.name}（${x.failure}）`:x.name).join('、')}。必須修正後重新測試。`;
         }else if(d.tool==='test_driver'){

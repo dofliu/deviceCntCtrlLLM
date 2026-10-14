@@ -23,8 +23,8 @@
 //   --offline  --no-full
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
 //   --holdout  allow the held-out VLAB-X (--device X); adds it to the manual library
-//   --gate C|D (D)  D: on rotary manuals the two-link case must also stay within 1.3x the
-//                   reference actions; C: reach-only (behaviour before 2026-10-14)
+//   --gate C|D|E (E)  E: D plus the elbow-limit two-link case on rotary manuals;
+//                   D: two-link case within 1.3x reference actions; C: reach-only
 //   --no-transient-retry  do not resend a model request after a timeout or HTTP 500/502/504/529
 // The last stdout line is "RESULT <json>" with the summary path for wrappers.
 const fs = require('node:fs');
@@ -53,9 +53,10 @@ if (![1, 5].includes(trials)) fail('--trials must be 1 or 5.');
 const offline = flag('--offline');
 const fixedGoalTarget = !flag('--legacy-target');
 const includeHoldout = flag('--holdout');
-const gate = String(arg('--gate', 'D')).toUpperCase();
-if (!['C', 'D'].includes(gate)) fail('--gate must be C or D.');
+const gate = String(arg('--gate', 'E')).toUpperCase();
+if (!['C', 'D', 'E'].includes(gate)) fail('--gate must be C, D or E.');
 const twoLinkMaxRatio = gate === 'C' ? null : undefined;
+const elbowLimitCase = gate === 'E' ? undefined : false;
 const maxTransientRetries = flag('--no-transient-retry') ? 0 : 1;
 const keyEnv = arg('--key-env', 'ANTHROPIC_API_KEY');
 const maxCalls = Math.min(500, Math.max(1, Math.floor(Number(arg('--max-calls', 150)) || 150)));
@@ -145,7 +146,7 @@ function summarize(report, { model, error }) {
     provenance: report?.provenance ? { driverSource: report.provenance.driverSource, controllerSource: report.provenance.controllerSource } : null,
     onboardingSteps: (o.steps || []).map(s => [s.tool, s.ok]), failedAttempts,
     driverTests: o.driverTests ? { passed: o.driverTests.passed, protocol: o.driverTests.protocol, failed: (o.driverTests.tests || []).filter(t => !t.passed).map(t => t.name) } : null,
-    controllerTests: ct ? { passed: ct.passed, channelKind: ct.channelKind ?? null, twoLinkMaxRatio: ct.twoLinkMaxRatio ?? null, efficiency: ct.efficiency ? { actions: ct.efficiency.actions, referenceActions: ct.efficiency.referenceActions, ratio: ct.efficiency.ratio, nonlinearArm: ct.efficiency.nonlinearArm ?? null } : null,
+    controllerTests: ct ? { passed: ct.passed, channelKind: ct.channelKind ?? null, twoLinkMaxRatio: ct.twoLinkMaxRatio ?? null, elbowLimitCase: ct.elbowLimitCase ?? null, efficiency: ct.efficiency ? { actions: ct.efficiency.actions, referenceActions: ct.efficiency.referenceActions, ratio: ct.efficiency.ratio, nonlinearArm: ct.efficiency.nonlinearArm ?? null } : null,
       cases: (ct.cases || []).map(c => ({ name: c.name, passed: c.passed, gate: c.gate ?? null, actions: c.actions, referenceActions: c.referenceActions ?? null, actionRatio: c.actionRatio ?? null, failure: c.failure })) } : null,
     controllerStepStats: mags.length ? { moves: mags.length, medianMaxAbsU: round(median(mags), 4), shareAtLeast0_09: round(mags.filter(m => m >= 0.09).length / mags.length),
       singleChannelMoves: moves.filter(u => (Math.abs(u[0]) < 1e-9) !== (Math.abs(u[1]) < 1e-9)).length, inputLimit: 0.1 } : null,
@@ -180,7 +181,7 @@ async function main() {
       strategy = 'claude';
     }
     console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : 'claude'} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
-    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio, includeHoldout });
+    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio, elbowLimitCase, includeHoldout });
     let state = await engine.initialize(), lastKind = '';
     for (let step = 0; !state.done && step < 6000; step++) {
       state = await engine.next();

@@ -31,6 +31,14 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### E 版閘門：肘關節極限案例（2026-10-14，離線 Node＋無頭 Chromium）
+
+紀錄：`validation/v70-gate-e.json`、新測試 `test_v70_gate_e`。沒有呼叫真實模型。
+- 新增 rotary 必要案例「二連桿肘關節極限繞行」，取自 D 版 P2/3140 第 3 回合失敗現場。
+- 事實基準：16 支真實 P2 控制程式在 seed 2026／3140／8675 完整重播；在 D 閘門放行的 13 支中，E 閘門正好擋下會失敗的 3 支、放行其餘 10 支；G3 控制程式與參考模組皆通過。
+- `--gate C|D|E`（預設 E）；`test_v70_gate_d` 以 D 設定檢查，`test_v7_controller_module` 的必要案例數改為 rotary 9、linear 7。
+- 回歸見下方清單；之後結果標為 E 版。
+
 ### D 版第二批（2026-10-14，使用者本機）
 
 紀錄：`validation/live-cli-batch-D2-2026-10-14.json`。兩批同時開跑共用橋接，造成 4 組因橋接上限中斷（程序問題，已修正：埠占用即拒絕、Windows 橋接不重用位址；橋接測試通過）。P2/3140 兩次在第 3 回合用完 180 步：肘關節停在極限時控制程式丟棄 limited 樣本而無法重估，離線重播可重現；現有隔離案例未涵蓋此情況。P2/2026 r2 5/5（271）。
