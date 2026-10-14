@@ -1,5 +1,6 @@
 'use strict';
-// V7.0 D-version controller gate. On rotary manuals (VLAB-P2) the two-link
+// V7.0 D-version controller gate (checked with elbowLimitCase false, i.e. as D;
+// the E version adds a case, see test_v70_gate_e). On rotary manuals (VLAB-P2) the two-link
 // case must reach every target within 1.3x the reference module's actions;
 // linear manuals (VLAB-G3) only report it. Checked against the C-version live
 // controllers: three P2 controllers that ran at 1.61-1.73x the offline
@@ -24,8 +25,8 @@ async function run() {
     try {
       await runtime.compile(r.source);
       const kind = r.device === 'VLAB-P2' ? 'rotary' : 'linear';
-      const d = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind }));
-      const c = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind, twoLinkMaxRatio: null }));
+      const d = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind, elbowLimitCase: false }));
+      const c = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind, twoLinkMaxRatio: null, elbowLimitCase: false }));
       rows.push({ controller: `${r.file}:${r.label}`, device: r.device, seed: r.seed, twoLinkRatio: d.efficiency.nonlinearArm.ratio, gateC: c.passed, gateD: d.passed, failure: d.cases.filter(x => x.gate && !x.passed).map(x => x.failure)[0] || null });
       assert.equal(c.passed, true, 'every C-version controller passed the C gate');
       if (kind === 'linear') assert.equal(d.passed, true, 'G3 is unaffected');
@@ -37,7 +38,7 @@ async function run() {
   assert.ok(rejected.every(x => x.device === 'VLAB-P2' && /1\.3 倍/.test(x.failure)), 'the failure states the ratio and the limit');
   for (const kind of ['rotary', 'linear']) {
     const runtime = new g.DriverRuntime({ kind: 'controller' });
-    try { await runtime.compile(M.REFERENCE_SOURCE); const ref = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind })); assert.equal(ref.passed, true); assert.equal(ref.twoLinkMaxRatio, 1.3); }
+    try { await runtime.compile(M.REFERENCE_SOURCE); const ref = plain(await M.isolationTest(s => runtime.control(s), { channelKind: kind, elbowLimitCase: false })); assert.equal(ref.passed, true); assert.equal(ref.twoLinkMaxRatio, 1.3); }
     finally { runtime.dispose(); }
   }
   rt.close();

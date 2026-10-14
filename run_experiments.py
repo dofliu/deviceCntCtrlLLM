@@ -52,8 +52,8 @@ def parse_args():
     p.add_argument("--no-full", action="store_true", help="Skip the gzipped full report per run.")
     p.add_argument("--holdout", action="store_true",
                    help="Allow the held-out device X (VLAB-X, CoreXY + Modbus-RTU style); also adds it to the manual library.")
-    p.add_argument("--gate", choices=("C", "D"), default="D",
-                   help="Controller gate: D (default) also limits the two-link case to 1.3x reference actions on rotary manuals; C is reach-only.")
+    p.add_argument("--gate", choices=("C", "D", "E"), default="E",
+                   help="Controller gate: E (default) = D plus the elbow-limit two-link case on rotary manuals; D limits the two-link case to 1.3x reference actions; C is reach-only.")
     p.add_argument("--no-transient-retry", action="store_true",
                    help="Do not resend a model request after a timeout or HTTP 500/502/504/529 (default: one retry, counted in the budget).")
     p.add_argument("--legacy-target", action="store_true", help="Re-measure the goal marker every step (behaviour before 2026-10-13); default holds the select_goal measurement.")

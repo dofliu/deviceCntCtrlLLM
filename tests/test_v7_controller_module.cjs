@@ -50,9 +50,9 @@ async function run() {
     const reference = await isolation(g, M.REFERENCE_SOURCE);
     assert.equal(reference.passed, true, JSON.stringify(reference.cases.filter(c => !c.passed)));
     assert.equal(reference.cases.filter(c => c.gate).length, 7, 'six original cases plus the target-bias case are required');
-    assert.equal(reference.cases.filter(c => !c.gate).length, 1, 'two-link case is report-only without a rotary manual');
+    assert.equal(reference.cases.filter(c => !c.gate).length, 2, 'both two-link cases are report-only without a rotary manual');
     const rotary = plain(await (async () => { const rt2 = new g.DriverRuntime({ kind: 'controller' }); try { await rt2.compile(M.REFERENCE_SOURCE); return await M.isolationTest(s => rt2.control(s), { channelKind: 'rotary' }); } finally { rt2.dispose(); } })());
-    assert.equal(rotary.passed, true); assert.equal(rotary.cases.filter(c => c.gate).length, 8, 'rotary manuals also require the two-link case');
+    assert.equal(rotary.passed, true); assert.equal(rotary.cases.filter(c => c.gate).length, 9, 'rotary manuals also require both two-link cases (E version)');
     assert.ok(reference.cases.every(c => c.reached.every(r => r.errorPx <= 7)));
     checks.push('offline reference module reaches every synthetic case (rotation, swap, reversal, nonlinearity, travel limit, mid-run reversal)');
 

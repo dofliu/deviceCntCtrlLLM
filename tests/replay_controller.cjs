@@ -15,7 +15,7 @@
 //   --device P2|G3 (default: the summary's device)  --seeds list (default: the summary's seed)
 //   --trials 5|1  --compare-reference  --jobs n (default 4)  --json out.json
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13 fix)
-//   --gate C|D (D)   controller gate version (C: two-link case reach-only)
+//   --gate C|D|E (E) controller gate version (C: two-link reach-only; D: +1.3x limit; E: +elbow-limit case)
 //   --ignore-gate    analysis only: let a controller that fails the isolation gate run anyway;
 //                    the real verdict is kept in gatePassed (never use for reported results)
 // Headless software canvas, as in the command-line runner; compare with headless baselines.
@@ -41,7 +41,7 @@ async function runOne({ device, seed, trials, source, legacyTarget, ignoreGate, 
   // the controller under test. The isolation reference counts stay those of
   // the built-in reference module.
   if (source) g.VlabControllerModule.REFERENCE_SOURCE = source;
-  const engine = new g.PickPlaceExperimentEngine({ seed, strategy: 'adaptive', recordFrames: false, trialCount: trials, device, manualTemplate: false, controllerMode: 'generated', fixedGoalTarget: !legacyTarget, includeHoldout: device === 'VLAB-X', twoLinkMaxRatio: gate === 'C' ? null : undefined });
+  const engine = new g.PickPlaceExperimentEngine({ seed, strategy: 'adaptive', recordFrames: false, trialCount: trials, device, manualTemplate: false, controllerMode: 'generated', fixedGoalTarget: !legacyTarget, includeHoldout: device === 'VLAB-X', twoLinkMaxRatio: gate === 'C' ? null : undefined, elbowLimitCase: gate === 'E' ? undefined : false });
   try {
     let state = await engine.initialize();
     for (let i = 0; i < 6000 && !state.done; i++) state = await engine.next();
@@ -71,7 +71,7 @@ if (flag('--child')) {
     const trials = Number(arg('--trials', 5));
     const jobs = [];
     for (const seed of seeds) {
-      const legacyTarget = flag('--legacy-target'), ignoreGate = flag('--ignore-gate'), gate = String(arg('--gate', 'D')).toUpperCase();
+      const legacyTarget = flag('--legacy-target'), ignoreGate = flag('--ignore-gate'), gate = String(arg('--gate', 'E')).toUpperCase();
       jobs.push({ kind: label, device, seed, trials, source, legacyTarget, ignoreGate, gate });
       if (flag('--compare-reference') && source) jobs.push({ kind: 'reference', device, seed, trials, source: null, legacyTarget, ignoreGate, gate });
     }
@@ -93,7 +93,7 @@ if (flag('--child')) {
       const arm = r.nonlinearArm ? (r.nonlinearArm.reached ? r.nonlinearArm.ratio : 'not reached') : '-';
       console.log(`${String(r.kind).slice(0, 34).padEnd(34)} ${String(r.device).slice(5).padEnd(6)} ${String(r.seed).padStart(5)}  ${String(r.completed ?? '-').padStart(4)}  ${String(r.actions ?? r.error).padStart(7)}  ${String(r.gateRatio ?? '-').padStart(9)}  ${String(arm).padStart(8)}  ${(r.trialActions || []).join('/')}`);
     }
-    const out = { kind: 'offline-controller-replay', gate: String(arg('--gate', 'D')).toUpperCase(), gateIgnored: flag('--ignore-gate'), goalTarget: flag('--legacy-target') ? 'legacy re-measured' : 'fixed at select_goal', runner: 'tests/replay_controller.cjs (headless-node, offline policy for high-level steps)', controller: label, device, trials, createdAt: new Date().toISOString(), rows };
+    const out = { kind: 'offline-controller-replay', gate: String(arg('--gate', 'E')).toUpperCase(), gateIgnored: flag('--ignore-gate'), goalTarget: flag('--legacy-target') ? 'legacy re-measured' : 'fixed at select_goal', runner: 'tests/replay_controller.cjs (headless-node, offline policy for high-level steps)', controller: label, device, trials, createdAt: new Date().toISOString(), rows };
     if (arg('--json')) { fs.writeFileSync(arg('--json'), JSON.stringify(out, null, 2) + '\n'); console.log('Wrote ' + arg('--json')); }
   })().catch(error => { console.error(String(error.message || error)); process.exitCode = 1; });
 }
