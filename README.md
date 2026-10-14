@@ -102,6 +102,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 
 **V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
 
+**2026-10-14 D 版第二批**（`validation/live-cli-batch-D2-2026-10-14.json`）：兩批同時開跑共用一個橋接而提早中斷（已修正 runner 與橋接）；P2/3140 兩次在第 3 回合失敗——肘關節卡在行程極限時，控制程式丟棄受限樣本而原地繞圈，隔離測試沒有對應案例。
+
 **2026-10-14 D 版真實第一批**（`validation/live-cli-batch-D-2026-10-14.json`）：3 組皆 5/5。兩組 P2 的初版控制程式（二連桿 1.42×）被 D 閘門擋下，模型依回饋改寫後通過，真實動作為基準 0.99×／1.08×（C 版 P2/3140 曾為 1.73×）。P2 仍需補足重複次數。
 
 **2026-10-14 保留評估設備 VLAB-X（離線建置，尚未真實評估）**（`validation/v7x-holdout-device.json`、`validation/v7x-offline-baseline.json`）：CoreXY 皮帶機構（含反向間隙）＋ Modbus-RTU 風格協定（CRC-16、須啟用與歸零）。預設不在手冊庫，須以 `--holdout` 啟用；未啟用時 P2／G3 的模型輸入完全不變。離線 16/16 組合 5/5。系統凍結後才做真實模型評估。

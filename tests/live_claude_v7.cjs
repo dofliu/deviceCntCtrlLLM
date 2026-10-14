@@ -31,6 +31,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
 const { spawn, execSync } = require('node:child_process');
+const net = require('node:net');
 const { createRuntime, plain, root } = require('./headless-runtime.cjs');
 
 const argv = process.argv.slice(2);
@@ -77,7 +78,20 @@ let bridge = null;
 function stopBridge() { if (bridge && bridge.exitCode === null) bridge.kill(); }
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => { stopBridge(); process.exit(130); });
 
-function startBridge() {
+// Refuse to start when something already answers on the bridge port: on
+// Windows a second bridge can bind the same port, and two runs would then
+// share one bridge and one call budget.
+function portBusy(p) {
+  return new Promise(resolve => {
+    const socket = net.connect({ host: '127.0.0.1', port: p });
+    socket.setTimeout(1500);
+    socket.once('connect', () => { socket.destroy(); resolve(true); });
+    socket.once('timeout', () => { socket.destroy(); resolve(false); });
+    socket.once('error', () => resolve(false));
+  });
+}
+async function startBridge() {
+  if (await portBusy(port)) throw new Error(`Port ${port} is already in use (another run or bridge?). Wait for it to finish or pass a different --port; no request was sent.`);
   if (!['ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY_Extra'].includes(keyEnv)) throw new Error('Unsupported key variable name.');
   if (!process.env[keyEnv]) throw new Error(`${keyEnv} is not set in this environment; no request was sent.`);
   const html = path.join(root, 'unknown-device-v7.0.html');

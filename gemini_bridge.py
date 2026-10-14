@@ -302,6 +302,9 @@ def validate_message(value: object) -> bool:
 
 class BridgeServer(ThreadingHTTPServer):
     daemon_threads = True
+    # On Windows SO_REUSEADDR lets a second bridge bind the same port, so two
+    # runs could silently share one bridge and its call budget.
+    allow_reuse_address = sys.platform != "win32"
 
     def __init__(self, port: int, html_path: Path, key: str, max_calls: int = 80, key_name: str = KEY_NAME):
         if not authorized_name(key_name):
