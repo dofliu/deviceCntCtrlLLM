@@ -83,7 +83,7 @@
     const feedback=decisionFeedback(c.decisionFeedback);
     if(c.phase==='onboarding') {
       return {
-        phase:'onboarding',scope:'simulated-device',...(feedback?{decisionFeedback:feedback}:{}),
+        phase:'onboarding',scope:'simulated-device',...(feedback?{decisionFeedback:feedback}:{}),...(libraryOf(c.documentLibrary)?{documentLibrary:libraryOf(c.documentLibrary)}:{}),
         allowedTools:Array.isArray(c.allowedTools)?FRONT.filter(x=>c.allowedTools.includes(x)):[],
         hypothesis:fields(c.hypothesis,{deviceClass:str,visibleAxes:num,modelLabel:str,uncertainties:str}),
         inventory:Array.isArray(c.inventory)?c.inventory.slice(0,30).map(x=>fields(x,endpointSpec)):[],
@@ -170,9 +170,23 @@
     verify_place:'確認橙色物件在藍色目的地內，且夾爪已升起、打開並移離物件。只有實際相機檢查通過才完成整個取放任務；先前導航成功、放開回覆或預期結果均不足。',
     stop:'停止這次實驗並保留尚未完成的狀態。缺乏證據、影像缺失或預算不足時使用，不等同成功。'
   };
-  function toolDefinition(name) {
-    const args=schemas[name];
-    return {name,description:descriptions[name],input_schema:{type:'object',additionalProperties:false,
+  // The manual library is fixed for development devices. An experiment that
+  // enables a held-out device passes documentLibrary; only then do the
+  // read_manual enum and description change.
+  const DEFAULT_LIBRARY=['VLAB-P2','VLAB-G3'];
+  function libraryOf(value){return Array.isArray(value)&&value.length>=1&&value.length<=8&&value.every(v=>typeof v==='string'&&/^VLAB-[A-Z0-9]{1,8}$/.test(v))?[...new Set(value)]:null;}
+  function schemaFor(name,library){
+    if(name!=='read_manual'||!library)return schemas[name];
+    return {documentId:{type:'string',enum:library.slice()}};
+  }
+  function descriptionFor(name,library){
+    if(name!=='read_manual'||!library)return descriptions[name];
+    const list=library.length>1?library.slice(0,-1).join('、')+' 與 '+library.at(-1):library[0];
+    return descriptions.read_manual.replace('手冊庫有 VLAB-P2 與 VLAB-G3','手冊庫有 '+list);
+  }
+  function toolDefinition(name,documentLibrary) {
+    const library=libraryOf(documentLibrary),args=schemaFor(name,library);
+    return {name,description:descriptionFor(name,library),input_schema:{type:'object',additionalProperties:false,
       properties:{args:{type:'object',additionalProperties:false,properties:args,required:Object.keys(args)},reason:{...S(),description:'一句繁體中文的簡短證據或理由，不提供內部思考過程。'},expected:{...S(),description:'選填：一句可由下次工具結果檢查的預期結果。省略時只記錄未提供，不代寫預測。'}},
       required:['args','reason']}};
   }
@@ -181,20 +195,20 @@
     if(!Number.isFinite(v)||typeof v!=='number'||(schema.type==='integer'&&!Number.isInteger(v)))return false;
     return (schema.enum?schema.enum.includes(v):true)&&(schema.minimum===undefined||v>=schema.minimum)&&(schema.exclusiveMinimum===undefined||v>schema.exclusiveMinimum)&&(schema.maximum===undefined||v<=schema.maximum);
   }
-  function decisionFrom(data,allowed) {
+  function decisionFrom(data,allowed,documentLibrary) {
     const calls=Array.isArray(data?.content)?data.content.filter(v=>v?.type==='tool_use'):[];
     if(data?.stop_reason!=='tool_use')rejectDecision('INVALID_TOOL_RESPONSE','stop-reason',{stopReason:data?.stop_reason,toolCount:calls.length});
     if(calls.length!==1)rejectDecision('INVALID_TOOL_RESPONSE','tool-count',{toolCount:calls.length,stopReason:data?.stop_reason});
-    return validateToolCall(calls[0],allowed);
+    return validateToolCall(calls[0],allowed,documentLibrary);
   }
-  function validateToolCall(call,allowed) {
+  function validateToolCall(call,allowed,documentLibrary) {
     const input=call?.input,receivedTool=call?.name;
     if(!ALL_TOOLS.includes(receivedTool)||!allowed.includes(receivedTool))rejectDecision('INVALID_DECISION','invalid-tool',{receivedTool});
     const envelope=['args','reason','expected'],required=['args','reason'];
     if(!record(input)||required.some(k=>!Object.hasOwn(input,k))||Object.keys(input).some(k=>!envelope.includes(k)))rejectDecision('INVALID_DECISION','invalid-envelope',{receivedTool,receivedType:valueType(input),missingFields:required.filter(k=>!record(input)||!Object.hasOwn(input,k)),extraFieldCount:record(input)?Object.keys(input).filter(k=>!envelope.includes(k)).length:0});
     const expectedProvided=Object.hasOwn(input,'expected');
     for(const field of expectedProvided?['reason','expected']:['reason'])if(!checkValue(input[field],S())||!input[field].trim())rejectDecision('INVALID_DECISION','invalid-'+field,{receivedTool,invalidFields:[field],receivedType:valueType(input[field]),...(typeof input[field]==='string'?{receivedLength:input[field].length}:{})});
-    const schema=schemas[call.name];
+    const schema=schemaFor(call.name,libraryOf(documentLibrary));
     if(!exact(input.args,Object.keys(schema))||Object.entries(schema).some(([k,s])=>!checkValue(input.args[k],s)))rejectDecision('INVALID_ARGUMENTS','invalid-arguments',{receivedTool,receivedType:valueType(input.args),missingFields:Object.keys(schema).filter(k=>!record(input.args)||!Object.hasOwn(input.args,k)),invalidFields:Object.entries(schema).filter(([k,s])=>!record(input.args)||!checkValue(input.args[k],s)).map(([k])=>k),extraFieldCount:record(input.args)?Object.keys(input.args).filter(k=>!Object.hasOwn(schema,k)).length:0});
     // Explanatory metadata must not block a valid device command when omitted.
     // Preserve its absence explicitly instead of inventing a model prediction.
@@ -372,7 +386,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
       safe.modelRequests={used:this.#calls,limit:this.#maxCalls};
       let evidence=JSON.stringify(safe);if(this.#key)evidence=evidence.split(this.#key).join('[REDACTED]');
       const request={model:this.#model,max_tokens:safe.phase==='onboarding'?8192:1400,system:INSTRUCTION+REPAIR_INSTRUCTION,
-        tools:safe.allowedTools.map(toolDefinition),tool_choice:{type:this.#toolChoice,disable_parallel_tool_use:true},
+        tools:safe.allowedTools.map(name=>toolDefinition(name,safe.documentLibrary)),tool_choice:{type:this.#toolChoice,disable_parallel_tool_use:true},
         messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/png',data:cameraPNG(frame)}},{type:'text',text:'目前可檢查的狀態（每次請求是獨立決策，以此狀態為準）：\n'+evidence+'\n選擇一個工具並提供完整參數。'}]}]};
       const c=new AbortController();this.#active=c;
       const t=transport(this.#bridge,this.#key);let responseUsage;
@@ -385,7 +399,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
           try{return await response.json();}catch(_){fail('INVALID_RESPONSE','Claude 回傳無法解析的資料；這次未執行動作。');}
         }});
         responseUsage=usage(data?.usage);if(c.signal.aborted||this.#disposed)fail('ABORTED','Claude 請求已取消，這次未執行動作。');
-        const result=decisionFrom(data,safe.allowedTools);
+        const result=decisionFrom(data,safe.allowedTools,safe.documentLibrary);
         if(this.#key && JSON.stringify(result.args).includes(this.#key))fail('CREDENTIAL_ECHO','外部回覆包含不應出現的認證資料，已拒絕這次決策。');
         if(this.#key){result.reason=result.reason.split(this.#key).join('[REDACTED]');result.expected=result.expected.split(this.#key).join('[REDACTED]');}
         return {...result,source:'claude',model:this.#model,usage:usage(data.usage)};

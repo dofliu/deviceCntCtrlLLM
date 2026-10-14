@@ -328,7 +328,7 @@
       if (this.disposed || !diagnostics || !diagnostics.geometry) return;
       this.diag = diagnostics;
       const g = diagnostics.geometry;
-      const gantry = g.kinematics === 'gantry';
+      const gantry = g.kinematics === 'gantry' || g.kinematics === 'corexy';
       const key = JSON.stringify([g.kinematics || '2r', g.lengths, g.channelToJoint]);
       if (key !== this.armKey) { if (gantry) this.makeGantry(g); else this.makeArm(g); this.armKey = key; }
       if (this.base) this.base.visible = !gantry;

@@ -75,11 +75,11 @@
     503:'尚未找到授權的 Gemini 金鑰，或服務暫時無法使用。'
     })[status]||'Gemini API 回傳 HTTP '+status+'；這次未執行動作。');
   }
-  function toolDefinition(name){
-    const tool=shared('toolDefinition',name);
+  function toolDefinition(name,documentLibrary){
+    const tool=shared('toolDefinition',name,documentLibrary);
     return {name:tool.name,description:tool.description,parametersJsonSchema:tool.input_schema};
   }
-  function decisionFrom(data,allowed){
+  function decisionFrom(data,allowed,documentLibrary){
     if(data?.promptFeedback?.blockReason)fail('BLOCKED_RESPONSE','Gemini 未提供可執行的工具決策；這次未執行動作。');
     const candidates=data?.candidates;
     const reject=(issue,details)=>{const diagnostic=shared('rejectionDiagnostic','INVALID_TOOL_RESPONSE',issue,details);fail('INVALID_TOOL_RESPONSE',diagnostic.message,diagnostic);};
@@ -89,7 +89,7 @@
     const calls=Array.isArray(parts)?parts.filter(part=>record(part?.functionCall)&&part.thought!==true):[];
     if(calls.length!==1)reject('tool-count',{toolCount:calls.length,stopReason:candidates[0]?.finishReason});
     const call=calls[0].functionCall;
-    return shared('validateToolCall',{name:call.name,input:call.args},allowed);
+    return shared('validateToolCall',{name:call.name,input:call.args},allowed,documentLibrary);
   }
   function usage(value){
     const out={};
@@ -124,7 +124,7 @@
       const body={
         systemInstruction:{parts:[{text:contract.instruction.replace(/tool_use/g,'functionCall')+'\n請只回傳一個 functionCall，不得平行呼叫多個工具。'}]},
         contents:[{role:'user',parts:[{inlineData:{mimeType:'image/png',data:shared('cameraPNG',frame)}},{text:'目前可檢查的狀態（每次請求是獨立決策，以此狀態為準）：\n'+evidence+'\n選擇一個工具並提供完整 args 與 reason；expected 為選填。'}]}],
-        tools:[{functionDeclarations:safe.allowedTools.map(toolDefinition)}],
+        tools:[{functionDeclarations:safe.allowedTools.map(name=>toolDefinition(name,safe.documentLibrary))}],
         toolConfig:{functionCallingConfig:{mode:'ANY',allowedFunctionNames:safe.allowedTools.slice()}},
         generationConfig:{candidateCount:1,maxOutputTokens:8192}
       };
@@ -142,7 +142,7 @@
         }});
         responseUsage=usage(data?.usageMetadata);
         if(controller.signal.aborted||this.#disposed)throw requests.schedulingError(ProviderError,'Gemini','ABORTED');
-        const result=decisionFrom(data,safe.allowedTools);
+        const result=decisionFrom(data,safe.allowedTools,safe.documentLibrary);
         if(this.#key&&JSON.stringify(result.args).includes(this.#key))fail('CREDENTIAL_ECHO','外部回覆包含不應出現的認證資料，已拒絕這次決策。');
         result.reason=redact(result.reason,this.#key);result.expected=redact(result.expected,this.#key);
         return {...result,source:'gemini',model:this.#model,usage:usage(data.usageMetadata)};

@@ -31,6 +31,15 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 保留評估設備 VLAB-X（2026-10-14，離線 Node＋無頭 Chromium）
+
+紀錄：`validation/v7x-holdout-device.json`、`validation/v7x-offline-baseline.json`。沒有呼叫真實模型，也沒有修改代理、閘門、提示或參考模組。
+- CoreXY（耦合皮帶＋反向間隙）與 Modbus-RTU 風格協定（CRC-16、0x17／0x06、例外碼、錯誤時不回覆、須啟用與歸零）。
+- 手冊範本與規格產生器驅動通過原有驅動測試；跳過 CRC、CRC 位元組順序錯、G3 驅動皆被拒。
+- 離線矩陣 16/16 組合 5/5（範本有無 × 內建／參考模組 × seed 7／2026／3140／8675）。
+- 未啟用 `includeHoldout` 時，P2／G3 的工具定義、模型上下文與手冊和 main 逐字相同；VLAB-X 無法啟動。
+- 回歸見下方清單；真實模型評估待 D 版完成並凍結後才執行。
+
 ### D 版閘門與傳輸重試（2026-10-14，離線 Node＋無頭 Chromium）
 
 紀錄：`validation/v70-gate-d.json`、`validation/v70-transient-retry.json`（provider 節奏測試含新增重試檢查）。沒有呼叫真實模型。

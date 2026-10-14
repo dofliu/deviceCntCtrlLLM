@@ -28,7 +28,7 @@ const { createRuntime, plain } = require('./headless-runtime.cjs');
 const argv = process.argv.slice(2);
 const arg = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 && i + 1 < argv.length ? argv[i + 1] : fallback; };
 const flag = name => argv.includes(name);
-const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3' };
+const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', X: 'VLAB-X', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3', 'VLAB-X': 'VLAB-X' };
 
 async function runOne({ device, seed, trials, source, legacyTarget, ignoreGate, gate }) {
   const rt = createRuntime(), g = rt.global;
@@ -41,7 +41,7 @@ async function runOne({ device, seed, trials, source, legacyTarget, ignoreGate, 
   // the controller under test. The isolation reference counts stay those of
   // the built-in reference module.
   if (source) g.VlabControllerModule.REFERENCE_SOURCE = source;
-  const engine = new g.PickPlaceExperimentEngine({ seed, strategy: 'adaptive', recordFrames: false, trialCount: trials, device, manualTemplate: false, controllerMode: 'generated', fixedGoalTarget: !legacyTarget, twoLinkMaxRatio: gate === 'C' ? null : undefined });
+  const engine = new g.PickPlaceExperimentEngine({ seed, strategy: 'adaptive', recordFrames: false, trialCount: trials, device, manualTemplate: false, controllerMode: 'generated', fixedGoalTarget: !legacyTarget, includeHoldout: device === 'VLAB-X', twoLinkMaxRatio: gate === 'C' ? null : undefined });
   try {
     let state = await engine.initialize();
     for (let i = 0; i < 6000 && !state.done; i++) state = await engine.next();
@@ -65,7 +65,7 @@ if (flag('--child')) {
     } else if (arg('--source')) { source = fs.readFileSync(arg('--source'), 'utf8'); label = path.basename(arg('--source')); }
     else if (!flag('--reference')) throw new Error('Give --summary, --source or --reference.');
     const device = DEVICES[String(arg('--device', summary?.condition?.device || 'P2')).toUpperCase()];
-    if (!device) throw new Error('--device must be P2 or G3.');
+    if (!device) throw new Error('--device must be P2, G3 or X.');
     const seeds = String(arg('--seeds', summary?.condition?.seed ?? 2026)).split(',').map(Number);
     if (!seeds.length || seeds.some(s => !Number.isInteger(s) || s < 1)) throw new Error('--seeds must be positive integers.');
     const trials = Number(arg('--trials', 5));

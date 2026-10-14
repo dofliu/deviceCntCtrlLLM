@@ -52,9 +52,47 @@ function decode(rawReply) {
   if (p[1] === 0x21 && p.length === 4 && p[2] <= 1 && p[3] <= 1) return {applied:{op:'grip',state:p[2] ? 'closed' : 'open'},limited:p[3] === 1};
   throw new Error('Unexpected reply layout.');
 }`;
+  const SAMPLE_DRIVER_X = `function encode(command) {
+  const crc = bytes => { let c = 0xffff; for (const b of bytes) { c ^= b; for (let i = 0; i < 8; i++) c = c & 1 ? (c >>> 1) ^ 0xa001 : c >>> 1; } return c; };
+  const hex = bytes => bytes.map(b => (b & 255).toString(16).padStart(2, '0')).join('');
+  const rtu = body => { const c = crc(body); return hex([...body, c & 255, (c >> 8) & 255]); };
+  const u16 = v => [(v >> 8) & 255, v & 255];
+  const s16 = v => { const n = Math.round(v * 10000); return u16(n < 0 ? n + 65536 : n); };
+  if (Array.isArray(command) && command.length === 2 && command.every(v => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= 0.1)) {
+    return rtu([0x11, 0x17, ...u16(0x0310), ...u16(3), ...u16(0x0300), ...u16(2), 4, ...s16(command[0]), ...s16(command[1])]);
+  }
+  if (command && command.op === 'lift' && ['up','down'].includes(command.position) && Object.keys(command).sort().join(',') === 'op,position') return rtu([0x11, 0x06, ...u16(0x0200), ...u16(command.position === 'up' ? 1 : 0)]);
+  if (command && command.op === 'grip' && ['open','closed'].includes(command.state) && Object.keys(command).sort().join(',') === 'op,state') return rtu([0x11, 0x06, ...u16(0x0201), ...u16(command.state === 'closed' ? 1 : 0)]);
+  throw new Error('Expected bounded XY array, lift position, or grip state.');
+}
+function decode(rawReply) {
+  if (typeof rawReply !== 'string' || rawReply === '') throw new Error('No reply from device.');
+  if (rawReply.length % 2 || !/^[0-9a-f]+$/.test(rawReply)) throw new Error('Reply is not lowercase hex.');
+  const b = []; for (let i = 0; i < rawReply.length; i += 2) b.push(parseInt(rawReply.slice(i, i + 2), 16));
+  if (b.length < 5) throw new Error('Reply too short.');
+  let c = 0xffff; for (const x of b.slice(0, -2)) { c ^= x; for (let i = 0; i < 8; i++) c = c & 1 ? (c >>> 1) ^ 0xa001 : c >>> 1; }
+  if (b[b.length - 2] !== (c & 255) || b[b.length - 1] !== ((c >> 8) & 255)) throw new Error('Bad CRC.');
+  if (b[0] !== 0x11) throw new Error('Wrong unit address.');
+  if (b[1] & 0x80) throw new Error('Device exception ' + b[2]);
+  const u16 = i => (b[i] << 8) | b[i + 1], s16 = i => { const v = u16(i); return (v >= 32768 ? v - 65536 : v) / 10000; };
+  if (b[1] === 0x17 && b.length === 11 && b[2] === 6) {
+    const flags = u16(7); if (flags > 1) throw new Error('Bad flags.');
+    const applied = [s16(3), s16(5)]; if (applied.some(v => Math.abs(v) > 0.1)) throw new Error('Out of range.');
+    return {applied, limited: flags === 1};
+  }
+  if (b[1] === 0x06 && b.length === 8) {
+    const reg = u16(2), value = u16(4);
+    if (reg === 0x0200 && value <= 1) return {applied: {op: 'lift', position: value ? 'up' : 'down'}, limited: false};
+    if (reg === 0x0201 && value <= 1) return {applied: {op: 'grip', state: value ? 'closed' : 'open'}, limited: false};
+  }
+  throw new Error('Unexpected reply layout.');
+}`;
   const DEVICES = {
     'VLAB-P2': {protocol:PROTOCOL, kinematics:'2r', serialBaud:115200, tcpPort:7402, endpoint:'arm', product:'VLAB-P2 virtual arm interface', firmware:'sim-2.0'},
-    'VLAB-G3': {protocol:'vlab-g3-bin/1', kinematics:'gantry', serialBaud:57600, tcpPort:7410, endpoint:'gantry', product:'VLAB-G3 virtual gantry controller', firmware:'sim-g3-1.0'}
+    'VLAB-G3': {protocol:'vlab-g3-bin/1', kinematics:'gantry', serialBaud:57600, tcpPort:7410, endpoint:'gantry', product:'VLAB-G3 virtual gantry controller', firmware:'sim-g3-1.0'},
+    // Held-out evaluation device: excluded from the default manual library and
+    // from development; experiments must enable it explicitly (includeHoldout).
+    'VLAB-X': {protocol:'vlab-x-modbus/1', kinematics:'corexy', serialBaud:19200, tcpPort:502, endpoint:'corexy', product:'VLAB-X virtual CoreXY motion controller', firmware:'sim-x-1.0', holdout:true}
   };
 
   function validCommand(command) {
@@ -75,7 +113,7 @@ function decode(rawReply) {
   }
 
   class SimulatedDeviceLink {
-    #plant; #seed; #transport; #connected = null; #hello = false; #traffic = []; #sequence = 0;
+    #plant; #seed; #transport; #connected = null; #hello = false; #traffic = []; #sequence = 0; #enabled = false; #homed = false;
     #canvas; #context; #model; #device; #includeTemplate;
     constructor({plant, seed = 42, model = 'VLAB-P2', includeTemplate = true} = {}) {
       if (!plant || typeof plant.act !== 'function' || typeof plant.frame !== 'function') throw new Error('A virtual plant is required.');
@@ -90,12 +128,13 @@ function decode(rawReply) {
     get model() { return this.#model; }
     get protocol() { return this.#connected?.protocol || null; }
     get includeTemplate() { return this.#includeTemplate; }
-    static models() { return Object.keys(DEVICES); }
+    static models({includeHoldout = false} = {}) { return Object.keys(DEVICES).filter(id => includeHoldout || !DEVICES[id].holdout); }
+    static isHoldout(model) { return Boolean(DEVICES[model]?.holdout); }
     inventory() {
       const d = this.#device, serial = this.#transport === 'serial', tag = d.endpoint;
       return [
         {endpointId:'sim-serial-logger', transport:'serial', deviceModel:'LOGGER-1', product:'LOGGER-1 virtual recorder', manufacturer:'Virtual Lab', address:'SIM-COM3', simulated:true},
-        {endpointId:serial ? 'sim-serial-' + tag : 'sim-tcp-' + tag, transport:this.#transport, deviceModel:this.#model, product:d.product, manufacturer:'Virtual Lab', address:serial ? (this.#model === 'VLAB-P2' ? 'SIM-COM7' : 'SIM-COM9') : 'SIM-NET-' + tag.toUpperCase() + ':' + d.tcpPort, simulated:true}
+        {endpointId:serial ? 'sim-serial-' + tag : 'sim-tcp-' + tag, transport:this.#transport, deviceModel:this.#model, product:d.product, manufacturer:'Virtual Lab', address:serial ? ({'VLAB-P2':'SIM-COM7','VLAB-G3':'SIM-COM9'}[this.#model] || 'SIM-COM5') : 'SIM-NET-' + tag.toUpperCase() + ':' + d.tcpPort, simulated:true}
       ];
     }
     // The host manual library holds every simulated model. Reading the wrong
@@ -103,7 +142,7 @@ function decode(rawReply) {
     manual(documentId) {
       if (!DEVICES[documentId]) throw new Error('找不到該模擬設備文件。');
       const transport = documentId === this.#model ? this.#transport : 'serial';
-      const manual = documentId === 'VLAB-G3' ? this.#manualG3(transport) : this.#manualP2(transport);
+      const manual = documentId === 'VLAB-X' ? this.#manualX(transport) : documentId === 'VLAB-G3' ? this.#manualG3(transport) : this.#manualP2(transport);
       manual.protocolSpec = global.VlabProtocols ? global.VlabProtocols.spec(manual.connection.protocol) : null;
       if (!this.#includeTemplate) {
         delete manual.sampleDriver; delete manual.sampleDriverSource;
@@ -163,6 +202,34 @@ function decode(rawReply) {
         sampleDriver:SAMPLE_DRIVER_G3, sampleDriverSource:SAMPLE_DRIVER_G3
       };
     }
+    #manualX(transport) {
+      const p = global.VlabProtocols.get('vlab-x-modbus/1'), r = p.registers;
+      const hex = n => '0x' + n.toString(16).padStart(4, '0');
+      return {
+        documentId:'VLAB-X', model:'VLAB-X', title:'VLAB-X 模擬 CoreXY 運動控制器通訊手冊', simulated:true,
+        disclaimer:'這是虛擬設備的內建測試手冊，並非實體產品規格。相機只提供外觀假設，連線身分須由握手確認。',
+        deviceClass:'CoreXY 平面機構：兩顆皮帶馬達通道共同驅動同一個滑座（每個通道都會同時改變兩個方向），搭配已知升降與夾爪命令', channels:2, channelKind:'linear',
+        manipulation:{lift:['up','down'],grip:['open','closed'],
+          constraints:'夾爪僅在下降、靠近物件、高度一致且由開轉閉時可能抓住物件。閉爪回覆不代表抓取成功；必須從影像驗證提起與跟隨。張開時物件垂直落至當地桌面或平台。低於平台頂面的平面穿越會整筆拒絕（例外碼 4），不執行任何通道。',
+          liftSemantics:'up 是固定安全高度 1；down 停止於夾具 XY 正下方的支撐面（桌面 0 或平台）。這是已知設備功能，不是任意 Z 軸控制。',
+          cameraHeightEvidence:'藍色大圈是 B 的地面 XY 參考，紫色小圈是平台頂面參考；兩圈的影像垂直差可驗證放置高度。'},
+        connection:{transport, baudRate:transport === 'serial' ? 19200 : 0, protocol:'vlab-x-modbus/1'},
+        selection:'從已列出的模擬介面，選擇 deviceModel 為 VLAB-X 且 transport 符合 connection 的端點。',
+        protocol:{name:'vlab-x-modbus/1',
+          framing:'Modbus-RTU 風格框架：單元位址 0x11 | 功能碼 | 資料 | CRC-16/MODBUS（多項式 0xA001 反射、初值 0xFFFF，低位元組在前）。線上以小寫十六進位字串表示每個位元組，不加空白或換行。位址不符或 CRC 錯誤時設備不回覆（空字串）。',
+          hello:p.hello, helloReply:p.replyIdentity('VLAB-X', MAX_STEP),
+          command:p.encodeCommand([0.02, 0]), reply:p.replyStep([0.02, 0], false),
+          commandLayout:`暫存器：識別 ${hex(r.identity)}×6（協定版本、通道數、最大步幅×10000、ASCII 型號每暫存器 2 字元）、ENABLE ${hex(r.enable)}、HOME ${hex(r.home)}、STATUS ${hex(r.status)}（bit0 已啟用、bit1 已歸零）、LIFT ${hex(r.lift)}（0 下降／1 升起）、GRIP ${hex(r.grip)}（0 張開／1 合攏）、STEP ${hex(r.step)}–${hex(r.step + 1)}（s16，輸入×10000）、RESULT ${hex(r.result)}–${hex(r.result + 2)}（實際接受 A、B 與旗標）。STEP 用功能碼 0x17（讀寫多個暫存器）：讀起點 ${hex(r.result)}、讀 3 個、寫起點 ${hex(r.step)}、寫 2 個、位元組數 4、兩個 s16 值。LIFT／GRIP 用功能碼 0x06 寫單一暫存器。`,
+          replyLayout:'0x17 回覆：位元組數 6，接 s16 A、s16 B（實際接受值×10000）與 u16 旗標（bit0=受限）。0x06 回覆原樣回送暫存器與值，代表已執行（未受限）。例外回覆：功能碼 | 0x80，接 1 位元組例外碼。',
+          liftCommand:p.encodeCommand({op:'lift', position:'up'}), liftReply:p.replyAuxiliary({op:'lift', position:'up'}),
+          gripCommand:p.encodeCommand({op:'grip', state:'closed'}), gripReply:p.replyAuxiliary({op:'grip', state:'closed'}),
+          limits:{channels:2,min:-MAX_STEP,max:MAX_STEP,resolution:0.0001,units:'相對馬達步進指令；CoreXY 耦合、方向與增益未知，須由觀察取得。'},
+          errors:'例外碼：1 ILLEGAL_FUNCTION、2 ILLEGAL_DATA_ADDRESS、3 ILLEGAL_DATA_VALUE（超出範圍）、4 DEVICE_FAILURE（低於平台頂面的穿越，整筆拒絕）、6 DEVICE_BUSY_NOT_READY（尚未啟用或歸零）；例外時不執行。啟動程序：handshake 時主機依序讀識別暫存器、寫 ENABLE=1、寫 HOME=1，並讀 STATUS 確認 bit0 與 bit1；完成前所有動作命令回覆例外碼 6。遇行程限制時旗標 bit0=1，回覆值為實際接受量。皮帶傳動有反向間隙：馬達改變方向後的最初一小段轉動不會移動滑座，ACK 仍回報馬達接受的指令。'},
+        hiddenProperties:['CoreXY 通道與方向的組合','正負方向','皮帶增益','反向間隙大小','行程範圍','相機轉換'],
+        driverContract:'定義 JavaScript encode(command) 回傳小寫十六進位 Modbus-RTU 框架字串（含單元位址 0x11 與 CRC-16，低位元組在前）；command 可為 [a,b]（|a|,|b|≤0.1，主機已量化到 0.0001，以 0x17 寫入 STEP 並讀回 RESULT）、{op:"lift",position:"up"|"down"} 或 {op:"grip",state:"open"|"closed"}（以 0x06 寫入 LIFT／GRIP）。decode(rawReply) 驗證位址、CRC、功能碼與長度，例外回覆、空字串（設備未回覆）或毀損回覆必須 throw；回傳 {applied,limited}，applied 為 [a,b] 數值（÷10000）或原升降／夾爪命令物件，0x06 回送的 limited 為 false。啟動程序由主機在 handshake 執行，驅動程式不需編碼 ENABLE／HOME。函式每次獨立執行，不可依賴全域狀態或網路。',
+        sampleDriver:SAMPLE_DRIVER_X, sampleDriverSource:SAMPLE_DRIVER_X
+      };
+    }
     connect(args = {}) {
       if (this.#connected) throw new Error('ALREADY_CONNECTED: disconnect before changing endpoint.');
       const entry = this.inventory().find(item => item.endpointId === args.endpointId), d = this.#device;
@@ -178,7 +245,21 @@ function decode(rawReply) {
       return copy(this.#connected);
     }
     disconnect() { this.#connected = null; this.#hello = false; }
+    // Drive enable and homing persist across reconnects of the same device.
     handshake() {
+      if (this.#device.protocol !== PROTOCOL && global.VlabProtocols.get(this.#device.protocol).startup) {
+        const profile = global.VlabProtocols.get(this.#device.protocol);
+        const identity = profile.parseReply(this.exchange(profile.hello));
+        if (!identity.ok || identity.model !== this.#model || identity.channels !== 2) throw new Error('HANDSHAKE: identity or capabilities failed.');
+        const startup = [];
+        for (const step of profile.startup) {
+          const reply = profile.parseReply(this.exchange(step.wire));
+          if (!reply.ok || (step.expectStatus !== undefined && reply.status !== step.expectStatus)) throw new Error('HANDSHAKE: start-up step ' + step.name + ' failed.');
+          startup.push(step.name);
+        }
+        return {ok:true, model:identity.model, protocol:identity.protocol, protocolVersion:identity.protocolVersion, channels:identity.channels, maxStep:identity.maxStep, firmware:this.#device.firmware,
+          capabilities:{xy:'relative-unknown-mapping',lift:['up','down'],grip:['open','closed']}, startup, simulated:true};
+      }
       if (this.#device.protocol !== PROTOCOL) {
         const profile = global.VlabProtocols.get(this.#device.protocol);
         const reply = profile.parseReply(this.exchange(profile.hello));
@@ -211,9 +292,38 @@ function decode(rawReply) {
       }
       return result;
     }
+    #exchangeModbus(wire, dryRun) {
+      const profile = global.VlabProtocols.get(this.#device.protocol), r = profile.registers;
+      const parsed = profile.deviceRequest(wire);
+      if (parsed.silent) return '';
+      if (parsed.exception) return profile.replyException(parsed.fn, parsed.exception);
+      const request = parsed.request;
+      if (request.kind === 'read') return request.start === r.identity ? profile.replyIdentity(this.#model, MAX_STEP) : profile.replyStatus((this.#enabled ? 1 : 0) | (this.#homed ? 2 : 0));
+      if (request.kind === 'enable') { this.#enabled = true; return profile.replyWrite(r.enable, 1); }
+      if (request.kind === 'home') {
+        if (!this.#enabled) return profile.replyException(0x06, 6);
+        this.#homed = true; this.#hello = true; return profile.replyWrite(r.home, 1);
+      }
+      const fn = request.kind === 'step' ? 0x17 : 0x06;
+      if (!this.#enabled || !this.#homed) return profile.replyException(fn, 6);
+      if (request.kind === 'step') {
+        try {
+          const outcome = dryRun ? {applied:request.channels.slice(),limited:false} : this.#plant.act(request.channels.slice());
+          return profile.replyStep(outcome.applied, outcome.limited);
+        } catch (error) { return profile.replyException(fn, /COLLISION/.test(String(error.message)) ? 4 : 3); }
+      }
+      const command = request.kind === 'lift' ? {op:'lift',position:request.position} : {op:'grip',state:request.state};
+      const outcome = dryRun ? {applied:copy(command),limited:false} : this.#plant.act(copy(command));
+      return profile.replyAuxiliary(outcome.applied);
+    }
     exchange(wire, {dryRun = false} = {}) {
       if (!this.#connected) throw new Error('NOT_CONNECTED: connect to a simulated endpoint first.');
       this.#log('TX', typeof wire === 'string' ? wire.slice(0,1024) : '<non-string>', dryRun);
+      if (this.#device.protocol !== PROTOCOL && global.VlabProtocols.get(this.#device.protocol).family === 'modbus-rtu') {
+        const result = typeof wire === 'string' ? this.#exchangeModbus(wire, dryRun) : '';
+        this.#log('RX', result, dryRun);
+        return result;
+      }
       if (this.#device.protocol !== PROTOCOL) {
         const result = typeof wire === 'string' ? this.#exchangeBinary(wire, dryRun) : global.VlabProtocols.get(this.#device.protocol).replyError(1, 0);
         this.#log('RX', result, dryRun);

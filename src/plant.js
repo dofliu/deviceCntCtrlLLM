@@ -16,11 +16,14 @@
     #objectHeight = 0; #graspCount = 0; #releaseCount = 0;
     #scenario = null; #destinationHeight = 0; #liftHeight = 1;
     #platformRadius = 24; #kinematics = '2r'; #travel = null;
+    #backlash = 0; #motor = [0, 0]; #belt = [0, 0];
 
     // kinematics '2r' is the original two-link arm; 'gantry' is a Cartesian
-    // two-axis carriage with travel limits. Both hide mapping, signs and gains.
+    // two-axis carriage with travel limits; 'corexy' (held-out VLAB-X) moves the
+    // same kind of carriage with two coupled belt motors that have reversal
+    // backlash. All hide mapping, signs and gains.
     constructor({ seed = 42, width = 640, height = 480, kinematics = '2r' } = {}) {
-      if (!['2r', 'gantry'].includes(kinematics)) throw new Error('PLANT: unknown kinematics.');
+      if (!['2r', 'gantry', 'corexy'].includes(kinematics)) throw new Error('PLANT: unknown kinematics.');
       this.#kinematics = kinematics;
       this.#width = Math.max(160, Math.round(width));
       this.#height = Math.max(120, Math.round(height));
@@ -48,6 +51,16 @@
         this.#q = [between(-60, 60), between(-50, 50)];
         this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
         this.#gains = [0, 1].map(() => between(125, 165) * (this.#random() < 0.5 ? -1 : 1));
+      } else if (this.#kinematics === 'corexy') {
+        // Each motor moves the carriage diagonally: x = (A+B)/2, y = (A-B)/2
+        // in the frame's own axes; mapping swaps which sum drives world x.
+        this.#travel = [between(125, 140), between(110, 122)];
+        this.#lengths = this.#travel.slice();
+        this.#q = [between(-60, 60), between(-50, 50)];
+        this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
+        this.#gains = [0, 1].map(() => between(150, 190) * (this.#random() < 0.5 ? -1 : 1));
+        this.#backlash = between(0.012, 0.02);
+        this.#motor = [0, 0]; this.#belt = [0, 0];
       } else {
         this.#lengths = [between(82, 104), between(66, 82)];
         this.#q = [between(-2.1, -0.3), between(1.0, 1.9)];
@@ -88,13 +101,13 @@
       if (this.#attached) throw new Error('TRIAL: release the held object before changing the scene.');
       const pairs = [[-135,-25],[30,-90],[-145,-15],[35,155],[100,-30]];
       const heights = [0,.35,.65,.35,0];
-      const radius = this.#kinematics === 'gantry' ? Math.min(...this.#travel) * .84 : (this.#lengths[0] + this.#lengths[1]) * .77;
+      const radius = this.#cartesian() ? Math.min(...this.#travel) * .84 : (this.#lengths[0] + this.#lengths[1]) * .77;
       const jitter = Math.sin(this.#seed * .173 + index * 2.1) * 3;
       const pointAt = degrees => {
         const angle = (degrees + jitter) * Math.PI / 180 - this.#camera.angle;
         return [Math.cos(angle) * radius, Math.sin(angle) * radius];
       };
-      if (initialPose && this.#kinematics === 'gantry') {
+      if (initialPose && this.#cartesian()) {
         this.#q = pointAt(135);
         this.#lift = 'up'; this.#liftHeight = 1; this.#grip = 'open';
       } else if (initialPose) {
@@ -124,8 +137,28 @@
         ? this.#destinationHeight : 0;
     }
 
+    #cartesian() { return this.#kinematics === 'gantry' || this.#kinematics === 'corexy'; }
+
+    // CoreXY with per-motor backlash: the belt follows the motor only after the
+    // motor has taken up the slack w. The ACK reports the motor command the
+    // controller accepted; the carriage moves by the belt displacement.
+    #coreXY(amount, scale) {
+      const motor = this.#motor.slice(), belt = this.#belt.slice(), half = this.#backlash / 2, moved = [0, 0];
+      for (let c = 0; c < 2; c++) {
+        motor[c] += amount[c] * scale;
+        const before = belt[c];
+        if (motor[c] - belt[c] > half) belt[c] = motor[c] - half;
+        else if (belt[c] - motor[c] > half) belt[c] = motor[c] + half;
+        moved[c] = (belt[c] - before) * this.#gains[c];
+      }
+      const frame = [(moved[0] + moved[1]) / 2, (moved[0] - moved[1]) / 2];
+      const delta = this.#mapping[0] === 0 ? frame : [frame[1], frame[0]];
+      return {motor, belt, next: [this.#q[0] + delta[0], this.#q[1] + delta[1]]};
+    }
+
     act(action) {
       if (action && !Array.isArray(action)) return this.#manipulate(action);
+      if (this.#kinematics === 'corexy') return this.#actCoreXY(action);
       const applied = [0, 0];
       const nextQ = this.#q.slice();
       let limited = false;
@@ -158,18 +191,39 @@
       // A rejected low-height move must never partly move and then report an
       // error. Joint-zero interpolation uses its short wrapped displacement.
       if (this.#scenario && this.#liftHeight < this.#destinationHeight - 1e-9) {
-        const delta = [this.#kinematics === 'gantry' ? nextQ[0]-this.#q[0] : wrap(nextQ[0]-this.#q[0]),nextQ[1]-this.#q[1]];
-        const clearance = this.#platformRadius + (this.#attached ? 8 : 0);
-        for (let sample=0; sample<=16; sample++) {
-          const point = this.#point(this.#q.map((value,j)=>value+delta[j]*sample/16));
-          if (Math.hypot(point[0]-this.#destination[0],point[1]-this.#destination[1]) < clearance) {
-            throw new Error('COLLISION: raise the end effector before crossing the elevated platform; no channels moved.');
-          }
-        }
+        this.#checkSweep(nextQ);
       }
       this.#q = nextQ;
       if (this.#attached) this.#object = this.#point();
       return { applied, limited };
+    }
+
+    #checkSweep(nextQ) {
+      const delta = [this.#cartesian() ? nextQ[0]-this.#q[0] : wrap(nextQ[0]-this.#q[0]),nextQ[1]-this.#q[1]];
+      const clearance = this.#platformRadius + (this.#attached ? 8 : 0);
+      for (let sample=0; sample<=16; sample++) {
+        const point = this.#point(this.#q.map((value,j)=>value+delta[j]*sample/16));
+        if (Math.hypot(point[0]-this.#destination[0],point[1]-this.#destination[1]) < clearance) {
+          throw new Error('COLLISION: raise the end effector before crossing the elevated platform; no channels moved.');
+        }
+      }
+    }
+
+    #actCoreXY(action) {
+      const amount = [0, 1].map(c => { const r = Number(action && action[c]); return clamp(Number.isFinite(r) ? r : 0, -0.10, 0.10); });
+      let limited = [0, 1].some(c => !Number.isFinite(Number(action && action[c])) || amount[c] !== Number(action[c]));
+      const inside = q => Math.abs(q[0]) <= this.#travel[0] + 1e-9 && Math.abs(q[1]) <= this.#travel[1] + 1e-9;
+      let scale = 1, result = this.#coreXY(amount, 1);
+      if (!inside(result.next)) {
+        // Both motors stop together at the travel limit (largest feasible fraction).
+        let low = 0, high = 1;
+        for (let i = 0; i < 30; i++) { const mid = (low + high) / 2; if (inside(this.#coreXY(amount, mid).next)) low = mid; else high = mid; }
+        scale = low; result = this.#coreXY(amount, scale); limited = true;
+      }
+      if (this.#scenario && this.#liftHeight < this.#destinationHeight - 1e-9) this.#checkSweep(result.next);
+      this.#motor = result.motor; this.#belt = result.belt; this.#q = result.next;
+      if (this.#attached) this.#object = this.#point();
+      return { applied: amount.map(v => v * scale), limited };
     }
 
     #manipulate(command) {
@@ -203,7 +257,7 @@
     operate(command) { return this.#manipulate(command); }
 
     #point(q = this.#q) {
-      if (this.#kinematics === 'gantry') return [q[0], q[1]];
+      if (this.#cartesian()) return [q[0], q[1]];
       return [
         this.#lengths[0] * Math.cos(q[0]) + this.#lengths[1] * Math.cos(q[0] + q[1]),
         this.#lengths[0] * Math.sin(q[0]) + this.#lengths[1] * Math.sin(q[0] + q[1])
@@ -233,7 +287,7 @@
       // to the controller. Goals are useful local-to-medium reaches, not a
       // fixed animation trajectory, and exclude poorly conditioned extremes.
       for (let attempt = 0; attempt < 40; attempt++) {
-        const q = this.#kinematics === 'gantry'
+        const q = this.#cartesian()
           ? [(this.#random() * 2 - 1) * this.#travel[0] * .85, (this.#random() * 2 - 1) * this.#travel[1] * .85]
           : [this.#q[0] + (this.#random() * 2 - 1) * 0.95, 0.65 + this.#random() * 1.6];
         candidate = this.#point(q);
@@ -304,7 +358,7 @@
       // Unpainted endpoint underlay is deliberately neutral. In the marker-loss
       // experiment only the colored marker disappears, so the allowed simple
       // vision algorithm must report missing evidence instead of inferring it.
-      if (this.#kinematics === 'gantry') {
+      if (this.#cartesian()) {
         // Two fixed rails along world x and a bridge that follows the carriage.
         // Neutral greys only: the colour detector must not see these parts.
         const [tx, ty] = this.#travel.map(v => v + 18), point = this.#point();
@@ -409,10 +463,10 @@
           placed:!this.#attached && Math.abs(this.#objectHeight-this.#destinationHeight) < 1e-9 &&
             Math.hypot(this.#object[0]-this.#destination[0],this.#object[1]-this.#destination[1]) <= 12
         },
-        description: `裝置 #${this.#seed} · ${this.#kinematics === 'gantry' ? '直角座標龍門機構' : '二連桿平面機構'} · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
+        description: `裝置 #${this.#seed} · ${{gantry:'直角座標龍門機構',corexy:'CoreXY 皮帶機構'}[this.#kinematics] || '二連桿平面機構'} · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
         // Debug/evaluation only. Never include this object in worker messages.
         geometry: { kinematics: this.#kinematics, lengths: this.#lengths.slice(), jointAngles: this.#q.slice(),
-          channelToJoint: this.#mapping.slice(), channelGains: this.#gains.slice(),
+          channelToJoint: this.#mapping.slice(), channelGains: this.#gains.slice(), ...(this.#kinematics === 'corexy' ? {backlash: this.#backlash, motor: this.#motor.slice(), belt: this.#belt.slice()} : {}),
           camera: { ...this.#camera }, object:this.#object.slice(), destination:this.#destination.slice(),destinationHeight:this.#destinationHeight,platformRadius:this.#platformRadius }
       };
     }

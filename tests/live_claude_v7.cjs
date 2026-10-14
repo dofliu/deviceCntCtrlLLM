@@ -22,6 +22,7 @@
 //   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra  --out-dir dir  --label name
 //   --offline  --no-full
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
+//   --holdout  allow the held-out VLAB-X (--device X); adds it to the manual library
 //   --gate C|D (D)  D: on rotary manuals the two-link case must also stay within 1.3x the
 //                   reference actions; C: reach-only (behaviour before 2026-10-14)
 //   --no-transient-retry  do not resend a model request after a timeout or HTTP 500/502/504/529
@@ -37,8 +38,9 @@ const arg = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 &&
 const flag = name => argv.includes(name);
 const fail = message => { console.error(message); console.log('RESULT ' + JSON.stringify({ ok: false, error: message })); process.exit(2); };
 
-const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3' };
-const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2 or G3.');
+const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', X: 'VLAB-X', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3', 'VLAB-X': 'VLAB-X' };
+const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2, G3 or X.');
+if (device === 'VLAB-X' && !flag('--holdout')) fail('VLAB-X is the held-out evaluation device; add --holdout to run it.');
 const seed = Number(arg('--seed', 2026));
 if (!Number.isInteger(seed) || seed < 1 || seed > 999999) fail('--seed must be an integer from 1 to 999999.');
 const manualTemplate = { on: true, off: false }[arg('--manual-template', 'off')];
@@ -49,6 +51,7 @@ const trials = Number(arg('--trials', 5));
 if (![1, 5].includes(trials)) fail('--trials must be 1 or 5.');
 const offline = flag('--offline');
 const fixedGoalTarget = !flag('--legacy-target');
+const includeHoldout = flag('--holdout');
 const gate = String(arg('--gate', 'D')).toUpperCase();
 if (!['C', 'D'].includes(gate)) fail('--gate must be C or D.');
 const twoLinkMaxRatio = gate === 'C' ? null : undefined;
@@ -163,7 +166,7 @@ async function main() {
       strategy = 'claude';
     }
     console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : 'claude'} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
-    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio });
+    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio, includeHoldout });
     let state = await engine.initialize(), lastKind = '';
     for (let step = 0; !state.done && step < 6000; step++) {
       state = await engine.next();
