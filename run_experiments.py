@@ -45,7 +45,8 @@ def parse_args():
     p.add_argument("--trials", type=int, choices=(1, 5), default=5)
     p.add_argument("--min-interval-ms", type=int, default=6000)
     p.add_argument("--key-env", choices=KEY_NAMES, default="ANTHROPIC_API_KEY")
-    p.add_argument("--port", type=int, default=8766)
+    p.add_argument("--port", type=int, default=8766,
+                   help="Bridge port (default 8766). Run batches one at a time, or give each concurrent batch its own port.")
     p.add_argument("--out-dir", type=Path, default=None, help="Default: artifacts/live-runs/batch-<timestamp>")
     p.add_argument("--offline", action="store_true", help="Offline rule policy; no bridge, no API call, no cost.")
     p.add_argument("--no-full", action="store_true", help="Skip the gzipped full report per run.")
@@ -170,7 +171,7 @@ def main():
               f"calls {row['modelCalls']}, budget left {remaining if not args.offline else '-'}", flush=True)
         if row["runnerError"]:
             print(f"    runner error: {row['runnerError']}")
-            if any(text in row["runnerError"] for text in ("is not set in this environment", "Run python build.py", "Bridge could not find")):
+            if any(text in row["runnerError"] for text in ("is not set in this environment", "Run python build.py", "Bridge could not find", "is already in use")):
                 stopped = f"stopped: setup problem in {label} ({row['runnerError']}); no further runs"
                 print(stopped)
                 break
