@@ -4,7 +4,7 @@
   // reads ONLY the machine-readable manual.protocolSpec and emits encode/decode
   // source. It is deterministic code generation from a specification, not a
   // language model; reports label its output 'offline-spec-synthesizer'.
-  // Supported framing families: json-line and binary-frame.
+  // Supported framing families: json-line, binary-frame and modbus-rtu.
   const LIMIT = 0.1;
   const lit = value => JSON.stringify(value);
 
@@ -139,11 +139,75 @@ function decode(rawReply) {
 }`;
   }
 
+  function fromModbus(spec) {
+    const frame = spec.frame || {}, commands = spec.commands || {}, reply = spec.reply || {};
+    if (spec.wire?.text !== 'hex') throw new Error('SPEC: modbus synthesizer supports hex wire text only.');
+    if (!Number.isInteger(frame.unit) || !/CRC-16\/MODBUS/.test(String(frame.crc || ''))) throw new Error('SPEC: unsupported Modbus frame.');
+    const step = commands.step, lift = commands.lift, grip = commands.grip;
+    if (!step || !Number.isInteger(step.function) || !Array.isArray(step.values) || step.values.length !== 2) throw new Error('SPEC: modbus spec lacks step layout.');
+    for (const c of [lift, grip]) if (!c || !Number.isInteger(c.function) || !Number.isInteger(c.register) || !c.map) throw new Error('SPEC: modbus spec lacks lift/grip register.');
+    if (!reply.step || !Array.isArray(reply.step.values) || !reply.exception) throw new Error('SPEC: modbus reply layout missing.');
+    const table = {unit: frame.unit, upper: spec.wire.case === 'upper', step, lift, grip, reply: {step: reply.step, lift: reply.lift, grip: reply.grip, exceptionFlag: reply.exception.functionFlag}, max: LIMIT};
+    return `// Generated offline from manual.protocolSpec (${spec.name || 'modbus-rtu'}); no driver template used.
+const SPEC = ${lit(table)};
+function crc16(bytes) { let c = 0xffff; for (const b of bytes) { c ^= b & 255; for (let i = 0; i < 8; i++) c = c & 1 ? (c >>> 1) ^ 0xa001 : c >>> 1; } return c & 0xffff; }
+function toHex(bytes) { const text = bytes.map(b => (b & 255).toString(16).padStart(2, '0')).join(''); return SPEC.upper ? text.toUpperCase() : text; }
+function rtu(body) { const c = crc16(body); return toHex([...body, c & 255, (c >> 8) & 255]); }
+function u16(v) { return [(v >> 8) & 255, v & 255]; }
+function s16(value, scale) { const n = Math.round(value * scale); if (!Number.isInteger(n) || n < -32768 || n > 32767) throw new Error('s16 overflow'); return u16(n < 0 ? n + 65536 : n); }
+function encode(command) {
+  if (Array.isArray(command) && command.length === 2 && command.every(v => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= SPEC.max)) {
+    const st = SPEC.step, data = [];
+    for (let i = 0; i < 2; i++) data.push(...s16(command[i], st.values[i].scale));
+    return rtu([SPEC.unit, st.function, ...u16(st.readStart), ...u16(st.readCount), ...u16(st.writeStart), ...u16(st.writeCount), st.byteCount, ...data]);
+  }
+  if (command && !Array.isArray(command) && Object.keys(command).sort().join(',') === 'op,position' && command.op === 'lift' && command.position in SPEC.lift.map)
+    return rtu([SPEC.unit, SPEC.lift.function, ...u16(SPEC.lift.register), ...u16(SPEC.lift.map[command.position])]);
+  if (command && !Array.isArray(command) && Object.keys(command).sort().join(',') === 'op,state' && command.op === 'grip' && command.state in SPEC.grip.map)
+    return rtu([SPEC.unit, SPEC.grip.function, ...u16(SPEC.grip.register), ...u16(SPEC.grip.map[command.state])]);
+  throw new Error('Unsupported or out-of-range command.');
+}
+function decode(rawReply) {
+  if (typeof rawReply !== 'string' || rawReply === '') throw new Error('Device did not reply.');
+  if (rawReply.length % 2 || !/^[0-9a-fA-F]+$/.test(rawReply) || (!SPEC.upper && /[A-F]/.test(rawReply))) throw new Error('Reply is not hex bytes.');
+  const b = []; for (let i = 0; i < rawReply.length; i += 2) b.push(parseInt(rawReply.slice(i, i + 2), 16));
+  if (b.length < 5) throw new Error('Reply too short.');
+  const c = crc16(b.slice(0, -2));
+  if (b[b.length - 2] !== (c & 255) || b[b.length - 1] !== ((c >> 8) & 255)) throw new Error('CRC mismatch.');
+  if (b[0] !== SPEC.unit) throw new Error('Wrong unit address.');
+  if (b[1] & SPEC.reply.exceptionFlag) throw new Error('Device exception ' + b[2]);
+  const read = i => (b[i] << 8) | b[i + 1];
+  if (b[1] === SPEC.reply.step.function) {
+    const values = SPEC.reply.step.values, bytes = values.length * 2;
+    if (b[2] !== SPEC.reply.step.byteCount || b.length !== 3 + bytes + 2) throw new Error('Step reply length mismatch.');
+    const applied = [], out = {};
+    values.forEach((item, k) => {
+      const raw = read(3 + k * 2);
+      if (item.type === 's16') { const v = (raw >= 32768 ? raw - 65536 : raw) / item.scale; const m = /^applied\\[(\\d+)\\]$/.exec(item.to); if (m) applied[Number(m[1])] = v; }
+      else if (item.type === 'u16') out[item.to] = raw;
+    });
+    if (!(out.flags === 0 || out.flags === 1)) throw new Error('Unknown flags.');
+    if (applied.length !== 2 || !applied.every(v => Number.isFinite(v) && Math.abs(v) <= SPEC.max + 1e-12)) throw new Error('Applied step out of range.');
+    return {applied, limited: out.flags === 1};
+  }
+  for (const [kind, key] of [['lift', 'position'], ['grip', 'state']]) {
+    const layout = SPEC.reply[kind];
+    if (b[1] === layout.function && b.length === 8 && read(2) === layout.register) {
+      const value = layout.map[read(4)];
+      if (value === undefined) throw new Error('Unknown ' + kind + ' value.');
+      return {applied: {op: kind, [key]: value}, limited: false};
+    }
+  }
+  throw new Error('Unexpected reply layout.');
+}`;
+  }
+
   function fromSpec(spec) {
     if (!spec || typeof spec !== 'object') throw new Error('SPEC: manual.protocolSpec is missing.');
     if (spec.family === 'json-line') return fromJsonLine(spec);
     if (spec.family === 'binary-frame') return fromBinaryFrame(spec);
+    if (spec.family === 'modbus-rtu') return fromModbus(spec);
     throw new Error('SPEC: unsupported framing family ' + String(spec.family).slice(0, 40));
   }
-  global.VlabDriverSynthesizer = {fromSpec, families: ['json-line', 'binary-frame']};
+  global.VlabDriverSynthesizer = {fromSpec, families: ['json-line', 'binary-frame', 'modbus-rtu']};
 })(globalThis);

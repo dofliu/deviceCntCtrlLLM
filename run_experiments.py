@@ -49,6 +49,8 @@ def parse_args():
     p.add_argument("--out-dir", type=Path, default=None, help="Default: artifacts/live-runs/batch-<timestamp>")
     p.add_argument("--offline", action="store_true", help="Offline rule policy; no bridge, no API call, no cost.")
     p.add_argument("--no-full", action="store_true", help="Skip the gzipped full report per run.")
+    p.add_argument("--holdout", action="store_true",
+                   help="Allow the held-out device X (VLAB-X, CoreXY + Modbus-RTU style); also adds it to the manual library.")
     p.add_argument("--gate", choices=("C", "D"), default="D",
                    help="Controller gate: D (default) also limits the two-link case to 1.3x reference actions on rotary manuals; C is reach-only.")
     p.add_argument("--no-transient-retry", action="store_true",
@@ -73,6 +75,8 @@ def run_one(args, device, seed, rep, max_calls, out_dir):
     if args.legacy_target:
         cmd.append("--legacy-target")
     cmd += ["--gate", args.gate]
+    if args.holdout:
+        cmd.append("--holdout")
     if args.no_transient_retry and not args.offline:
         cmd.append("--no-transient-retry")
     print(f"\n=== {label} (cap {0 if args.offline else max_calls} calls) ===", flush=True)
@@ -121,8 +125,10 @@ def main():
     if not (ROOT / "unknown-device-v7.0.html").exists():
         sys.exit("Run python build.py first.")
     devices = [d.strip().upper() for d in args.devices.split(",") if d.strip()]
-    if not devices or any(d not in ("P2", "G3") for d in devices):
-        sys.exit("--devices must list P2 and/or G3.")
+    if not devices or any(d not in ("P2", "G3", "X") for d in devices):
+        sys.exit("--devices must list P2, G3 and/or X.")
+    if "X" in devices and not args.holdout:
+        sys.exit("X is the held-out evaluation device; add --holdout to run it.")
     try:
         seeds = [int(s) for s in args.seeds.split(",") if s.strip()]
     except ValueError:
@@ -176,7 +182,7 @@ def main():
     batch = {
         "kind": "offline-cli-batch" if args.offline else "live-model-batch", "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node)",
         "createdAt": dt.datetime.now().isoformat(timespec="seconds"), "model": None if args.offline else args.model,
-        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal", "gate": args.gate,
+        "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal", "gate": args.gate, "holdout": args.holdout,
                       "transientRetry": None if args.offline else not args.no_transient_retry,
                       "minIntervalMs": None if args.offline else args.min_interval_ms},
         "budget": None if args.offline else {"perRun": per_run, "total": args.total_max_calls, "remaining": remaining},

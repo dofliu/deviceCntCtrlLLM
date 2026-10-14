@@ -1,0 +1,284 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "device": "VLAB-X (held-out; CoreXY with backlash, Modbus-RTU style registers)",
+  "date": "2026-10-14",
+  "modelCalls": 0,
+  "scope": "Offline rule policy with the manual template or the offline spec synthesizer, builtin numerical controller or the hand-written reference control module. Environment check that the held-out task is solvable; not a model result.",
+  "note": "Seed 7 is the device-development seed. 2026/3140/8675 rows are the offline baselines for the planned live held-out runs. These runs did not change the agent, gate, prompts or reference module.",
+  "passed": true,
+  "rows": [
+    {
+      "manualTemplate": true,
+      "controllerMode": "builtin",
+      "seed": 7,
+      "completed": 5,
+      "totalActions": 160,
+      "trialActions": [
+        37,
+        29,
+        31,
+        31,
+        32
+      ],
+      "maxPlacementErrorPx": 6.35,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "builtin",
+      "seed": 2026,
+      "completed": 5,
+      "totalActions": 162,
+      "trialActions": [
+        38,
+        30,
+        34,
+        31,
+        29
+      ],
+      "maxPlacementErrorPx": 6.95,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "builtin",
+      "seed": 3140,
+      "completed": 5,
+      "totalActions": 161,
+      "trialActions": [
+        37,
+        29,
+        32,
+        32,
+        31
+      ],
+      "maxPlacementErrorPx": 6.89,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "builtin",
+      "seed": 8675,
+      "completed": 5,
+      "totalActions": 162,
+      "trialActions": [
+        36,
+        31,
+        32,
+        29,
+        34
+      ],
+      "maxPlacementErrorPx": 6.12,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "generated",
+      "seed": 7,
+      "completed": 5,
+      "totalActions": 171,
+      "trialActions": [
+        41,
+        33,
+        32,
+        31,
+        34
+      ],
+      "maxPlacementErrorPx": 2.47,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "generated",
+      "seed": 2026,
+      "completed": 5,
+      "totalActions": 166,
+      "trialActions": [
+        39,
+        31,
+        35,
+        30,
+        31
+      ],
+      "maxPlacementErrorPx": 4.66,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "generated",
+      "seed": 3140,
+      "completed": 5,
+      "totalActions": 163,
+      "trialActions": [
+        39,
+        30,
+        32,
+        31,
+        31
+      ],
+      "maxPlacementErrorPx": 2.52,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": true,
+      "controllerMode": "generated",
+      "seed": 8675,
+      "completed": 5,
+      "totalActions": 165,
+      "trialActions": [
+        38,
+        32,
+        32,
+        30,
+        33
+      ],
+      "maxPlacementErrorPx": 4.23,
+      "driverSource": "manual-template",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 7,
+      "completed": 5,
+      "totalActions": 160,
+      "trialActions": [
+        37,
+        29,
+        31,
+        31,
+        32
+      ],
+      "maxPlacementErrorPx": 6.35,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 2026,
+      "completed": 5,
+      "totalActions": 162,
+      "trialActions": [
+        38,
+        30,
+        34,
+        31,
+        29
+      ],
+      "maxPlacementErrorPx": 6.95,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 3140,
+      "completed": 5,
+      "totalActions": 161,
+      "trialActions": [
+        37,
+        29,
+        32,
+        32,
+        31
+      ],
+      "maxPlacementErrorPx": 6.89,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "builtin",
+      "seed": 8675,
+      "completed": 5,
+      "totalActions": 162,
+      "trialActions": [
+        36,
+        31,
+        32,
+        29,
+        34
+      ],
+      "maxPlacementErrorPx": 6.12,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 7,
+      "completed": 5,
+      "totalActions": 171,
+      "trialActions": [
+        41,
+        33,
+        32,
+        31,
+        34
+      ],
+      "maxPlacementErrorPx": 2.47,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 2026,
+      "completed": 5,
+      "totalActions": 166,
+      "trialActions": [
+        39,
+        31,
+        35,
+        30,
+        31
+      ],
+      "maxPlacementErrorPx": 4.66,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 3140,
+      "completed": 5,
+      "totalActions": 163,
+      "trialActions": [
+        39,
+        30,
+        32,
+        31,
+        31
+      ],
+      "maxPlacementErrorPx": 2.52,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    },
+    {
+      "manualTemplate": false,
+      "controllerMode": "generated",
+      "seed": 8675,
+      "completed": 5,
+      "totalActions": 165,
+      "trialActions": [
+        38,
+        32,
+        32,
+        30,
+        33
+      ],
+      "maxPlacementErrorPx": 4.23,
+      "driverSource": "offline-spec-synthesizer",
+      "failure": null
+    }
+  ]
+}

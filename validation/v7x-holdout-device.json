@@ -1,0 +1,16 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "device": "VLAB-X (held-out)",
+  "date": "2026-10-14",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "Modbus-RTU style frames: CRC-16/MODBUS (check value 0x4B37), unit 0x11, function 0x17 step and 0x06 lift/grip round trips; silence parsed as no response",
+    "device answers exception 6 before enable/home; host handshake reads identity, enables, homes and confirms status; bad CRC/unit stay silent; Modbus exception codes for range, address and function",
+    "manual template and offline spec-synthesized drivers pass the unchanged driver tests; skipping CRC, swapping CRC byte order or reusing the G3 driver fails",
+    "CoreXY plant: each motor moves the carriage diagonally; a reversal inside the backlash band leaves the carriage still while the ACK reports the motor command",
+    "default runs are unchanged: VLAB-X is not listed, cannot start without includeHoldout, and read_manual schema, description and context stay the two-document versions",
+    "offline single trial on VLAB-X (seed 7, no template, spec-synthesized driver, reference controller module): completed in 41 actions"
+  ]
+}
