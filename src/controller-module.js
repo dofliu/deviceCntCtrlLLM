@@ -5,7 +5,7 @@
   // a stateless JavaScript function control(state) executed in the same opaque
   // sandbox as generated drivers. It never touches the device: the host turns
   // its bounded output into a driver command and records the camera result.
-  const LIMIT = 0.1, TOLERANCE = 7, HISTORY = 40;
+  const LIMIT = 0.1, TOLERANCE = 7, HISTORY = 40, TWO_LINK_MAX_RATIO = 1.3;
   const copy = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const finite = v => typeof v === 'number' && Number.isFinite(v);
 
@@ -17,7 +17,7 @@
     '回傳 {action:"move", u:[a,b]}（|a|,|b| ≤ 0.1 的有限數值）、{action:"verify"}（認為已在 tolerancePx 內，主機會重新拍攝驗證）或 {action:"stop", reason}。',
     '違反格式、超出範圍或拋出例外時主機不送出任何動作並停止。設備遇行程限制會回覆較小的 applied 與 limited:true。',
     'inputLimit（0.1）是每個通道每步的上限，可以使用到上限；設備在行程邊界會自行縮小並回覆 limited，不會因此損壞。動作數是評估指標：遠離目標時應讓 u 的最大分量接近 0.1，接近目標時再縮小；不要另設更小的固定步長上限。',
-    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制、中途反向，以及接近目標時目標量測會偏移），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過；「二連桿長距離多目標」在手冊 channelKind 為 rotary（旋轉通道）的設備上必須到達，其他設備只回報（efficiency.nonlinearArm）。'
+    '程式須先通過主機以合成設備進行的隔離測試（不同旋轉、交換、反向、非線性、行程限制、中途反向，以及接近目標時目標量測會偏移），才會用於真實模擬設備。測試報告另列各案例相對預寫參考模組的動作數倍率（efficiency），只供改進參考，不影響是否通過；唯一例外是「二連桿長距離多目標」：在手冊 channelKind 為 rotary（旋轉通道）的設備上必須到達，且動作數不得超過參考模組的 1.3 倍（局部映射隨姿態旋轉，只擬合近期歷史通常較有效率），其他設備只回報（efficiency.nonlinearArm）。'
   ].join('\n');
 
   // Offline reference controller. It is a hand-written baseline used by the
@@ -186,20 +186,30 @@
 
   // decide(state) is the sandboxed generated controller call. Pass/fail is
   // decided only by reaching every target; efficiency is informational.
+  // twoLinkMaxRatio (D version, default 1.3): on rotary manuals the required
+  // two-link case also fails when it needs more than that multiple of the
+  // reference module's actions. null keeps the reach-only rule (C version).
   async function isolationTest(decide, options = {}) {
     const result = await runCases(decide, options), reference = await referenceCounts();
+    const maxRatio = options.twoLinkMaxRatio === undefined ? TWO_LINK_MAX_RATIO : options.twoLinkMaxRatio;
     result.channelKind = options.channelKind === 'rotary' ? 'rotary' : options.channelKind === 'linear' ? 'linear' : null;
     let actions = 0, referenceActions = 0;
     result.cases.forEach((c, i) => {
       const ref = reference[i];
       c.referenceActions = ref;
       c.actionRatio = c.passed && ref ? Number((c.actions / ref).toFixed(2)) : null;
+      c.reachedAll = c.passed;
+      if (CASES[i].rotaryOnly && c.gate && c.passed && Number.isFinite(maxRatio) && c.actionRatio > maxRatio) {
+        c.passed = false; c.failure = `已到達，但動作數為參考模組的 ${c.actionRatio} 倍，超過旋轉通道設備的上限 ${maxRatio} 倍`;
+      }
       if (c.gate && c.passed && ref) { actions += c.actions; referenceActions += ref; }
     });
+    result.passed = result.cases.filter(c => c.gate).every(c => c.passed);
     const arm = result.cases.find((c, i) => CASES[i].rotaryOnly);
+    result.twoLinkMaxRatio = Number.isFinite(maxRatio) ? maxRatio : null;
     result.efficiency = {actions, referenceActions, ratio: referenceActions ? Number((actions / referenceActions).toFixed(2)) : null,
-      nonlinearArm: arm ? {required: arm.gate, reached: arm.passed, actions: arm.actions, referenceActions: arm.referenceActions, ratio: arm.actionRatio, failure: arm.failure} : null,
-      note: 'ratio = required cases that passed; nonlinearArm = two-link case, required only when the manual declares rotary channels; reference = offline hand-written module; ratios are not pass criteria'};
+      nonlinearArm: arm ? {required: arm.gate, reached: arm.reachedAll, actions: arm.actions, referenceActions: arm.referenceActions, ratio: arm.actionRatio, maxRatio: arm.gate ? result.twoLinkMaxRatio : null, passed: arm.passed, failure: arm.failure} : null,
+      note: 'ratio = required cases that passed; nonlinearArm = two-link case, required only when the manual declares rotary channels, then also limited to maxRatio x the reference actions; other ratios are not pass criteria'};
     return result;
   }
 
@@ -243,5 +253,5 @@
       scope: 'synthetic host simulation only; no device command was sent'};
   }
 
-  global.VlabControllerModule = {CONTRACT, REFERENCE_SOURCE, LIMIT, TOLERANCE, HISTORY, validateDecision, state, isolationTest, cases: () => CASES.map(({arm, ...rest}) => copy(rest))};
+  global.VlabControllerModule = {CONTRACT, REFERENCE_SOURCE, LIMIT, TOLERANCE, HISTORY, TWO_LINK_MAX_RATIO, validateDecision, state, isolationTest, cases: () => CASES.map(({arm, ...rest}) => copy(rest))};
 })(globalThis);

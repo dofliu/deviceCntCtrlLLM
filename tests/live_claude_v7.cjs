@@ -22,6 +22,9 @@
 //   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra  --out-dir dir  --label name
 //   --offline  --no-full
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
+//   --gate C|D (D)  D: on rotary manuals the two-link case must also stay within 1.3x the
+//                   reference actions; C: reach-only (behaviour before 2026-10-14)
+//   --no-transient-retry  do not resend a model request after a timeout or HTTP 500/502/504/529
 // The last stdout line is "RESULT <json>" with the summary path for wrappers.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -46,6 +49,10 @@ const trials = Number(arg('--trials', 5));
 if (![1, 5].includes(trials)) fail('--trials must be 1 or 5.');
 const offline = flag('--offline');
 const fixedGoalTarget = !flag('--legacy-target');
+const gate = String(arg('--gate', 'D')).toUpperCase();
+if (!['C', 'D'].includes(gate)) fail('--gate must be C or D.');
+const twoLinkMaxRatio = gate === 'C' ? null : undefined;
+const maxTransientRetries = flag('--no-transient-retry') ? 0 : 1;
 const keyEnv = arg('--key-env', 'ANTHROPIC_API_KEY');
 const maxCalls = Math.min(500, Math.max(1, Math.floor(Number(arg('--max-calls', 150)) || 150)));
 const minIntervalMs = Math.min(120000, Math.max(0, Number(arg('--min-interval-ms', 6000))));
@@ -110,18 +117,18 @@ function summarize(report, { model, error }) {
   return {
     version: report?.version || '0.7.0', kind: offline ? 'offline-cli-run' : 'live-model-run', runner: 'headless-node (tests/live_claude_v7.cjs)',
     provider: offline ? null : 'claude', model: offline ? null : (report?.model || model || null), git: gitInfo(), node: process.version,
-    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs },
+    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), gate, controllerGate: report?.suiteParameters?.controllerGate ?? null, maxTransientRetries: offline ? null : maxTransientRetries, maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs },
     startedAt: started.toISOString(), finishedAt: new Date().toISOString(), runnerError: error,
     result: { done: report?.done ?? false, failure: report?.failure ?? null, failureCategory: report?.failureCategory ?? null, completedTrials: report?.suiteProgress?.totalCompleted ?? 0,
       allTruthPlaced: trialRows.length === trials && trialRows.every(t => t.evaluatorTruth?.placed === true) },
     modelCalls: report?.modelCalls ?? 0, frontCalls: report?.provenance?.frontCalls ?? null, controlCalls: report?.provenance?.controlCalls ?? null, usage: report?.provenance?.usage || null,
-    rateLimitRetries: report?.modelRuntime?.rateLimitRetries ?? null, decisionRejections: report?.decisionRejections ?? null, decisionRejectionDetails: rejections,
+    rateLimitRetries: report?.modelRuntime?.rateLimitRetries ?? null, transientRetries: report?.modelRuntime?.transientRetries ?? null, decisionRejections: report?.decisionRejections ?? null, decisionRejectionDetails: rejections,
     actionCount: report?.actionCount ?? null, xyActionCount: report?.xyActionCount ?? null, unconfirmedActuationCount: report?.unconfirmedActuationCount ?? null,
     driverRuntime: report?.driverRuntime ? { requests: report.driverRuntime.requests, failures: report.driverRuntime.failures, programErrors: report.driverRuntime.programErrors } : null,
     provenance: report?.provenance ? { driverSource: report.provenance.driverSource, controllerSource: report.provenance.controllerSource } : null,
     onboardingSteps: (o.steps || []).map(s => [s.tool, s.ok]), failedAttempts,
     driverTests: o.driverTests ? { passed: o.driverTests.passed, protocol: o.driverTests.protocol, failed: (o.driverTests.tests || []).filter(t => !t.passed).map(t => t.name) } : null,
-    controllerTests: ct ? { passed: ct.passed, channelKind: ct.channelKind ?? null, efficiency: ct.efficiency ? { actions: ct.efficiency.actions, referenceActions: ct.efficiency.referenceActions, ratio: ct.efficiency.ratio, nonlinearArm: ct.efficiency.nonlinearArm ?? null } : null,
+    controllerTests: ct ? { passed: ct.passed, channelKind: ct.channelKind ?? null, twoLinkMaxRatio: ct.twoLinkMaxRatio ?? null, efficiency: ct.efficiency ? { actions: ct.efficiency.actions, referenceActions: ct.efficiency.referenceActions, ratio: ct.efficiency.ratio, nonlinearArm: ct.efficiency.nonlinearArm ?? null } : null,
       cases: (ct.cases || []).map(c => ({ name: c.name, passed: c.passed, gate: c.gate ?? null, actions: c.actions, referenceActions: c.referenceActions ?? null, actionRatio: c.actionRatio ?? null, failure: c.failure })) } : null,
     controllerStepStats: mags.length ? { moves: mags.length, medianMaxAbsU: round(median(mags), 4), shareAtLeast0_09: round(mags.filter(m => m >= 0.09).length / mags.length),
       singleChannelMoves: moves.filter(u => (Math.abs(u[0]) < 1e-9) !== (Math.abs(u[1]) < 1e-9)).length, inputLimit: 0.1 } : null,
@@ -152,11 +159,11 @@ async function main() {
         model = ids.find(id => /opus/.test(id)) || ids[0];
         if (!model) throw new Error('No Claude model listed for this key.');
       }
-      provider = new g.ClaudeAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs });
+      provider = new g.ClaudeAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries });
       strategy = 'claude';
     }
     console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : 'claude'} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
-    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget });
+    engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio });
     let state = await engine.initialize(), lastKind = '';
     for (let step = 0; !state.done && step < 6000; step++) {
       state = await engine.next();

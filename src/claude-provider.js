@@ -75,7 +75,7 @@
   const boundedJson=(v,max=6000)=>{if(!record(v))return null;try{const text=JSON.stringify(v);return text.length<=max?JSON.parse(text):null;}catch(_){return null;}};
   const allowControllerTests=v=>record(v)?{passed:v.passed===true,tolerancePx:num(v.tolerancePx),maxActionsPerTarget:num(v.maxActionsPerTarget),
     cases:Array.isArray(v.cases)?v.cases.slice(0,12).map(x=>fields(x,{name:str,gate:v=>v!==false,passed:bool,actions:num,calls:num,referenceActions:num,actionRatio:num,failure:v=>str(v,300)})):[],
-    efficiency:record(v.efficiency)?{...fields(v.efficiency,{actions:num,referenceActions:num,ratio:num}),nonlinearArm:fields(v.efficiency.nonlinearArm,{required:bool,reached:bool,actions:num,referenceActions:num,ratio:num,failure:v=>str(v,300)})}:null}:null;
+    efficiency:record(v.efficiency)?{...fields(v.efficiency,{actions:num,referenceActions:num,ratio:num}),nonlinearArm:fields(v.efficiency.nonlinearArm,{required:bool,reached:bool,actions:num,referenceActions:num,ratio:num,maxRatio:num,passed:bool,failure:v=>str(v,300)})}:null,twoLinkMaxRatio:num(v.twoLinkMaxRatio)}:null;
   const markerQuality=v=>fields(v,{accepted:bool,reason:str,pixelCount:num,inlierCount:num,inlierFraction:num,coverageBins:num,totalBins:num,largestGapDeg:num,radiusPx:num,residualRmsPx:num});
   function allowContext(c) {
     c=record(c)?c:{};
@@ -233,7 +233,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
     if(Number.isInteger(value.status)&&value.status>=100&&value.status<=599)out.status=value.status;
     if(['rate','daily','spend','unavailable','unknown'].includes(value.quotaKind))out.quotaKind=value.quotaKind;
     if(typeof value.retryable==='boolean')out.retryable=value.retryable;
-    for(const key of ['retryAfterMs','retryAttempt','maxRetries','requestNumber'])if(Number.isFinite(value[key])&&value[key]>=0)out[key]=value[key];
+    for(const key of ['retryAfterMs','retryAttempt','maxRetries','requestNumber','transientRetries'])if(Number.isFinite(value[key])&&value[key]>=0)out[key]=value[key];
     return out;
   }
   function schedulingError(ErrorType,label,code,meta={}) {
@@ -268,15 +268,19 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
     return {status:response.status,quotaKind,retryable,...(retryAfterMs!==null?{retryAfterMs}:{})};
   }
   class ModelRequestScheduler {
-    #minIntervalMs;#maxRetries;#notify;#makeError;#lastStarted=null;#requests=0;#retries=0;#waitMs=0;#recent=[];#lastError=null;
+    #minIntervalMs;#maxRetries;#maxTransientRetries;#transientCooldownMs;#notify;#makeError;#lastStarted=null;#requests=0;#retries=0;#transientRetries=0;#waitMs=0;#recent=[];#lastError=null;
     #status={phase:'idle',waitUntil:null,retryAttempt:0,maxRetries:2,startedAt:null};
-    constructor({minIntervalMs=6000,maxRateLimitRetries=2,onRequestStatus,makeError}) {
+    // maxTransientRetries: a model request that times out or gets HTTP 500/502/504/529
+    // is sent again at most this many times (0 or 1) after transientCooldownMs (10 s). Each
+    // attempt is a real request: it passes the budget check and is counted.
+    // Only model generation is retried; device commands are never resent here.
+    constructor({minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,transientCooldownMs=10000,onRequestStatus,makeError}) {
       this.#makeError=makeError;
-      if(!Number.isFinite(minIntervalMs)||minIntervalMs<0||minIntervalMs>120000||!Number.isInteger(maxRateLimitRetries)||maxRateLimitRetries<0||maxRateLimitRetries>2)throw makeError('INVALID_PACING');
-      this.#minIntervalMs=minIntervalMs;this.#maxRetries=maxRateLimitRetries;this.#notify=typeof onRequestStatus==='function'?onRequestStatus:null;this.#status.maxRetries=maxRateLimitRetries;
+      if(!Number.isFinite(minIntervalMs)||minIntervalMs<0||minIntervalMs>120000||!Number.isInteger(maxRateLimitRetries)||maxRateLimitRetries<0||maxRateLimitRetries>2||!Number.isInteger(maxTransientRetries)||maxTransientRetries<0||maxTransientRetries>1||!Number.isFinite(transientCooldownMs)||transientCooldownMs<0||transientCooldownMs>60000)throw makeError('INVALID_PACING');
+      this.#minIntervalMs=minIntervalMs;this.#maxRetries=maxRateLimitRetries;this.#maxTransientRetries=maxTransientRetries;this.#transientCooldownMs=transientCooldownMs;this.#notify=typeof onRequestStatus==='function'?onRequestStatus:null;this.#status.maxRetries=maxRateLimitRetries;
     }
     get status(){return {...this.#status};}
-    get diagnostics(){return {minIntervalMs:this.#minIntervalMs,requests:this.#requests,rateLimitRetries:this.#retries,waitMs:this.#waitMs,recent:this.#recent.map(v=>({...v})),lastError:this.#lastError?{...this.#lastError}:null};}
+    get diagnostics(){return {minIntervalMs:this.#minIntervalMs,requests:this.#requests,rateLimitRetries:this.#retries,transientRetries:this.#transientRetries,maxTransientRetries:this.#maxTransientRetries,waitMs:this.#waitMs,recent:this.#recent.map(v=>({...v})),lastError:this.#lastError?{...this.#lastError}:null};}
     #event(kind,fields={}){this.#recent.push({kind,at:Date.now(),...fields});if(this.#recent.length>40)this.#recent.shift();}
     #transition(phase,fields={}){this.#status={...this.#status,phase,waitUntil:null,...fields};try{this.#notify?.(this.status);}catch(_){}}
     #aborted(signal){if(signal.aborted)throw this.#makeError('ABORTED');}
@@ -296,7 +300,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
       finally{clearTimeout(timer);this.#waitMs+=Math.max(0,Date.now()-started);}
     }
     async run({controller,timeoutMs,beforeAttempt,hasBudget,perform}) {
-      const signal=controller.signal;let retryAttempt=0;
+      const signal=controller.signal;let retryAttempt=0,transientAttempt=0,transientRetry=false;
       try{
         for(;;){
           this.#aborted(signal);
@@ -310,14 +314,22 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
               this.#transition('requesting',{retryAttempt,startedAt:Date.now()});
               // A status observer may cancel. Count and time the request only
               // after that callback, immediately before actual fetch dispatch.
-              this.#aborted(attempt.signal);beforeAttempt();this.#lastStarted=Date.now();this.#requests++;if(retryAttempt)this.#retries++;
+              this.#aborted(attempt.signal);beforeAttempt();this.#lastStarted=Date.now();this.#requests++;if(transientRetry){this.#transientRetries++;transientRetry=false;}else if(retryAttempt)this.#retries++;
               this.#event('request',{requestNumber:this.#requests,retryAttempt});
               timer=setTimeout(()=>{timedOut=true;attempt.abort();},timeoutMs);
               return perform(attempt.signal);
             },attempt.signal);
             const result=await pending;this.#aborted(signal);this.#event('response',{requestNumber:this.#requests,retryAttempt});return result;
           }catch(error){
-            this.#aborted(signal);if(timedOut)throw this.#makeError('TIMEOUT',{retryAttempt,maxRetries:this.#maxRetries,requestNumber:this.#requests});
+            this.#aborted(signal);
+            if((timedOut||/^HTTP_(500|502|504|529)$/.test(error?.code||''))&&transientAttempt<this.#maxTransientRetries){
+              if(hasBudget&&!hasBudget())throw this.#makeError('CALL_BUDGET',{retryAttempt,maxRetries:this.#maxRetries,requestNumber:this.#requests});
+              this.#event('transient-retry',{code:timedOut?'TIMEOUT':error.code,requestNumber:this.#requests,transientAttempt:transientAttempt+1});
+              clearTimeout(timer);signal.removeEventListener('abort',cancel);
+              transientAttempt++;transientRetry=true;await this.#wait(Date.now()+this.#transientCooldownMs,'cooldown',retryAttempt,signal);
+              continue;
+            }
+            if(timedOut)throw this.#makeError('TIMEOUT',{retryAttempt,maxRetries:this.#maxRetries,requestNumber:this.#requests,transientRetries:transientAttempt});
             const meta=error?.requestDiagnostic;
             if(error?.code!=='RATE_LIMITED'||meta?.retryable!==true)throw error;
             const details={...meta,retryAttempt,maxRetries:this.#maxRetries,requestNumber:this.#requests};
@@ -341,13 +353,13 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
   }
   class ClaudeAgentProvider {
     #key;#model;#bridge;#maxCalls;#timeoutMs;#calls=0;#active=null;#disposed=false;#toolChoice;#scheduler;
-    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,toolChoice='auto',minIntervalMs=6000,maxRateLimitRetries=2,onRequestStatus}={}) {
+    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,toolChoice='auto',minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=1,onRequestStatus}={}) {
       this.#bridge=bridgeOf(bridgeUrl);this.#key=this.#bridge?'':keyOf(apiKey);this.#model=modelOf(model);
       if(!Number.isInteger(maxCalls)||maxCalls<1||maxCalls>500)fail('INVALID_BUDGET','Claude 呼叫上限必須介於 1 與 500。');
       if(!Number.isFinite(timeoutMs)||timeoutMs<1||timeoutMs>120000)fail('INVALID_TIMEOUT','Claude 逾時設定不正確。');
       if(!['auto','any'].includes(toolChoice))fail('INVALID_TOOL_CHOICE','Claude 工具選擇模式不正確。');
       this.#maxCalls=maxCalls;this.#timeoutMs=timeoutMs;this.#toolChoice=toolChoice;
-      this.#scheduler=new ModelRequestScheduler({minIntervalMs,maxRateLimitRetries,onRequestStatus,makeError:(code,meta)=>schedulingError(ProviderError,'Claude',code,meta)});
+      this.#scheduler=new ModelRequestScheduler({minIntervalMs,maxRateLimitRetries,maxTransientRetries,onRequestStatus,makeError:(code,meta)=>schedulingError(ProviderError,'Claude',code,meta)});
     }
     get calls(){return this.#calls;} get model(){return this.#model;} get mode(){return this.#bridge?'bridge':'direct';}
     get requestStatus(){return this.#scheduler.status;}get requestDiagnostics(){return this.#scheduler.diagnostics;}

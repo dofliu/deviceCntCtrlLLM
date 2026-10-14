@@ -58,7 +58,7 @@ async function run() {
     const safe = plain(g.VlabAgentContract.allowContext({ phase: 'onboarding', allowedTools: ['test_controller'], controllerMode: 'generated', controllerContract: M.CONTRACT, controllerSource: 'function control(s){}', controllerTests: slow }));
     assert.equal(safe.controllerTests.efficiency.ratio, slow.efficiency.ratio);
     assert.equal(safe.controllerTests.cases[0].actionRatio, slow.cases[0].actionRatio);
-    assert.deepEqual(Object.keys(safe.controllerTests.efficiency.nonlinearArm).sort(), ['actions', 'failure', 'ratio', 'reached', 'referenceActions', 'required']);
+    assert.deepEqual(Object.keys(safe.controllerTests.efficiency.nonlinearArm).sort(), ['actions', 'failure', 'maxRatio', 'passed', 'ratio', 'reached', 'referenceActions', 'required']);
     assert.equal(safe.controllerTests.cases.at(-1).gate, false);
     assert.equal(Object.hasOwn(safe.controllerTests.efficiency, 'note'), false);
     checks.push('contract states the 0.1 step guidance; model context keeps per-case and total ratios');

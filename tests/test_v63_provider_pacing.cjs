@@ -218,7 +218,7 @@ async function reject(h, promise, code) {
     assert.equal((await h.clock.settle(h.begin())).tool, 'observe');
     assert.deepEqual(h.requests.map(request => request.at), [0, 60000]);
     assert.equal(h.clock.now, 104000);
-    h = harness(kind, [limited(kind, '60'), {status: 200, hang: true}], {timeoutMs: 45000});
+    h = harness(kind, [limited(kind, '60'), {status: 200, hang: true}], {timeoutMs: 45000, maxTransientRetries: 0});
     await reject(h, h.begin(), 'TIMEOUT');
     assert.equal(h.requests.length, 2); assert.equal(h.clock.now, 105000);
   });
@@ -229,6 +229,30 @@ async function reject(h, promise, code) {
     assert.equal(error.diagnostic.issue, 'invalid-arguments');
     assert.equal(h.requests.length, 2); assert.equal(h.provider.calls, 2);
   });
+
+  {
+    // Claude resends a model request once after a timeout or HTTP 500/502/504/529.
+    // Each attempt is counted against the call budget; Gemini keeps no retry.
+    const server = {status: 502, body: {error: {type: 'api_error', message: 'upstream'}}};
+    let h = harness('claude', [server, ok('claude')]);
+    assert.equal((await h.clock.settle(h.begin())).tool, 'observe');
+    assert.deepEqual(h.requests.map(request => request.at), [0, 10000]);
+    assert.equal(h.provider.calls, 2); assert.equal(h.provider.requestDiagnostics.transientRetries, 1);
+    h = harness('claude', [server, server]);
+    await reject(h, h.begin(), 'HTTP_502'); assert.equal(h.requests.length, 2); assert.equal(h.provider.calls, 2);
+    h = harness('claude', [{status: 200, hang: true}, ok('claude')], {timeoutMs: 45000});
+    assert.equal((await h.clock.settle(h.begin())).tool, 'observe');
+    assert.deepEqual(h.requests.map(request => request.at), [0, 55000]);
+    h = harness('claude', [{status: 400, body: {error: {type: 'invalid_request_error', message: 'bad'}}}]);
+    await reject(h, h.begin(), 'HTTP_400'); assert.equal(h.requests.length, 1);
+    h = harness('claude', [server], {maxCalls: 1});
+    await reject(h, h.begin(), 'CALL_BUDGET'); assert.equal(h.requests.length, 1); assert.equal(h.provider.calls, 1);
+    h = harness('claude', [server], {maxTransientRetries: 0});
+    await reject(h, h.begin(), 'HTTP_502'); assert.equal(h.requests.length, 1);
+    h = harness('gemini', [server]);
+    await reject(h, h.begin(), 'HTTP_502'); assert.equal(h.requests.length, 1);
+    checks.push('Claude resends a model request once after a timeout or HTTP 5xx (500/502/504/529), counted in the call budget; 4xx, an exhausted budget, maxTransientRetries 0 and Gemini get no resend');
+  }
 
   await group('Request diagnostics and wait status remain bounded and omit keys and raw HTTP errors', async kind => {
     const h = harness(kind, [limited(kind, '1'), ...Array.from({length: 44}, () => ok(kind))], {minIntervalMs: 0});
