@@ -1,0 +1,218 @@
+{
+  "kind": "live-model-batch",
+  "version": "D (two-link efficiency limit 1.3x on rotary manuals; one transient retry)",
+  "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node, command line; report separately from browser runs)",
+  "source": "user local machine, batch-20261014-212247 (zip uploaded 2026-10-14); commit fda8470; planned 18 runs (P2,G3 x seeds 2026/3140/8675 x 3), batch budget 330 allowed 3",
+  "model": "claude-haiku-5-5",
+  "condition": {
+    "manualTemplate": "off",
+    "controllerMode": "generated",
+    "trials": 5,
+    "gate": "D",
+    "transientRetry": true
+  },
+  "planned": 18,
+  "ran": 3,
+  "stopped": "batch budget left 70 < 100",
+  "notes": [
+    "All three runs 5/5 with simulator truth; offline replay reproduces every action count (278, 300, 139).",
+    "Both P2 runs first wrote a controller whose two-link ratio was 1.42 (the C-version slow range). The D gate rejected it with the ratio in the feedback; the model rewrote it to 0.97 / 1.07 and the live runs used 0.99x / 1.08x the offline baseline. C-version P2/3140 controllers ran at 1.73x and 1.72x in two of three runs.",
+    "No transient retries were needed in these runs."
+  ],
+  "runs": [
+    {
+      "label": "g3-s2026-r1-claude",
+      "device": "VLAB-G3",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 88,
+      "frontCalls": 13,
+      "transientRetries": 0,
+      "actions": 139,
+      "trialActions": [
+        30,
+        27,
+        29,
+        28,
+        25
+      ],
+      "placementErrorPx": [
+        4.8,
+        0.5,
+        3.33,
+        4.88,
+        6.63
+      ],
+      "ratioToBaseline": 0.93,
+      "controllerTestRatio": 0.88,
+      "twoLink": {
+        "required": false,
+        "reached": true,
+        "actions": 71,
+        "referenceActions": 69,
+        "ratio": 1.03,
+        "maxRatio": null,
+        "passed": true,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界、接近目標時目標量測偏移。必須修正後重新測試。"
+      ],
+      "git": {
+        "commit": "fda8470",
+        "dirtySourceOrTests": false
+      },
+      "condition": {
+        "device": "VLAB-G3",
+        "protocol": "vlab-g3-bin/1",
+        "manualTemplate": false,
+        "controllerMode": "generated",
+        "trials": 5,
+        "seed": 2026,
+        "goalTarget": "B-zone goal measured once by camera at select_goal, then held fixed; object and clearance goals re-measured every step",
+        "gate": "D",
+        "controllerGate": "D: two-link case on rotary manuals must reach within 1.3x reference actions",
+        "maxTransientRetries": 1,
+        "maxCalls": 150,
+        "minIntervalMs": 6000
+      },
+      "generatedControllerSource": "function control(state) {\n  var MAXU = 0.1;\n  if (!state || !state.tip || !state.target) return {action: 'stop', reason: 'missing state'};\n  var tip = state.tip, target = state.target;\n  if (!isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return {action: 'stop', reason: 'non-finite state'};\n  }\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var dist = Math.sqrt(ex * ex + ey * ey);\n  var tol = (state.tolerancePx != null) ? state.tolerancePx : 7;\n  if (dist <= tol) return {action: 'verify'};\n  if (typeof state.maxActions === 'number' && typeof state.step === 'number' && state.step >= state.maxActions) {\n    return {action: 'stop', reason: 'action budget exhausted'};\n  }\n  var h = state.history || [];\n  var W = 12;\n  var start = Math.max(0, h.length - W);\n\n  // most recent commanded sign per channel (used to alternate probes, escapes travel limits)\n  var lastCmd = [0, 0];\n  for (var k = h.length - 1; k >= 0 && (lastCmd[0] === 0 || lastCmd[1] === 0); k--) {\n    var sk = h[k];\n    if (!sk || !sk.command) continue;\n    for (var c = 0; c < 2; c++) {\n      if (lastCmd[c] === 0 && typeof sk.command[c] === 'number' && sk.command[c] !== 0) {\n        lastCmd[c] = sk.command[c] > 0 ? 1 : -1;\n      }\n    }\n  }\n\n  var a00 = 0, a01 = 0, a11 = 0;\n  var r00 = 0, r01 = 0, r10 = 0, r11 = 0;\n  var e0 = 0, e1 = 0, cnt = 0;\n  for (var i = start; i < h.length; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var u0 = s.applied[0], u1 = s.applied[1], d0 = s.delta[0], d1 = s.delta[1];\n    if (!isFinite(u0) || !isFinite(u1) || !isFinite(d0) || !isFinite(d1)) continue;\n    if (Math.abs(u0) + Math.abs(u1) < 1e-6) continue;\n    a00 += u0 * u0; a01 += u0 * u1; a11 += u1 * u1;\n    r00 += u0 * d0; r01 += u1 * d0;\n    r10 += u0 * d1; r11 += u1 * d1;\n    e0 += u0 * u0; e1 += u1 * u1;\n    cnt++;\n  }\n\n  function probe() {\n    // excite the less-excited channel, reversing its last command sign\n    var c = (e0 <= e1) ? 0 : 1;\n    var sign = (lastCmd[c] > 0) ? -1 : 1;\n    if (c === 0) return {action: 'move', u: [sign * MAXU, 0]};\n    return {action: 'move', u: [0, sign * MAXU]};\n  }\n\n  if (cnt < 2 || e0 < 1e-6 || e1 < 1e-6) return probe();\n\n  var lam = 1e-4 * (1 + a00 + a11);\n  var A00 = a00 + lam, A11 = a11 + lam, A01 = a01;\n  var det = A00 * A11 - A01 * A01;\n  if (!isFinite(det) || Math.abs(det) < 1e-10) return probe();\n\n  // J = R * inv(A)\n  var J00 = (A11 * r00 - A01 * r01) / det;\n  var J01 = (-A01 * r00 + A00 * r01) / det;\n  var J10 = (A11 * r10 - A01 * r11) / det;\n  var J11 = (-A01 * r10 + A00 * r11) / det;\n  var jdet = J00 * J11 - J01 * J10;\n  var jnorm = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n  if (!isFinite(jdet) || !isFinite(jnorm) || jnorm <= 0 || Math.abs(jdet) < 1e-3 * jnorm) {\n    return probe();\n  }\n\n  // solve J u = e\n  var ux = (J11 * ex - J01 * ey) / jdet;\n  var uy = (-J10 * ex + J00 * ey) / jdet;\n  if (!isFinite(ux) || !isFinite(uy)) return probe();\n\n  var cap = (dist < 3 * tol) ? 0.05 : MAXU;\n  var mag = Math.max(Math.abs(ux), Math.abs(uy));\n  if (mag > cap) {\n    ux = ux * cap / mag;\n    uy = uy * cap / mag;\n  }\n  if (Math.abs(ux) > MAXU) ux = (ux > 0 ? MAXU : -MAXU);\n  if (Math.abs(uy) > MAXU) uy = (uy > 0 ? MAXU : -MAXU);\n  return {action: 'move', u: [ux, uy]};\n}\n"
+    },
+    {
+      "label": "p2-s2026-r1-claude",
+      "device": "VLAB-P2",
+      "seed": 2026,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 88,
+      "frontCalls": 16,
+      "transientRetries": 0,
+      "actions": 278,
+      "trialActions": [
+        57,
+        59,
+        57,
+        54,
+        51
+      ],
+      "placementErrorPx": [
+        3.17,
+        2.34,
+        5.96,
+        2.34,
+        5.23
+      ],
+      "ratioToBaseline": 0.99,
+      "controllerTestRatio": 0.9,
+      "twoLink": {
+        "required": true,
+        "reached": true,
+        "actions": 67,
+        "referenceActions": 69,
+        "ratio": 0.97,
+        "maxRatio": 1.3,
+        "passed": true,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界。必須修正後重新測試。",
+        "控制程式未通過隔離測試：二連桿長距離多目標（已到達，但動作數為參考模組的 1.42 倍，超過旋轉通道設備的上限 1.3 倍）。必須修正後重新測試。"
+      ],
+      "git": {
+        "commit": "fda8470",
+        "dirtySourceOrTests": false
+      },
+      "condition": {
+        "device": "VLAB-P2",
+        "protocol": "vlab-p2-json/1",
+        "manualTemplate": false,
+        "controllerMode": "generated",
+        "trials": 5,
+        "seed": 2026,
+        "goalTarget": "B-zone goal measured once by camera at select_goal, then held fixed; object and clearance goals re-measured every step",
+        "gate": "D",
+        "controllerGate": "D: two-link case on rotary manuals must reach within 1.3x reference actions",
+        "maxTransientRetries": 1,
+        "maxCalls": 150,
+        "minIntervalMs": 6000
+      },
+      "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: \"stop\", reason: \"missing points\" };\n  }\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: \"stop\", reason: \"non-finite error\" };\n  if (err <= state.tolerancePx) return { action: \"verify\" };\n\n  var h = state.history || [];\n\n  // 全歷史中每個通道是否曾被有效激發，用於探測\n  var c0 = 0, c1 = 0;\n  for (var k = 0; k < h.length; k++) {\n    var r = h[k];\n    if (!r || !r.applied || !r.delta) continue;\n    if (Math.abs(r.applied[0]) > 0.01 && isFinite(r.delta[0]) && isFinite(r.delta[1])) c0++;\n    if (Math.abs(r.applied[1]) > 0.01 && isFinite(r.delta[0]) && isFinite(r.delta[1])) c1++;\n  }\n  var s = (h.length % 4 < 2) ? 1 : -1;\n  if (c0 < 1) return { action: \"move\", u: [0.1 * s, 0] };\n  if (c1 < 1) return { action: \"move\", u: [0, 0.1 * s] };\n\n  // 局部擬合：只用最近的歷史（姿態會改變局部 Jacobian）；樣本不足時放寬視窗\n  var windows = [12, 40];\n  var J = null;\n  for (var w = 0; w < windows.length && J === null; w++) {\n    var start = Math.max(0, h.length - windows[w]);\n    var A = [[1e-5, 0], [0, 1e-5]];\n    var M = [[0, 0], [0, 0]];\n    var n = 0;\n    for (var q = start; q < h.length; q++) {\n      var rec = h[q];\n      if (!rec || !rec.applied || !rec.delta) continue;\n      var a = rec.applied;\n      var d = rec.delta;\n      if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n      if (Math.abs(a[0]) + Math.abs(a[1]) < 1e-9) continue;\n      n++;\n      for (var i = 0; i < 2; i++) {\n        for (var j = 0; j < 2; j++) {\n          A[i][j] += a[i] * a[j];\n          M[i][j] += d[i] * a[j];\n        }\n      }\n    }\n    if (n < 2) continue;\n    var det = A[0][0] * A[1][1] - A[0][1] * A[1][0];\n    if (!isFinite(det) || Math.abs(det) < 1e-12) continue;\n    var inv = [[A[1][1] / det, -A[0][1] / det], [-A[1][0] / det, A[0][0] / det]];\n    var Jc = [[0, 0], [0, 0]];\n    for (var rr = 0; rr < 2; rr++) {\n      for (var cc = 0; cc < 2; cc++) {\n        Jc[rr][cc] = M[rr][0] * inv[0][cc] + M[rr][1] * inv[1][cc];\n      }\n    }\n    var detJ = Jc[0][0] * Jc[1][1] - Jc[0][1] * Jc[1][0];\n    if (isFinite(detJ) && Math.abs(detJ) > 1e-9) J = Jc;\n  }\n\n  if (J === null) {\n    return { action: \"move\", u: [0.1 * s, 0.1 * s] };\n  }\n\n  var detJ2 = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  var Ji = [[J[1][1] / detJ2, -J[0][1] / detJ2], [-J[1][0] / detJ2, J[0][0] / detJ2]];\n  var u0 = 0.9 * (Ji[0][0] * ex + Ji[0][1] * ey);\n  var u1 = 0.9 * (Ji[1][0] * ex + Ji[1][1] * ey);\n  if (!isFinite(u0) || !isFinite(u1)) return { action: \"stop\", reason: \"singular mapping\" };\n\n  // 每通道上限 0.1；大步長保持方向，接近時至少 0.01 以持續前進\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) {\n    u0 = u0 * 0.1 / m;\n    u1 = u1 * 0.1 / m;\n  } else if (m > 0 && m < 0.01) {\n    u0 = u0 * 0.01 / m;\n    u1 = u1 * 0.01 / m;\n  }\n  u0 = Math.max(-0.1, Math.min(0.1, u0));\n  u1 = Math.max(-0.1, Math.min(0.1, u1));\n  return { action: \"move\", u: [u0, u1] };\n}\n"
+    },
+    {
+      "label": "p2-s3140-r1-claude",
+      "device": "VLAB-P2",
+      "seed": 3140,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "modelCalls": 84,
+      "frontCalls": 14,
+      "transientRetries": 0,
+      "actions": 300,
+      "trialActions": [
+        75,
+        51,
+        58,
+        57,
+        59
+      ],
+      "placementErrorPx": [
+        6.46,
+        4.9,
+        5.16,
+        5.14,
+        4.43
+      ],
+      "ratioToBaseline": 1.08,
+      "controllerTestRatio": 0.93,
+      "twoLink": {
+        "required": true,
+        "reached": true,
+        "actions": 74,
+        "referenceActions": 69,
+        "ratio": 1.07,
+        "maxRatio": 1.3,
+        "passed": true,
+        "failure": null
+      },
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "controllerGateFailures": [
+        "控制程式未通過隔離測試：起點貼近行程邊界、接近目標時目標量測偏移、二連桿長距離多目標（已到達，但動作數為參考模組的 1.42 倍，超過旋轉通道設備的上限 1.3 倍）。必須修正後重新測試。"
+      ],
+      "git": {
+        "commit": "fda8470",
+        "dirtySourceOrTests": false
+      },
+      "condition": {
+        "device": "VLAB-P2",
+        "protocol": "vlab-p2-json/1",
+        "manualTemplate": false,
+        "controllerMode": "generated",
+        "trials": 5,
+        "seed": 3140,
+        "goalTarget": "B-zone goal measured once by camera at select_goal, then held fixed; object and clearance goals re-measured every step",
+        "gate": "D",
+        "controllerGate": "D: two-link case on rotary manuals must reach within 1.3x reference actions",
+        "maxTransientRetries": 1,
+        "maxCalls": 150,
+        "minIntervalMs": 6000
+      },
+      "generatedControllerSource": "function control(state) {\n  var tip = state.tip, tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: \"stop\", reason: \"missing tip or target\" };\n  }\n  var ex = tgt[0] - tip[0], ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (typeof state.maxActions === \"number\" && typeof state.step === \"number\" && state.step >= state.maxActions) {\n    return { action: \"stop\", reason: \"action budget reached\" };\n  }\n  if (err <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n  var h = state.history || [];\n  var start = Math.max(0, h.length - 10);\n  var cc00 = 0, cc01 = 0, cc11 = 0;\n  var dc00 = 0, dc01 = 0, dc10 = 0, dc11 = 0;\n  for (var i = start; i < h.length; i++) {\n    var c = h[i].applied, d = h[i].delta;\n    if (!c || !d || c.length !== 2 || d.length !== 2) continue;\n    if (!isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    cc00 += c[0] * c[0];\n    cc01 += c[0] * c[1];\n    cc11 += c[1] * c[1];\n    dc00 += d[0] * c[0];\n    dc01 += d[0] * c[1];\n    dc10 += d[1] * c[0];\n    dc11 += d[1] * c[1];\n  }\n  // Excitation: probe the less-excited channel, alternating sign by history parity\n  // so that a channel stuck at a travel limit is also tested in the opposite direction.\n  var sign = (h.length % 2 === 0) ? 1 : -1;\n  if (cc00 < 1e-4 || cc11 < 1e-4) {\n    var ch = (cc00 <= cc11) ? 0 : 1;\n    return ch === 0 ? { action: \"move\", u: [0.1 * sign, 0] } : { action: \"move\", u: [0, 0.1 * sign] };\n  }\n  // Least-squares Jacobian J (delta = J * u) from the recent window: J = D * inv(C C^T)\n  var reg = 1e-6 * (cc00 + cc11) + 1e-12;\n  var a = cc00 + reg, b = cc01, c2 = cc11 + reg;\n  var det = a * c2 - b * b;\n  if (!(det > 0) || !isFinite(det)) {\n    return { action: \"move\", u: [0.1 * sign, 0] };\n  }\n  var i00 = c2 / det, i01 = -b / det, i10 = -b / det, i11 = a / det;\n  var J00 = dc00 * i00 + dc01 * i10;\n  var J01 = dc00 * i01 + dc01 * i11;\n  var J10 = dc10 * i00 + dc11 * i10;\n  var J11 = dc10 * i01 + dc11 * i11;\n  var jn = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n  if (!isFinite(jn) || jn < 1e-8) {\n    // no usable motion observed yet: probe alternately\n    return { action: \"move\", u: [0.1 * sign, 0.1 * sign * 0.5] };\n  }\n  // Damped least squares: u = J^T (J J^T + lam I)^-1 e\n  var m00 = J00 * J00 + J01 * J01;\n  var m01 = J00 * J10 + J01 * J11;\n  var m11 = J10 * J10 + J11 * J11;\n  var lam = 1e-3 * (m00 + m11) + 1e-9;\n  var p00 = m00 + lam, p11 = m11 + lam;\n  var pdet = p00 * p11 - m01 * m01;\n  if (!(Math.abs(pdet) > 0) || !isFinite(pdet)) {\n    return { action: \"stop\", reason: \"singular jacobian\" };\n  }\n  var z0 = (p11 * ex - m01 * ey) / pdet;\n  var z1 = (-m01 * ex + p00 * ey) / pdet;\n  var u0 = J00 * z0 + J10 * z1;\n  var u1 = J01 * z0 + J11 * z1;\n  var mag = Math.max(Math.abs(u0), Math.abs(u1));\n  if (!(mag > 0) || !isFinite(mag)) {\n    return { action: \"stop\", reason: \"no usable jacobian direction\" };\n  }\n  var s = Math.min(1, 0.1 / mag);\n  if (err < 3 * state.tolerancePx) {\n    s *= 0.5;\n  }\n  var out0 = u0 * s, out1 = u1 * s;\n  if (!isFinite(out0) || !isFinite(out1)) {\n    return { action: \"stop\", reason: \"non-finite command\" };\n  }\n  out0 = Math.max(-0.1, Math.min(0.1, out0));\n  out1 = Math.max(-0.1, Math.min(0.1, out1));\n  return { action: \"move\", u: [out0, out1] };\n}\n"
+    }
+  ]
+}
