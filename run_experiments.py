@@ -99,7 +99,7 @@ def row_for(label, device, seed, rep, code, result, summary):
         "modelCalls": s.get("modelCalls"), "frontCalls": s.get("frontCalls"), "decisionRejections": s.get("decisionRejections"),
         "rateLimitRetries": s.get("rateLimitRetries"), "actions": s.get("actionCount"), "xyActions": s.get("xyActionCount"),
         "unconfirmed": s.get("unconfirmedActuationCount"), "maxPlacementErrorPx": max(errs) if errs else None,
-        "controllerTestRatio": (ct.get("efficiency") or {}).get("ratio"), "medianStep": step.get("medianMaxAbsU"),
+        "controllerTestRatio": (ct.get("efficiency") or {}).get("ratio"), "twoLinkRatio": ((ct.get("efficiency") or {}).get("nonlinearArm") or {}).get("ratio"), "medianStep": step.get("medianMaxAbsU"),
         "driverFirstTry": None if not s.get("onboardingSteps") else not any(t == "test_driver" and not ok for t, ok in s["onboardingSteps"]),
         "controllerFirstTry": None if not s.get("onboardingSteps") else not any(t == "test_controller" and not ok for t, ok in s["onboardingSteps"]),
         "summary": result.get("summary") if result else None, "runnerError": (result or {}).get("error"),
