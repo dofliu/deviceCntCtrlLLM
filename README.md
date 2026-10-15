@@ -102,6 +102,8 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 
 **V7.0（2026-10-12，離線＋無頭 Chromium，未呼叫真實模型）**：協定／裝置／無範本、控制程式閘門、瀏覽器煙霧測試全部通過；離線五回合矩陣（P2／G3 × 範本有無 × 內建／控制程式模組）12/12 組合皆 5/5。細節與動作數比較見 `docs/VALIDATION_STATUS.md` 與 `validation/v7-*.json`。
 
+**2026-10-15 VLAB-X 保留評估（E 版凍結後）**（`validation/live-cli-holdout-X-2026-10-15.json`）：未參與開發的 CoreXY＋Modbus 設備，每 seed 3 次共 9 組，45/45 回合完成，無控制失敗、無中斷；跨 seed 重播 27/27。動作數為離線參考模組的 0.91–1.10×（中位 0.98）。驅動 8/9、控制程式 4/9 第一次就通過閘門。限制：歸零由主機執行；CoreXY 在運動學上仍屬線性隔離案例已涵蓋的類別。
+
 **2026-10-15 E 版 P2 真實三次重複**（`validation/live-cli-batch-E-2026-10-15.json`）：9/9 組、45/45 回合，無控制失敗、無中斷（4 次逾時／5xx 自動重試）；控制程式跨 seed 重播 27/27 完成。動作倍率中位數 1.06，2 支偏慢（1.36×、1.51×）。
 
 **2026-10-14 E 版閘門（待真實模型）**（`validation/v70-gate-e.json`）：新增「二連桿肘關節極限繞行」案例（取自 D 版 P2/3140 失敗現場）。以 16 支真實 P2 控制程式 × 3 seed 的完整重播為事實基準，在 D 放行的 13 支中正好擋下會失敗的 3 支、不誤擋其他 10 支。預設 `--gate E`。
@@ -110,7 +112,7 @@ Claude／Gemini 已可依手冊產生並執行 JavaScript `encode` / `decode` �
 
 **2026-10-14 D 版真實第一批**（`validation/live-cli-batch-D-2026-10-14.json`）：3 組皆 5/5。兩組 P2 的初版控制程式（二連桿 1.42×）被 D 閘門擋下，模型依回饋改寫後通過，真實動作為基準 0.99×／1.08×（C 版 P2/3140 曾為 1.73×）。P2 仍需補足重複次數。
 
-**2026-10-14 保留評估設備 VLAB-X（離線建置，尚未真實評估）**（`validation/v7x-holdout-device.json`、`validation/v7x-offline-baseline.json`）：CoreXY 皮帶機構（含反向間隙）＋ Modbus-RTU 風格協定（CRC-16、須啟用與歸零）。預設不在手冊庫，須以 `--holdout` 啟用；未啟用時 P2／G3 的模型輸入完全不變。離線 16/16 組合 5/5。系統凍結後才做真實模型評估。
+**2026-10-14 保留評估設備 VLAB-X（離線建置；真實評估見上方 2026-10-15）**（`validation/v7x-holdout-device.json`、`validation/v7x-offline-baseline.json`）：CoreXY 皮帶機構（含反向間隙）＋ Modbus-RTU 風格協定（CRC-16、須啟用與歸零）。預設不在手冊庫，須以 `--holdout` 啟用；未啟用時 P2／G3 的模型輸入完全不變。離線 16/16 組合 5/5。系統凍結後才做真實模型評估。
 
 **2026-10-14 D 版（閘門＋重試，待真實模型）**（`validation/v70-gate-d.json`）：P2（rotary）的二連桿案例須在參考 1.3 倍動作內到達，C 版 18 支控制程式中正好擋下 3 支低效率 P2；Claude 請求逾時或 HTTP 5xx 後重送一次（計入預算，不重送設備動作）。`--gate C`、`--no-transient-retry` 可回到 C 版行為。之後結果須標為 D 版。
 
