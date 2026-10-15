@@ -92,7 +92,10 @@ function decode(rawReply) {
     'VLAB-G3': {protocol:'vlab-g3-bin/1', kinematics:'gantry', serialBaud:57600, tcpPort:7410, endpoint:'gantry', product:'VLAB-G3 virtual gantry controller', firmware:'sim-g3-1.0'},
     // Held-out evaluation device: excluded from the default manual library and
     // from development; experiments must enable it explicitly (includeHoldout).
-    'VLAB-X': {protocol:'vlab-x-modbus/1', kinematics:'corexy', serialBaud:19200, tcpPort:502, endpoint:'corexy', product:'VLAB-X virtual CoreXY motion controller', firmware:'sim-x-1.0', holdout:true}
+    'VLAB-X': {protocol:'vlab-x-modbus/1', kinematics:'corexy', serialBaud:19200, tcpPort:502, endpoint:'corexy', product:'VLAB-X virtual CoreXY motion controller', firmware:'sim-x-1.0', holdout:true},
+    // Second held-out device: the development JSON-line protocol on a
+    // closed-chain five-bar arm, so only the kinematic class is new.
+    'VLAB-Y': {protocol:PROTOCOL, kinematics:'fivebar', serialBaud:230400, tcpPort:7420, endpoint:'fivebar', product:'VLAB-Y virtual five-bar parallel arm', firmware:'sim-y-1.0', holdout:true}
   };
 
   function validCommand(command) {
@@ -134,7 +137,7 @@ function decode(rawReply) {
       const d = this.#device, serial = this.#transport === 'serial', tag = d.endpoint;
       return [
         {endpointId:'sim-serial-logger', transport:'serial', deviceModel:'LOGGER-1', product:'LOGGER-1 virtual recorder', manufacturer:'Virtual Lab', address:'SIM-COM3', simulated:true},
-        {endpointId:serial ? 'sim-serial-' + tag : 'sim-tcp-' + tag, transport:this.#transport, deviceModel:this.#model, product:d.product, manufacturer:'Virtual Lab', address:serial ? ({'VLAB-P2':'SIM-COM7','VLAB-G3':'SIM-COM9'}[this.#model] || 'SIM-COM5') : 'SIM-NET-' + tag.toUpperCase() + ':' + d.tcpPort, simulated:true}
+        {endpointId:serial ? 'sim-serial-' + tag : 'sim-tcp-' + tag, transport:this.#transport, deviceModel:this.#model, product:d.product, manufacturer:'Virtual Lab', address:serial ? ({'VLAB-P2':'SIM-COM7','VLAB-G3':'SIM-COM9','VLAB-Y':'SIM-COM6'}[this.#model] || 'SIM-COM5') : 'SIM-NET-' + tag.toUpperCase() + ':' + d.tcpPort, simulated:true}
       ];
     }
     // The host manual library holds every simulated model. Reading the wrong
@@ -142,7 +145,7 @@ function decode(rawReply) {
     manual(documentId) {
       if (!DEVICES[documentId]) throw new Error('找不到該模擬設備文件。');
       const transport = documentId === this.#model ? this.#transport : 'serial';
-      const manual = documentId === 'VLAB-X' ? this.#manualX(transport) : documentId === 'VLAB-G3' ? this.#manualG3(transport) : this.#manualP2(transport);
+      const manual = documentId === 'VLAB-Y' ? this.#manualY(transport) : documentId === 'VLAB-X' ? this.#manualX(transport) : documentId === 'VLAB-G3' ? this.#manualG3(transport) : this.#manualP2(transport);
       manual.protocolSpec = global.VlabProtocols ? global.VlabProtocols.spec(manual.connection.protocol) : null;
       if (!this.#includeTemplate) {
         delete manual.sampleDriver; delete manual.sampleDriverSource;
@@ -230,6 +233,31 @@ function decode(rawReply) {
         sampleDriver:SAMPLE_DRIVER_X, sampleDriverSource:SAMPLE_DRIVER_X
       };
     }
+    #manualY(transport) {
+      const d = DEVICES['VLAB-Y'];
+      return {
+        documentId:'VLAB-Y', model:'VLAB-Y', title:'VLAB-Y 模擬五連桿平行手臂通訊手冊', simulated:true,
+        disclaimer:'這是虛擬設備的內建測試手冊，並非實體產品規格。相機只提供外觀假設，連線身分須由握手確認。',
+        deviceClass:'五連桿平行手臂（閉迴路）：底座上兩顆旋轉馬達各驅動一支主動臂，兩支從動臂在末端夾具會合；每個通道都會同時改變末端的兩個方向，搭配已知升降與夾爪命令', channels:2, channelKind:'rotary',
+        manipulation:{lift:['up','down'],grip:['open','closed'],
+          constraints:'夾爪僅在下降、靠近物件、高度一致且由開轉閉時可能抓住物件。閉爪回覆不代表抓取成功；必須從影像驗證提起與跟隨。張開時物件垂直落至當地桌面或平台。低於平台頂面的平面穿越會整筆拒絕，不執行任何通道。',
+          liftSemantics:'up 是固定安全高度 1；down 停止於夾具 XY 正下方的支撐面（桌面 0 或平台）。這是已知設備功能，不是任意 Z 軸控制。',
+          cameraHeightEvidence:'藍色大圈是 B 的地面 XY 參考，紫色小圈是平台頂面參考；兩圈的影像垂直差可驗證放置高度。'},
+        connection:{transport, baudRate:transport === 'serial' ? d.serialBaud : 0, protocol:PROTOCOL},
+        selection:'從已列出的模擬介面，選擇 deviceModel 為 VLAB-Y 且 transport 符合 connection 的端點。',
+        protocol:{name:PROTOCOL, framing:'與 VLAB-P2 相同的 JSON 單行協定：每筆 UTF-8 JSON 物件後加一個 LF 換行，不允許多筆串接。', hello:'{"op":"hello"}\n',
+          command:'{"op":"step","channels":[0.02,0]}\n', reply:'{"ok":true,"accepted":[0.02,0],"limited":false}\n',
+          liftCommand:'{"op":"lift","position":"up"}\n',
+          liftReply:'{"ok":true,"accepted":{"op":"lift","position":"up"},"limited":false}\n',
+          gripCommand:'{"op":"grip","state":"closed"}\n',
+          gripReply:'{"ok":true,"accepted":{"op":"grip","state":"closed"},"limited":false}\n',
+          limits:{channels:2,min:-MAX_STEP,max:MAX_STEP,units:'相對馬達轉角指令；通道對應、方向與角度增益未知，須由觀察取得。'},
+          errors:'ok:false 表示不執行。accepted 是設備實際接受的指令。兩支從動臂接近共線、主動臂與從動臂接近伸直或摺疊（奇異位形）或末端到達工作範圍邊界前，兩顆馬達會一起停在可行位置，accepted 為實際接受量並回報 limited:true。'},
+        hiddenProperties:['主動臂與從動臂長度','馬達間距','機構安裝方向','通道對應','正負方向','角度增益','相機轉換'],
+        driverContract:'定義 JavaScript encode(command) 回傳 LF 結尾 JSON 字串；command 可為 [a,b]（轉成 step 封包）、{op:"lift",position:"up"|"down"} 或 {op:"grip",state:"open"|"closed"}。decode(rawReply) 回傳 {applied:reply.accepted,limited:reply.limited}；applied 可為陣列或原升降／夾爪命令物件。函式每次獨立執行，不可依賴全域狀態或網路。三類命令都須通過測試。',
+        sampleDriver:SAMPLE_DRIVER, sampleDriverSource:SAMPLE_DRIVER
+      };
+    }
     connect(args = {}) {
       if (this.#connected) throw new Error('ALREADY_CONNECTED: disconnect before changing endpoint.');
       const entry = this.inventory().find(item => item.endpointId === args.endpointId), d = this.#device;
@@ -267,7 +295,7 @@ function decode(rawReply) {
         return {...reply, firmware:this.#device.firmware, capabilities:{xy:'relative-unknown-mapping',lift:['up','down'],grip:['open','closed']}, simulated:true};
       }
       const reply = JSON.parse(this.exchange('{"op":"hello"}\n'));
-      if (!reply.ok || reply.model !== 'VLAB-P2' || reply.protocol !== PROTOCOL || reply.channels !== 2) throw new Error('HANDSHAKE: identity or capabilities failed.');
+      if (!reply.ok || reply.model !== this.#model || reply.protocol !== PROTOCOL || reply.channels !== 2) throw new Error('HANDSHAKE: identity or capabilities failed.');
       return reply;
     }
     #exchangeBinary(wire, dryRun) {
@@ -334,7 +362,7 @@ function decode(rawReply) {
         const request = parseWire(wire);
         if (request.op === 'hello' && Object.keys(request).length === 1) {
           this.#hello = true;
-          reply = {ok:true,model:'VLAB-P2',protocol:PROTOCOL,firmware:'sim-2.0',channels:2,maxStep:MAX_STEP,
+          reply = {ok:true,model:this.#model,protocol:PROTOCOL,firmware:this.#device.firmware,channels:2,maxStep:MAX_STEP,
             capabilities:{xy:'relative-unknown-mapping',lift:['up','down'],grip:['open','closed']},simulated:true};
         } else if (request.op === 'step') {
           if (!this.#hello) throw new Error('NOT_READY: successful hello is required before movement.');

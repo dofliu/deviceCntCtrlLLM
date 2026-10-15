@@ -1,0 +1,924 @@
+{
+ "kind": "live-model-holdout-evaluation",
+ "version": "E (frozen at commit 5e37851)",
+ "runner": "run_experiments.py --holdout -> tests/live_claude_v7.cjs (headless-node, command line; report separately from browser runs)",
+ "source": "user local machine, batch-20261015-154647 (seed 2026), -161810 (3140), -165312 (8675), run one after another; all runs report commit 5e37851 with clean source/tests",
+ "model": "claude-haiku-5-5",
+ "device": "VLAB-X (held out: CoreXY belts with backlash, Modbus-RTU style registers with CRC-16; not used in development)",
+ "condition": {
+  "manualTemplate": "off",
+  "controllerMode": "generated",
+  "trials": 5,
+  "gate": "E",
+  "transientRetry": true,
+  "holdout": true
+ },
+ "freeze": "System frozen at E after the E-version P2 runs (PR #23). These results did not and must not change the gate, prompts, reference module or thresholds.",
+ "baseline": {
+  "source": "validation/v7x-offline-baseline.json",
+  "referenceModuleTemplateOff": {
+   "2026": 166,
+   "3140": 163,
+   "8675": 165
+  },
+  "note": "ratioToBaseline = live actions / offline reference control module actions on the same seed"
+ },
+ "summary": {
+  "runs": 9,
+  "completeRuns": 9,
+  "trials": "45/45",
+  "ratioMedian": 0.98,
+  "ratioRange": [
+   0.91,
+   1.1
+  ],
+  "modelCallsRange": [
+   80,
+   90
+  ],
+  "transientRetriesTotal": 2,
+  "rateLimitRetriesTotal": 0,
+  "unconfirmedTotal": 0,
+  "driverFirstTry": 8,
+  "controllerFirstTry": 4,
+  "crossSeedReplaysComplete": "27/27",
+  "ownSeedReplayMatchesLive": true,
+  "controllerGateAttemptsTotal": 17,
+  "runsWithBoundaryStartRejection": 5,
+  "decisionRejectionsTotal": 5,
+  "inputTokensTotal": 3851126,
+  "outputTokensTotal": 370375
+ },
+ "notes": [
+  "All nine runs 5/5 with simulator truth (45/45 trials); no control failures, no interruptions; two transient retries absorbed; zero unconfirmed actuations.",
+  "Each controller was replayed offline over five trials on all three seeds: 27/27 complete; own-seed replays reproduce the live action counts exactly.",
+  "Live actions 151-182, ratio to the offline reference module 0.91-1.10 (median 0.98).",
+  "Driver: 8/9 passed the Modbus driver test first time (CRC, unit address, exception replies, silent device); x-s3140-r3 failed twice on the lift/grip encode/decode case, then passed. driverRuntime.programErrors = 8 per passed driver test is the expected count of throws on the eight malformed reply fixtures, not a runtime fault.",
+  "Controller: 4/9 passed the isolation gate first time; 17 gate runs in total. The most common rejection was the boundary-start case (5 runs). The manual describes linear motor channels, so the two rotary-only two-link cases were report-only on this device; they appear in some failure lists but did not decide pass/fail.",
+  "Host performs the enable/home startup in handshake; the model did not perform the homing procedure.",
+  "Validity limits: one model, 3 seeds x 3 repeats; CoreXY with backlash is a constant linear channel mix plus a dead zone, i.e. kinematically within the class the linear isolation cases already cover. The new element for the model is mainly the protocol family (Modbus-RTU style, CRC-16) and the coupled belts, not a new kinematic class."
+ ],
+ "runs": [
+  {
+   "batch": "batch-20261015-154647",
+   "label": "x-s2026-r1-claude",
+   "device": "VLAB-X",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 88,
+   "frontCalls": 15,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 1,
+   "actions": 172,
+   "xyActions": 132,
+   "unconfirmed": 0,
+   "ratioToBaseline": 1.04,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.9,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 86,
+    "referenceActions": 69,
+    "ratio": 1.25
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界"
+    ],
+    [
+     "接近目標時目標量測偏移",
+     "二連桿長距離多目標",
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 370,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 466874,
+    "output_tokens": 48433,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 172,
+     "trialActions": [
+      40,
+      31,
+      36,
+      32,
+      33
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 171,
+     "trialActions": [
+      39,
+      31,
+      35,
+      33,
+      33
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 170,
+     "trialActions": [
+      36,
+      34,
+      32,
+      31,
+      37
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i] & 0xFF;\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) {\n        crc = (crc >>> 1) ^ 0xA001;\n      } else {\n        crc = crc >>> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction bytesToHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = (bytes[i] & 0xFF).toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction buildFrame(bytes) {\n  var c = crc16(bytes);\n  var out = bytes.slice();\n  out.push(c & 0xFF);\n  out.push((c >>> 8) & 0xFF);\n  return bytesToHex(out);\n}\n\nfunction s16Bytes(v) {\n  var u = v < 0 ? v + 65536 : v;\n  return [(u >>> 8) & 0xFF, u & 0xFF];\n}\n\nfunction s16FromBytes(hi, lo) {\n  var u = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  return u >= 0x8000 ? u - 0x10000 : u;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('step command must have 2 channels');\n    var q = [];\n    for (var i = 0; i < 2; i++) {\n      var x = command[i];\n      if (typeof x !== 'number' || !isFinite(x)) throw new Error('non-finite channel value');\n      if (Math.abs(x) > 0.1 + 1e-12) throw new Error('channel value out of range');\n      var v = Math.round(x * 10000);\n      if (v > 1000) v = 1000;\n      if (v < -1000) v = -1000;\n      q.push(v);\n    }\n    var bytes = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04];\n    var a = s16Bytes(q[0]);\n    var b = s16Bytes(q[1]);\n    bytes.push(a[0], a[1], b[0], b[1]);\n    return buildFrame(bytes);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var lv;\n      if (command.position === 'up') lv = 1;\n      else if (command.position === 'down') lv = 0;\n      else throw new Error('lift position must be up or down');\n      return buildFrame([0x11, 0x06, 0x02, 0x00, 0x00, lv]);\n    }\n    if (command.op === 'grip') {\n      var gv;\n      if (command.state === 'closed') gv = 1;\n      else if (command.state === 'open') gv = 0;\n      else throw new Error('grip state must be open or closed');\n      return buildFrame([0x11, 0x06, 0x02, 0x01, 0x00, gv]);\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') throw new Error('reply must be a string');\n  var s = rawReply.trim().toLowerCase();\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-f]+$/.test(s)) throw new Error('malformed hex reply');\n  var bytes = [];\n  for (var i = 0; i < s.length; i += 2) {\n    bytes.push(parseInt(s.substr(i, 2), 16));\n  }\n  if (bytes.length < 5) throw new Error('reply too short');\n  var n = bytes.length;\n  var c = crc16(bytes.slice(0, n - 2));\n  if (bytes[n - 2] !== (c & 0xFF) || bytes[n - 1] !== ((c >>> 8) & 0xFF)) {\n    throw new Error('CRC mismatch');\n  }\n  if (bytes[0] !== 0x11) throw new Error('unit address mismatch');\n  var func = bytes[1];\n  if (func & 0x80) {\n    throw new Error('device exception code ' + bytes[2]);\n  }\n  if (func === 0x17) {\n    if (n !== 11 || bytes[2] !== 6) throw new Error('bad step reply length');\n    var a = s16FromBytes(bytes[3], bytes[4]) / 10000;\n    var b = s16FromBytes(bytes[5], bytes[6]) / 10000;\n    var flags = ((bytes[7] & 0xFF) << 8) | (bytes[8] & 0xFF);\n    return { applied: [a, b], limited: (flags & 1) === 1 };\n  }\n  if (func === 0x06) {\n    if (n !== 8) throw new Error('bad write reply length');\n    var reg = ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);\n    var val = ((bytes[4] & 0xFF) << 8) | (bytes[5] & 0xFF);\n    if (reg === 0x0200) {\n      if (val === 0) return { applied: { op: 'lift', position: 'down' }, limited: false };\n      if (val === 1) return { applied: { op: 'lift', position: 'up' }, limited: false };\n      throw new Error('bad lift value in reply');\n    }\n    if (reg === 0x0201) {\n      if (val === 0) return { applied: { op: 'grip', state: 'open' }, limited: false };\n      if (val === 1) return { applied: { op: 'grip', state: 'closed' }, limited: false };\n      throw new Error('bad grip value in reply');\n    }\n    throw new Error('unexpected register in reply');\n  }\n  throw new Error('unsupported function code in reply');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip, target = state.target;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var dist = Math.sqrt(ex * ex + ey * ey);\n  if (dist <= state.tolerancePx) return { action: 'verify' };\n  if (state.maxActions !== null && state.maxActions !== undefined && state.step >= state.maxActions) {\n    return { action: 'stop', reason: 'action budget exhausted' };\n  }\n  var h = state.history || [];\n  var S = [];\n  var start = Math.max(0, h.length - 40);\n  var span = Math.max(1, h.length - start);\n  for (var i = start; i < h.length; i++) {\n    var a = h[i].applied, d = h[i].delta;\n    if (!a || !d) continue;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    var w = 0.5 + (i - start) / span;\n    S.push({ a: a, d: d, w: w });\n  }\n  var n = S.length;\n  function clampRound(v) {\n    var r = Math.round(v * 10000) / 10000;\n    if (r > 0.1) r = 0.1;\n    if (r < -0.1) r = -0.1;\n    return r;\n  }\n  function norm2(v) { return Math.sqrt(v[0] * v[0] + v[1] * v[1]); }\n  var mag = dist > 30 ? 0.1 : 0.03;\n  function probe() {\n    var n0 = 0, n1 = 0;\n    for (var k = 0; k < n; k++) {\n      if (Math.abs(S[k].a[0]) > 1e-6) n0++;\n      if (Math.abs(S[k].a[1]) > 1e-6) n1++;\n    }\n    var ch;\n    if (n0 < n1) ch = 0;\n    else if (n1 < n0) ch = 1;\n    else ch = n % 2;\n    var sign = (Math.floor(n / 2) % 2 === 0) ? 1 : -1;\n    if (ch === 0) return { action: 'move', u: [clampRound(0.1 * sign), 0] };\n    return { action: 'move', u: [0, clampRound(0.1 * sign)] };\n  }\n  // Escape a stuck pair: commanded motion but image barely moves (e.g. travel limit or backlash).\n  if (n >= 2) {\n    var l1 = S[n - 1], l2 = S[n - 2];\n    if (norm2(l1.a) >= 0.02 && norm2(l2.a) >= 0.02 && norm2(l1.d) < 0.5 && norm2(l2.d) < 0.5) {\n      var sc = 0.1 / Math.max(Math.abs(l1.a[0]), Math.abs(l1.a[1]));\n      var bu = [clampRound(-l1.a[0] * sc), clampRound(-l1.a[1] * sc)];\n      if (bu[0] !== 0 || bu[1] !== 0) return { action: 'move', u: bu };\n    }\n  }\n  if (n < 2) return probe();\n  // Weighted ridge least squares: delta = J * applied (recent samples weighted more)\n  var s00 = 0, s01 = 0, s11 = 0, b0x = 0, b1x = 0, b0y = 0, b1y = 0;\n  for (var j = 0; j < n; j++) {\n    var aa = S[j].a, dd = S[j].d, ww = S[j].w;\n    s00 += ww * aa[0] * aa[0]; s01 += ww * aa[0] * aa[1]; s11 += ww * aa[1] * aa[1];\n    b0x += ww * aa[0] * dd[0]; b1x += ww * aa[1] * dd[0];\n    b0y += ww * aa[0] * dd[1]; b1y += ww * aa[1] * dd[1];\n  }\n  var lam = 1e-6;\n  s00 += lam; s11 += lam;\n  var det = s00 * s11 - s01 * s01;\n  if (!isFinite(det) || Math.abs(det) < 1e-8) return probe();\n  var Jxx = (s11 * b0x - s01 * b1x) / det;\n  var Jxy = (-s01 * b0x + s00 * b1x) / det;\n  var Jyx = (s11 * b0y - s01 * b1y) / det;\n  var Jyy = (-s01 * b0y + s00 * b1y) / det;\n  var detJ = Jxx * Jyy - Jxy * Jyx;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-3) return probe();\n  // Residual check of the local linear model (robust to a few noisy samples)\n  var res = 0, mg = 0;\n  for (var k2 = 0; k2 < n; k2++) {\n    var a2 = S[k2].a, d2 = S[k2].d;\n    var px = Jxx * a2[0] + Jxy * a2[1], py = Jyx * a2[0] + Jyy * a2[1];\n    res += (px - d2[0]) * (px - d2[0]) + (py - d2[1]) * (py - d2[1]);\n    mg += d2[0] * d2[0] + d2[1] * d2[1];\n  }\n  if (n >= 4 && mg > 0 && res > 0.5 * mg) return probe();\n  // Solve J u = e\n  var u0 = (Jyy * ex - Jxy * ey) / detJ;\n  var u1 = (-Jyx * ex + Jxx * ey) / detJ;\n  if (!isFinite(u0) || !isFinite(u1)) return probe();\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  // Proportional scaling: full step far away, reduced step near target to avoid overshoot from measurement offset\n  var cap = dist > 30 ? 0.1 : (dist > 12 ? 0.05 : 0.03);\n  if (m > cap) { u0 = u0 * cap / m; u1 = u1 * cap / m; }\n  u0 = clampRound(u0);\n  u1 = clampRound(u1);\n  if (u0 === 0 && u1 === 0) return probe();\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-154647",
+   "label": "x-s2026-r2-claude",
+   "device": "VLAB-X",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 84,
+   "frontCalls": 12,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 151,
+   "xyActions": 111,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.91,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.89,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 63,
+    "referenceActions": 69,
+    "ratio": 0.91
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界"
+    ]
+   ],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 328,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 416155,
+    "output_tokens": 39165,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 151,
+     "trialActions": [
+      35,
+      28,
+      32,
+      28,
+      28
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 149,
+     "trialActions": [
+      34,
+      27,
+      30,
+      29,
+      29
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 150,
+     "trialActions": [
+      33,
+      29,
+      29,
+      28,
+      31
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i] & 0xFF;\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) { crc = (crc >> 1) ^ 0xA001; } else { crc = crc >> 1; }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction toHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    s += ('0' + (bytes[i] & 0xFF).toString(16)).slice(-2);\n  }\n  return s;\n}\n\nfunction withCrc(bytes) {\n  var c = crc16(bytes);\n  var out = bytes.slice();\n  out.push(c & 0xFF, (c >> 8) & 0xFF);\n  return toHex(out);\n}\n\nfunction s16bytes(v) {\n  var u = v < 0 ? v + 65536 : v;\n  return [(u >> 8) & 0xFF, u & 0xFF];\n}\n\nfunction s16from(hi, lo) {\n  var u = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  return u >= 0x8000 ? u - 0x10000 : u;\n}\n\nfunction quant(x) {\n  if (typeof x !== 'number' || !isFinite(x)) throw new Error('non-finite channel value');\n  if (Math.abs(x) > 0.1 + 1e-12) throw new Error('channel value out of range');\n  var v = Math.round(x * 10000);\n  if (v > 1000) v = 1000;\n  if (v < -1000) v = -1000;\n  return v;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('XY command needs 2 channels');\n    var a = quant(command[0]);\n    var b = quant(command[1]);\n    var f = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04];\n    f = f.concat(s16bytes(a), s16bytes(b));\n    return withCrc(f);\n  }\n  if (command && command.op === 'lift') {\n    var lv;\n    if (command.position === 'up') lv = 1;\n    else if (command.position === 'down') lv = 0;\n    else throw new Error('lift position must be up or down');\n    return withCrc([0x11, 0x06, 0x02, 0x00, 0x00, lv]);\n  }\n  if (command && command.op === 'grip') {\n    var gv;\n    if (command.state === 'closed') gv = 1;\n    else if (command.state === 'open') gv = 0;\n    else throw new Error('grip state must be open or closed');\n    return withCrc([0x11, 0x06, 0x02, 0x01, 0x00, gv]);\n  }\n  throw new Error('unsupported command');\n}\n\nfunction fromHex(s) {\n  if (typeof s !== 'string') throw new Error('reply must be a string');\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(s)) throw new Error('malformed hex reply');\n  var out = [];\n  for (var i = 0; i < s.length; i += 2) {\n    out.push(parseInt(s.substr(i, 2), 16));\n  }\n  return out;\n}\n\nfunction decode(rawReply) {\n  var b = fromHex(rawReply);\n  var n = b.length;\n  if (n < 5) throw new Error('reply too short');\n  var c = crc16(b.slice(0, n - 2));\n  if (b[n - 2] !== (c & 0xFF) || b[n - 1] !== ((c >> 8) & 0xFF)) throw new Error('CRC mismatch');\n  if (b[0] !== 0x11) throw new Error('unit address mismatch');\n  var fn = b[1];\n  if (fn & 0x80) {\n    var code = b[2];\n    var names = {1: 'ILLEGAL_FUNCTION', 2: 'ILLEGAL_DATA_ADDRESS', 3: 'ILLEGAL_DATA_VALUE', 4: 'DEVICE_FAILURE', 6: 'DEVICE_BUSY_NOT_READY'};\n    throw new Error('device exception ' + code + ' ' + (names[code] || 'UNKNOWN'));\n  }\n  if (fn === 0x17) {\n    if (n !== 11) throw new Error('bad XY reply length');\n    if (b[2] !== 6) throw new Error('bad XY reply byte count');\n    var a = s16from(b[3], b[4]) / 10000;\n    var bb = s16from(b[5], b[6]) / 10000;\n    var flags = ((b[7] & 0xFF) << 8) | (b[8] & 0xFF);\n    return { applied: [a, bb], limited: (flags & 1) === 1 };\n  }\n  if (fn === 0x06) {\n    if (n !== 8) throw new Error('bad aux reply length');\n    var reg = ((b[2] & 0xFF) << 8) | (b[3] & 0xFF);\n    var val = ((b[4] & 0xFF) << 8) | (b[5] & 0xFF);\n    if (reg === 0x0200) {\n      if (val === 0) return { applied: { op: 'lift', position: 'down' }, limited: false };\n      if (val === 1) return { applied: { op: 'lift', position: 'up' }, limited: false };\n      throw new Error('bad lift value');\n    }\n    if (reg === 0x0201) {\n      if (val === 0) return { applied: { op: 'grip', state: 'open' }, limited: false };\n      if (val === 1) return { applied: { op: 'grip', state: 'closed' }, limited: false };\n      throw new Error('bad grip value');\n    }\n    throw new Error('unexpected register in reply');\n  }\n  throw new Error('unexpected function code ' + fn);\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var h = (state && state.history) ? state.history : [];\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: 'stop', reason: 'invalid tip or target' };\n  }\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var e = Math.sqrt(ex * ex + ey * ey);\n  if (e <= state.tolerancePx) {\n    return { action: 'verify' };\n  }\n  var n = h.length;\n\n  // Stall detection: last 4 moves produced almost no image motion (boundary, backlash).\n  // Escape by moving one channel away from its last commanded sign.\n  var stalled = n >= 4;\n  for (var k = n - 4; k < n && stalled; k++) {\n    if (k < 0) { stalled = false; break; }\n    var sk = h[k];\n    if (!sk || !sk.delta || !isFinite(sk.delta[0]) || !isFinite(sk.delta[1])) { stalled = false; break; }\n    var mk = Math.sqrt(sk.delta[0] * sk.delta[0] + sk.delta[1] * sk.delta[1]);\n    if (mk >= 0.5) stalled = false;\n  }\n  if (stalled) {\n    var ch = (n % 2 === 0) ? 0 : 1;\n    var lastCmd = null;\n    for (var j = n - 1; j >= 0; j--) {\n      if (h[j] && h[j].command && (Math.abs(h[j].command[0]) + Math.abs(h[j].command[1]) > 1e-6)) { lastCmd = h[j].command; break; }\n    }\n    var sgn = 1;\n    if (lastCmd && Math.abs(lastCmd[ch]) > 1e-6) sgn = lastCmd[ch] > 0 ? -1 : 1;\n    else sgn = (n % 4 < 2) ? 1 : -1;\n    var eu = [0, 0];\n    eu[ch] = 0.1 * sgn;\n    return { action: 'move', u: eu };\n  }\n\n  // Weighted least squares fit of local Jacobian J (delta = J * applied), recent samples weighted more.\n  var Saa = 0, Sab = 0, Sbb = 0;\n  var Xa = 0, Xb = 0, Ya = 0, Yb = 0;\n  var cnt = 0;\n  for (var i = 0; i < n; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var a = s.applied[0], b = s.applied[1];\n    var dx = s.delta[0], dy = s.delta[1];\n    if (!isFinite(a) || !isFinite(b) || !isFinite(dx) || !isFinite(dy)) continue;\n    if (Math.abs(a) + Math.abs(b) < 1e-6) continue;\n    // skip backlash / no-motion samples: they do not represent the mapping\n    if (Math.abs(dx) + Math.abs(dy) < 0.3) continue;\n    var w = Math.pow(0.9, n - 1 - i);\n    Saa += w * a * a;\n    Sab += w * a * b;\n    Sbb += w * b * b;\n    Xa += w * a * dx;\n    Xb += w * b * dx;\n    Ya += w * a * dy;\n    Yb += w * b * dy;\n    cnt++;\n  }\n  var probe = (n % 2 === 0) ? [0.1, 0] : [0, 0.1];\n  var scale = Saa + Sbb;\n  if (cnt < 2 || !(scale > 0)) {\n    return { action: 'move', u: probe };\n  }\n  var lam = 1e-6 * scale + 1e-12;\n  var A = Saa + lam, B = Sab, D = Sbb + lam;\n  var det0 = A * D - B * B;\n  if (!(det0 > 1e-3 * scale * scale)) {\n    return { action: 'move', u: probe };\n  }\n  var p0 = (D * Xa - B * Xb) / det0;\n  var p1 = (A * Xb - B * Xa) / det0;\n  var q0 = (D * Ya - B * Yb) / det0;\n  var q1 = (A * Yb - B * Ya) / det0;\n  // J = [[p0,p1],[q0,q1]]\n  var detJ = p0 * q1 - p1 * q0;\n  var normJ2 = p0 * p0 + p1 * p1 + q0 * q0 + q1 * q1;\n  if (!(normJ2 > 1e-9) || !isFinite(detJ)) {\n    return { action: 'move', u: probe };\n  }\n  var u0, u1;\n  if (Math.abs(detJ) > 0.02 * normJ2 / 2) {\n    u0 = 0.8 * (q1 * ex - p1 * ey) / detJ;\n    u1 = 0.8 * (-q0 * ex + p0 * ey) / detJ;\n  } else {\n    // ill-conditioned: damped least squares u = J^T (J J^T + mu I)^-1 e\n    var M00 = p0 * p0 + p1 * p1, M01 = p0 * q0 + p1 * q1, M11 = q0 * q0 + q1 * q1;\n    var mu = 0.01 * (M00 + M11) + 1e-12;\n    var m00 = M00 + mu, m11 = M11 + mu;\n    var dd = m00 * m11 - M01 * M01;\n    if (!(Math.abs(dd) > 1e-14)) {\n      return { action: 'move', u: probe };\n    }\n    var z0 = (m11 * ex - M01 * ey) / dd;\n    var z1 = (-M01 * ex + m00 * ey) / dd;\n    u0 = 0.8 * (p0 * z0 + q0 * z1);\n    u1 = 0.8 * (p1 * z0 + q1 * z1);\n  }\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: 'move', u: probe };\n  }\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) {\n    u0 = u0 * 0.1 / m;\n    u1 = u1 * 0.1 / m;\n    m = 0.1;\n  }\n  if (m < 0.003) {\n    // keep steps meaningful so the mapping is excited near the target\n    var f = 0.003 / Math.max(m, 1e-9);\n    u0 *= f; u1 *= f;\n    var m2 = Math.max(Math.abs(u0), Math.abs(u1));\n    if (m2 > 0.1) { u0 = u0 * 0.1 / m2; u1 = u1 * 0.1 / m2; }\n  }\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: 'move', u: probe };\n  }\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-154647",
+   "label": "x-s2026-r3-claude",
+   "device": "VLAB-X",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 90,
+   "frontCalls": 18,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 2,
+   "actions": 165,
+   "xyActions": 125,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.99,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.98,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 63,
+    "referenceActions": 69,
+    "ratio": 0.91
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界",
+     "二連桿肘關節極限繞行"
+    ],
+    [
+     "起點貼近行程邊界",
+     "二連桿肘關節極限繞行"
+    ],
+    [
+     "起點貼近行程邊界"
+    ]
+   ],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 356,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 526039,
+    "output_tokens": 62584,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 165,
+     "trialActions": [
+      38,
+      30,
+      35,
+      31,
+      31
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 166,
+     "trialActions": [
+      37,
+      32,
+      33,
+      32,
+      32
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 166,
+     "trialActions": [
+      36,
+      33,
+      32,
+      31,
+      34
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i];\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) {\n        crc = (crc >>> 1) ^ 0xA001;\n      } else {\n        crc = crc >>> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction toHex(bytes) {\n  var s = \"\";\n  for (var i = 0; i < bytes.length; i++) {\n    var h = bytes[i].toString(16);\n    s += (h.length < 2 ? \"0\" : \"\") + h;\n  }\n  return s;\n}\n\nfunction frameWithCrc(bytes) {\n  var c = crc16(bytes);\n  return toHex(bytes.concat([c & 0xFF, (c >> 8) & 0xFF]));\n}\n\nfunction s16Bytes(value) {\n  if (typeof value !== \"number\" || !isFinite(value)) {\n    throw new Error(\"invalid step value\");\n  }\n  if (value < -0.1 - 1e-9 || value > 0.1 + 1e-9) {\n    throw new Error(\"step out of range\");\n  }\n  var x = Math.round(value * 10000);\n  if (x < 0) x += 65536;\n  return [(x >> 8) & 0xFF, x & 0xFF];\n}\n\nfunction parseHex(raw) {\n  if (typeof raw !== \"string\") throw new Error(\"reply is not a string\");\n  if (raw.length === 0) throw new Error(\"no reply from device\");\n  if (raw.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(raw)) {\n    throw new Error(\"malformed hex reply\");\n  }\n  var bytes = [];\n  for (var i = 0; i < raw.length; i += 2) {\n    bytes.push(parseInt(raw.substr(i, 2), 16));\n  }\n  return bytes;\n}\n\nfunction s16FromBytes(hi, lo) {\n  var v = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  if (v & 0x8000) v -= 0x10000;\n  return v;\n}\n\nfunction encode(command) {\n  var UNIT = 0x11;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step command needs two channels\");\n    var a = s16Bytes(command[0]);\n    var b = s16Bytes(command[1]);\n    // 0x17: read 0x0310 x3, write 0x0300 x2, byte count 4\n    return frameWithCrc([UNIT, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04,\n      a[0], a[1], b[0], b[1]]);\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      var liftVal;\n      if (command.position === \"up\") liftVal = 1;\n      else if (command.position === \"down\") liftVal = 0;\n      else throw new Error(\"invalid lift position\");\n      // 0x06 write register 0x0200\n      return frameWithCrc([UNIT, 0x06, 0x02, 0x00, 0x00, liftVal]);\n    }\n    if (command.op === \"grip\") {\n      var gripVal;\n      if (command.state === \"open\") gripVal = 0;\n      else if (command.state === \"closed\") gripVal = 1;\n      else throw new Error(\"invalid grip state\");\n      // 0x06 write register 0x0201\n      return frameWithCrc([UNIT, 0x06, 0x02, 0x01, 0x00, gripVal]);\n    }\n  }\n  throw new Error(\"unsupported command\");\n}\n\nfunction decode(rawReply) {\n  var b = parseHex(rawReply);\n  if (b.length < 5) throw new Error(\"reply too short\");\n  var body = b.slice(0, b.length - 2);\n  var c = crc16(body);\n  if (b[b.length - 2] !== (c & 0xFF) || b[b.length - 1] !== ((c >> 8) & 0xFF)) {\n    throw new Error(\"CRC mismatch\");\n  }\n  if (b[0] !== 0x11) throw new Error(\"unit address mismatch\");\n  var func = b[1];\n  if (func & 0x80) {\n    var code = b[2];\n    var names = { 1: \"ILLEGAL_FUNCTION\", 2: \"ILLEGAL_DATA_ADDRESS\", 3: \"ILLEGAL_DATA_VALUE\", 4: \"DEVICE_FAILURE\", 6: \"DEVICE_BUSY_NOT_READY\" };\n    throw new Error(\"device exception \" + code + \" \" + (names[code] || \"UNKNOWN\"));\n  }\n  if (func === 0x17) {\n    if (b.length !== 11) throw new Error(\"bad step reply length\");\n    if (b[2] !== 6) throw new Error(\"bad step reply byte count\");\n    var av = s16FromBytes(b[3], b[4]) / 10000;\n    var bv = s16FromBytes(b[5], b[6]) / 10000;\n    var flags = ((b[7] & 0xFF) << 8) | (b[8] & 0xFF);\n    return { applied: [av, bv], limited: (flags & 1) === 1 };\n  }\n  if (func === 0x06) {\n    if (b.length !== 8) throw new Error(\"bad write reply length\");\n    var reg = ((b[2] & 0xFF) << 8) | (b[3] & 0xFF);\n    var val = ((b[4] & 0xFF) << 8) | (b[5] & 0xFF);\n    if (reg === 0x0200) {\n      if (val !== 0 && val !== 1) throw new Error(\"bad lift echo value\");\n      return { applied: { op: \"lift\", position: val === 1 ? \"up\" : \"down\" }, limited: false };\n    }\n    if (reg === 0x0201) {\n      if (val !== 0 && val !== 1) throw new Error(\"bad grip echo value\");\n      return { applied: { op: \"grip\", state: val === 1 ? \"closed\" : \"open\" }, limited: false };\n    }\n    throw new Error(\"unexpected register echo\");\n  }\n  throw new Error(\"unsupported function code\");\n}\n",
+   "generatedControllerSource": "function fitJacobian(S, decay, maxN) {\n  var m00 = 1e-5, m01 = 0, m11 = 1e-5;\n  var b = [[0, 0], [0, 0]];\n  var start = Math.max(0, S.length - maxN);\n  var cnt = 0;\n  for (var k = start; k < S.length; k++) {\n    var s = S[k];\n    var age = S.length - 1 - k;\n    var w = Math.pow(decay, age);\n    var c0 = s.c[0], c1 = s.c[1];\n    m00 += w * c0 * c0;\n    m01 += w * c0 * c1;\n    m11 += w * c1 * c1;\n    for (var i = 0; i < 2; i++) {\n      b[i][0] += w * c0 * s.d[i];\n      b[i][1] += w * c1 * s.d[i];\n    }\n    cnt++;\n  }\n  if (cnt < 2) return null;\n  var det = m00 * m11 - m01 * m01;\n  if (!(det > 0)) return null;\n  var inv00 = m11 / det, inv01 = -m01 / det, inv11 = m00 / det;\n  var J = [[0, 0], [0, 0]];\n  for (var r = 0; r < 2; r++) {\n    J[r][0] = inv00 * b[r][0] + inv01 * b[r][1];\n    J[r][1] = inv01 * b[r][0] + inv11 * b[r][1];\n  }\n  return J;\n}\n\nfunction residualRatio(S, J, maxN) {\n  var start = Math.max(0, S.length - maxN);\n  var eR = 0, eD = 0;\n  for (var k = start; k < S.length; k++) {\n    var s = S[k];\n    for (var i = 0; i < 2; i++) {\n      var pred = J[i][0] * s.c[0] + J[i][1] * s.c[1];\n      var r = s.d[i] - pred;\n      eR += r * r;\n      eD += s.d[i] * s.d[i];\n    }\n  }\n  if (eD <= 1e-9) return 1e9;\n  return Math.sqrt(eR / eD);\n}\n\nfunction probeMove(S) {\n  // 四方向循環探測；近期受限回覆所指的方向視為被阻擋，改選其他方向\n  var dirs = [[0.1, 0], [0, 0.1], [-0.1, 0], [0, -0.1]];\n  var blocked = [false, false, false, false];\n  var start = Math.max(0, S.length - 6);\n  for (var k = start; k < S.length; k++) {\n    var s = S[k];\n    if (!s.limited) continue;\n    for (var ch = 0; ch < 2; ch++) {\n      if (Math.abs(s.c[ch]) <= 1e-6) continue;\n      var idx = (ch === 0 ? 0 : 1) + (s.c[ch] > 0 ? 0 : 2);\n      blocked[idx] = true;\n    }\n  }\n  var base = S.length % 4;\n  for (var t = 0; t < 4; t++) {\n    var j = (base + t) % 4;\n    if (!blocked[j]) return dirs[j];\n  }\n  // 全部被阻擋時朝最近樣本的反方向移動\n  if (S.length > 0) {\n    var last = S[S.length - 1].c;\n    return [-0.1 * (last[0] > 0 ? 1 : (last[0] < 0 ? -1 : 0)), -0.1 * (last[1] > 0 ? 1 : (last[1] < 0 ? -1 : 0))];\n  }\n  return dirs[0];\n}\n\nfunction control(state) {\n  var hist = (state && state.history) ? state.history : [];\n  var tip = state.tip, target = state.target;\n  var tol = state.tolerancePx || 7;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return { action: \"stop\", reason: \"缺少有效的影像座標\" };\n  }\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (err <= tol) return { action: \"verify\" };\n  if (typeof state.step === \"number\" && typeof state.maxActions === \"number\" && state.step >= state.maxActions) {\n    return { action: \"stop\", reason: \"動作預算用盡\" };\n  }\n\n  var S = [];\n  for (var k = 0; k < hist.length; k++) {\n    var h = hist[k];\n    if (!h || !h.applied || !h.delta) continue;\n    var c = h.applied, d = h.delta;\n    if (!isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    S.push({ c: c, d: d, limited: !!h.limited });\n  }\n\n  var J = null;\n  var bestRatio = 1e9;\n  var cands = [[0.85, 40], [0.7, 8]];\n  for (var q2 = 0; q2 < cands.length; q2++) {\n    var Jq = fitJacobian(S, cands[q2][0], cands[q2][1]);\n    if (!Jq) continue;\n    var rr = residualRatio(S, Jq, cands[q2][1]);\n    if (rr < bestRatio) { bestRatio = rr; J = Jq; }\n  }\n\n  var good = false;\n  if (J) {\n    var det = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n    var nrm2 = J[0][0] * J[0][0] + J[0][1] * J[0][1] + J[1][0] * J[1][0] + J[1][1] * J[1][1];\n    if (isFinite(det) && nrm2 > 0 && Math.abs(det) >= 0.05 * nrm2 && bestRatio <= 0.3) good = true;\n  }\n\n  if (!good) {\n    var pu = probeMove(S);\n    if (!isFinite(pu[0]) || !isFinite(pu[1])) return { action: \"stop\", reason: \"探測數值無效\" };\n    return { action: \"move\", u: pu };\n  }\n\n  var gain = err < 30 ? 0.4 : 0.5;\n  var dx = gain * ex, dy = gain * ey;\n  var det2 = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  var u0 = (J[1][1] * dx - J[0][1] * dy) / det2;\n  var u1 = (-J[1][0] * dx + J[0][0] * dy) / det2;\n  var mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (mx > 0.1) { u0 *= 0.1 / mx; u1 *= 0.1 / mx; }\n  else if (mx < 0.01 && err > 2 * tol) { var sc = 0.01 / mx; u0 *= sc; u1 *= sc; }\n  u0 = Math.max(-0.1, Math.min(0.1, Math.round(u0 * 10000) / 10000));\n  u1 = Math.max(-0.1, Math.min(0.1, Math.round(u1 * 10000) / 10000));\n  if (!isFinite(u0) || !isFinite(u1)) return { action: \"stop\", reason: \"數值無效\" };\n  return { action: \"move\", u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-161810",
+   "label": "x-s3140-r1-claude",
+   "device": "VLAB-X",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 83,
+   "frontCalls": 11,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 1,
+   "actions": 151,
+   "xyActions": 111,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.93,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.88,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 67,
+    "referenceActions": 69,
+    "ratio": 0.97
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 328,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 394386,
+    "output_tokens": 37669,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 155,
+     "trialActions": [
+      35,
+      30,
+      32,
+      30,
+      28
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 151,
+     "trialActions": [
+      34,
+      28,
+      31,
+      29,
+      29
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 154,
+     "trialActions": [
+      33,
+      30,
+      31,
+      29,
+      31
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i] & 0xFF;\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) { crc = (crc >> 1) ^ 0xA001; } else { crc = crc >> 1; }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction hex2(n) {\n  var s = (n & 0xFF).toString(16);\n  return s.length < 2 ? '0' + s : s;\n}\n\nfunction buildFrame(bytes) {\n  var c = crc16(bytes);\n  var out = '';\n  for (var i = 0; i < bytes.length; i++) { out += hex2(bytes[i]); }\n  out += hex2(c & 0xFF) + hex2((c >> 8) & 0xFF);\n  return out;\n}\n\nfunction s16Bytes(v) {\n  var x = v < 0 ? v + 65536 : v;\n  return [(x >> 8) & 0xFF, x & 0xFF];\n}\n\nfunction toStep(x) {\n  if (typeof x !== 'number' || !isFinite(x)) { throw new Error('invalid channel value'); }\n  if (x < -0.1 - 1e-12 || x > 0.1 + 1e-12) { throw new Error('channel value out of range'); }\n  var q = Math.round(x * 10000);\n  if (q < -1000) { q = -1000; }\n  if (q > 1000) { q = 1000; }\n  return q;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) { throw new Error('step command needs two channels'); }\n    var a = toStep(command[0]);\n    var b = toStep(command[1]);\n    var bytes = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04]\n      .concat(s16Bytes(a), s16Bytes(b));\n    return buildFrame(bytes);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var v;\n      if (command.position === 'up') { v = 1; }\n      else if (command.position === 'down') { v = 0; }\n      else { throw new Error('invalid lift position'); }\n      return buildFrame([0x11, 0x06, 0x02, 0x00, (v >> 8) & 0xFF, v & 0xFF]);\n    }\n    if (command.op === 'grip') {\n      var g;\n      if (command.state === 'closed') { g = 1; }\n      else if (command.state === 'open') { g = 0; }\n      else { throw new Error('invalid grip state'); }\n      return buildFrame([0x11, 0x06, 0x02, 0x01, (g >> 8) & 0xFF, g & 0xFF]);\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction parseHex(raw) {\n  if (typeof raw !== 'string') { throw new Error('reply must be a string'); }\n  if (raw.length === 0) { throw new Error('no reply from device'); }\n  if (raw.length % 2 !== 0) { throw new Error('odd hex length'); }\n  if (!/^[0-9a-fA-F]+$/.test(raw)) { throw new Error('non-hex reply'); }\n  var bytes = [];\n  for (var i = 0; i < raw.length; i += 2) {\n    bytes.push(parseInt(raw.substr(i, 2), 16));\n  }\n  return bytes;\n}\n\nfunction decode(rawReply) {\n  var bytes = parseHex(rawReply);\n  if (bytes.length < 5) { throw new Error('reply too short'); }\n  if (bytes[0] !== 0x11) { throw new Error('wrong unit address'); }\n  var body = bytes.slice(0, bytes.length - 2);\n  var c = crc16(body);\n  if (bytes[bytes.length - 2] !== (c & 0xFF) || bytes[bytes.length - 1] !== ((c >> 8) & 0xFF)) {\n    throw new Error('CRC mismatch');\n  }\n  var fc = bytes[1];\n  if (fc & 0x80) {\n    throw new Error('device exception code ' + bytes[2]);\n  }\n  if (fc === 0x17) {\n    if (bytes.length !== 11) { throw new Error('bad step reply length'); }\n    if (bytes[2] !== 6) { throw new Error('bad step reply byte count'); }\n    var av = (bytes[3] << 8) | bytes[4];\n    var bv = (bytes[5] << 8) | bytes[6];\n    if (av >= 32768) { av -= 65536; }\n    if (bv >= 32768) { bv -= 65536; }\n    var flags = (bytes[7] << 8) | bytes[8];\n    return { applied: [av / 10000, bv / 10000], limited: (flags & 1) === 1 };\n  }\n  if (fc === 0x06) {\n    if (bytes.length !== 8) { throw new Error('bad write reply length'); }\n    var reg = (bytes[2] << 8) | bytes[3];\n    var val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      if (val === 1) { return { applied: { op: 'lift', position: 'up' }, limited: false }; }\n      if (val === 0) { return { applied: { op: 'lift', position: 'down' }, limited: false }; }\n      throw new Error('bad lift echo');\n    }\n    if (reg === 0x0201) {\n      if (val === 1) { return { applied: { op: 'grip', state: 'closed' }, limited: false }; }\n      if (val === 0) { return { applied: { op: 'grip', state: 'open' }, limited: false }; }\n      throw new Error('bad grip echo');\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unsupported function code');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: 'stop', reason: 'invalid tip or target' };\n  }\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  var tol = state.tolerancePx;\n  if (err <= tol) { return { action: 'verify' }; }\n\n  var h = state.history || [];\n  var probes = [[0.1, 0], [0, 0.1], [-0.1, 0], [0, -0.1]];\n  var probe = probes[h.length % 4];\n\n  // Accumulate least-squares fit delta = J * applied over recent samples.\n  var start = Math.max(0, h.length - 12);\n  var aa00 = 0, aa01 = 0, aa11 = 0;\n  var da00 = 0, da01 = 0, da10 = 0, da11 = 0;\n  var n = 0;\n  for (var i = start; i < h.length; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) { continue; }\n    var u0 = s.applied[0], u1 = s.applied[1];\n    var d0 = s.delta[0], d1 = s.delta[1];\n    if (!isFinite(u0) || !isFinite(u1) || !isFinite(d0) || !isFinite(d1)) { continue; }\n    aa00 += u0 * u0; aa01 += u0 * u1; aa11 += u1 * u1;\n    da00 += d0 * u0; da01 += d0 * u1;\n    da10 += d1 * u0; da11 += d1 * u1;\n    n++;\n  }\n  if (n < 2) { return { action: 'move', u: probe }; }\n\n  // Small ridge term keeps the fit stable when samples cluster in one direction.\n  var lam = 1e-6;\n  var m00 = aa00 + lam, m01 = aa01, m11 = aa11 + lam;\n  var detM = m00 * m11 - m01 * m01;\n  if (!isFinite(detM) || Math.abs(detM) < 1e-18) { return { action: 'move', u: probe }; }\n  // Minv = [[m11, -m01], [-m01, m00]] / detM ; J = DA * Minv\n  var i00 = m11 / detM, i01 = -m01 / detM, i10 = -m01 / detM, i11 = m00 / detM;\n  var j00 = da00 * i00 + da01 * i10;\n  var j01 = da00 * i01 + da01 * i11;\n  var j10 = da10 * i00 + da11 * i10;\n  var j11 = da10 * i01 + da11 * i11;\n  var detJ = j00 * j11 - j01 * j10;\n  var scaleRef = Math.abs(j00 * j11) + Math.abs(j01 * j10) + 1e-12;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-3 * scaleRef) {\n    return { action: 'move', u: probe };\n  }\n\n  // Solve J * du = e.\n  var du0 = (j11 * ex - j01 * ey) / detJ;\n  var du1 = (-j10 * ex + j00 * ey) / detJ;\n  if (!isFinite(du0) || !isFinite(du1)) { return { action: 'move', u: probe }; }\n\n  var mx = Math.max(Math.abs(du0), Math.abs(du1));\n  if (mx < 1e-9) { return { action: 'move', u: probe }; }\n  var s2 = err > 30 ? Math.min(1, 0.1 / mx) : Math.min(0.8, 0.1 / mx);\n  var a = du0 * s2, b = du1 * s2;\n  a = Math.max(-0.1, Math.min(0.1, a));\n  b = Math.max(-0.1, Math.min(0.1, b));\n  a = Math.round(a * 10000) / 10000;\n  b = Math.round(b * 10000) / 10000;\n  if (Math.abs(a) < 0.0001 && Math.abs(b) < 0.0001) { return { action: 'move', u: probe }; }\n  return { action: 'move', u: [a, b] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-161810",
+   "label": "x-s3140-r2-claude",
+   "device": "VLAB-X",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 85,
+   "frontCalls": 10,
+   "transientRetries": 1,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 160,
+   "xyActions": 120,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.98,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.94,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 64,
+    "referenceActions": 69,
+    "ratio": 0.93
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 346,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 387381,
+    "output_tokens": 31066,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 159,
+     "trialActions": [
+      36,
+      30,
+      33,
+      31,
+      29
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160,
+     "trialActions": [
+      37,
+      29,
+      34,
+      30,
+      30
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 157,
+     "trialActions": [
+      33,
+      31,
+      31,
+      30,
+      32
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i] & 0xFF;\n    for (var k = 0; k < 8; k++) {\n      if (crc & 1) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = crc >> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction withCrc(body) {\n  var crc = crc16(body);\n  var out = body.slice();\n  out.push(crc & 0xFF);\n  out.push((crc >> 8) & 0xFF);\n  return out;\n}\n\nfunction toHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = (bytes[i] & 0xFF).toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction encodeStep(a, b) {\n  var vals = [a, b];\n  var enc = [];\n  for (var i = 0; i < 2; i++) {\n    var v = vals[i];\n    if (typeof v !== 'number' || !isFinite(v) || Math.abs(v) > 0.1 + 1e-12) {\n      throw new Error('step value out of range');\n    }\n    var q = Math.round(v * 10000);\n    if (q > 1000) q = 1000;\n    if (q < -1000) q = -1000;\n    var u = q < 0 ? q + 65536 : q;\n    enc.push((u >> 8) & 0xFF, u & 0xFF);\n  }\n  var body = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04];\n  body.push(enc[0], enc[1], enc[2], enc[3]);\n  return toHex(withCrc(body));\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('command must have 2 channels');\n    return encodeStep(command[0], command[1]);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var lv;\n      if (command.position === 'up') lv = 1;\n      else if (command.position === 'down') lv = 0;\n      else throw new Error('bad lift position');\n      return toHex(withCrc([0x11, 0x06, 0x02, 0x00, 0x00, lv]));\n    }\n    if (command.op === 'grip') {\n      var gv;\n      if (command.state === 'closed') gv = 1;\n      else if (command.state === 'open') gv = 0;\n      else throw new Error('bad grip state');\n      return toHex(withCrc([0x11, 0x06, 0x02, 0x01, 0x00, gv]));\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction parseHex(s) {\n  if (typeof s !== 'string') throw new Error('reply not a string');\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(s)) throw new Error('malformed hex reply');\n  var bytes = [];\n  for (var i = 0; i < s.length; i += 2) {\n    bytes.push(parseInt(s.substr(i, 2), 16));\n  }\n  return bytes;\n}\n\nfunction s16(hi, lo) {\n  var v = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  return v >= 0x8000 ? v - 0x10000 : v;\n}\n\nfunction decode(rawReply) {\n  var bytes = parseHex(rawReply);\n  if (bytes.length < 5) throw new Error('reply too short');\n  if (bytes[0] !== 0x11) throw new Error('unit address mismatch');\n  var n = bytes.length;\n  var crc = crc16(bytes.slice(0, n - 2));\n  var got = bytes[n - 2] | (bytes[n - 1] << 8);\n  if (crc !== got) throw new Error('CRC mismatch');\n  var fn = bytes[1];\n  if (fn & 0x80) {\n    throw new Error('device exception code ' + bytes[2]);\n  }\n  if (fn === 0x17) {\n    if (n !== 11 || bytes[2] !== 6) throw new Error('bad step reply length');\n    var a = s16(bytes[3], bytes[4]) / 10000;\n    var b = s16(bytes[5], bytes[6]) / 10000;\n    var flags = ((bytes[7] & 0xFF) << 8) | (bytes[8] & 0xFF);\n    return { applied: [a, b], limited: (flags & 1) === 1 };\n  }\n  if (fn === 0x06) {\n    if (n !== 8) throw new Error('bad write reply length');\n    var addr = ((bytes[2] & 0xFF) << 8) | (bytes[3] & 0xFF);\n    var val = ((bytes[4] & 0xFF) << 8) | (bytes[5] & 0xFF);\n    if (addr === 0x0200) {\n      if (val === 0) return { applied: { op: 'lift', position: 'down' }, limited: false };\n      if (val === 1) return { applied: { op: 'lift', position: 'up' }, limited: false };\n      throw new Error('bad lift echo value');\n    }\n    if (addr === 0x0201) {\n      if (val === 0) return { applied: { op: 'grip', state: 'open' }, limited: false };\n      if (val === 1) return { applied: { op: 'grip', state: 'closed' }, limited: false };\n      throw new Error('bad grip echo value');\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unexpected function code');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip, target = state.target;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  var tol = state.tolerancePx || 7;\n  if (err <= tol) return { action: 'verify' };\n\n  var hist = state.history || [];\n  var start = Math.max(0, hist.length - 12);\n  var M00 = 0, M01 = 0, M11 = 0, rx0 = 0, rx1 = 0, ry0 = 0, ry1 = 0, n = 0;\n  for (var i = start; i < hist.length; i++) {\n    var h = hist[i];\n    if (!h || h.limited || !h.delta) continue;\n    var a = h.applied || h.command;\n    if (!a || a.length !== 2) continue;\n    var a0 = a[0], a1 = a[1], dx = h.delta[0], dy = h.delta[1];\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(dx) || !isFinite(dy)) continue;\n    M00 += a0 * a0; M01 += a0 * a1; M11 += a1 * a1;\n    rx0 += a0 * dx; rx1 += a1 * dx;\n    ry0 += a0 * dy; ry1 += a1 * dy;\n    n++;\n  }\n\n  var ok = false, u0 = 0, u1 = 0;\n  var det = M00 * M11 - M01 * M01;\n  var scl = M00 + M11;\n  if (n >= 2 && scl > 0 && det > 0.01 * scl * scl) {\n    // local Jacobian J: delta = J * u\n    var px = (M11 * rx0 - M01 * rx1) / det;\n    var qx = (-M01 * rx0 + M00 * rx1) / det;\n    var py = (M11 * ry0 - M01 * ry1) / det;\n    var qy = (-M01 * ry0 + M00 * ry1) / det;\n    var jd = px * qy - qx * py;\n    var frob = px * px + qx * qx + py * py + qy * qy;\n    if (isFinite(jd) && frob > 0 && Math.abs(jd) > 0.02 * frob) {\n      u0 = (qy * ex - qx * ey) / jd;\n      u1 = (-py * ex + px * ey) / jd;\n      if (isFinite(u0) && isFinite(u1)) ok = true;\n    }\n  }\n\n  if (!ok) {\n    // excitation probe: cycle through unit channel moves\n    var probes = [[0.1, 0], [0, 0.1], [-0.1, 0], [0, -0.1]];\n    var idx = 0;\n    if (hist.length > 0) {\n      var last = hist[hist.length - 1].command;\n      for (var k = 0; k < probes.length; k++) {\n        if (last && last[0] === probes[k][0] && last[1] === probes[k][1]) { idx = (k + 1) % probes.length; break; }\n      }\n    }\n    return { action: 'move', u: probes[idx] };\n  }\n\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  var g = 0.8;\n  u0 *= g; u1 *= g;\n  m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) { u0 *= 0.1 / m; u1 *= 0.1 / m; }\n  m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 0.01 && m > 0) { u0 *= 0.01 / m; u1 *= 0.01 / m; }\n  if (m === 0) {\n    return { action: 'move', u: [0.01, 0] };\n  }\n  u0 = Math.round(u0 * 10000) / 10000;\n  u1 = Math.round(u1 * 10000) / 10000;\n  if (Math.abs(u0) > 0.1) u0 = u0 > 0 ? 0.1 : -0.1;\n  if (Math.abs(u1) > 0.1) u1 = u1 > 0 ? 0.1 : -0.1;\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-161810",
+   "label": "x-s3140-r3-claude",
+   "device": "VLAB-X",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 88,
+   "frontCalls": 17,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 1,
+   "actions": 160,
+   "xyActions": 120,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.98,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.92,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 71,
+    "referenceActions": 69,
+    "ratio": 1.03
+   },
+   "driverGateAttempts": [
+    false,
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界",
+     "接近目標時目標量測偏移"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "升降與夾爪四種命令的實際編解碼"
+    ],
+    [
+     "升降與夾爪四種命令的實際編解碼"
+    ]
+   ],
+   "driverRuntime": {
+    "requests": 386,
+    "failures": 0,
+    "programErrors": 24
+   },
+   "usage": {
+    "input_tokens": 476438,
+    "output_tokens": 49545,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 163,
+     "trialActions": [
+      38,
+      29,
+      34,
+      32,
+      30
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160,
+     "trialActions": [
+      38,
+      29,
+      32,
+      30,
+      31
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 158,
+     "trialActions": [
+      37,
+      29,
+      30,
+      30,
+      32
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i] & 0xFF;\n    for (var k = 0; k < 8; k++) {\n      if (crc & 1) {\n        crc = (crc >>> 1) ^ 0xA001;\n      } else {\n        crc = crc >>> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction hexOf(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = (bytes[i] & 0xFF).toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction withCrc(bytes) {\n  var c = crc16(bytes);\n  return hexOf(bytes.concat([c & 0xFF, (c >> 8) & 0xFF]));\n}\n\nfunction parseHex(s) {\n  if (typeof s !== 'string') throw new Error('reply is not a string');\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-f]+$/.test(s)) throw new Error('malformed hex reply');\n  var out = [];\n  for (var i = 0; i < s.length; i += 2) {\n    out.push(parseInt(s.substr(i, 2), 16));\n  }\n  return out;\n}\n\nfunction toS16Scaled(x) {\n  if (typeof x !== 'number' || !isFinite(x)) throw new Error('non-finite channel value');\n  if (Math.abs(x) > 0.1 + 1e-12) throw new Error('channel value out of range');\n  var v = Math.round(x * 10000);\n  return v & 0xFFFF;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('step command needs two channels');\n    var a = toS16Scaled(command[0]);\n    var b = toS16Scaled(command[1]);\n    var bytes = [\n      0x11, 0x17,\n      0x03, 0x10, 0x00, 0x03,\n      0x03, 0x00, 0x00, 0x02,\n      0x04,\n      (a >> 8) & 0xFF, a & 0xFF,\n      (b >> 8) & 0xFF, b & 0xFF\n    ];\n    return withCrc(bytes);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var lv;\n      if (command.position === 'up') lv = 1;\n      else if (command.position === 'down') lv = 0;\n      else throw new Error('invalid lift position');\n      return withCrc([0x11, 0x06, 0x02, 0x00, 0x00, lv & 0xFF]);\n    }\n    if (command.op === 'grip') {\n      var gv;\n      if (command.state === 'closed') gv = 1;\n      else if (command.state === 'open') gv = 0;\n      else throw new Error('invalid grip state');\n      return withCrc([0x11, 0x06, 0x02, 0x01, 0x00, gv & 0xFF]);\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  var b = parseHex(rawReply);\n  if (b.length < 4) throw new Error('reply too short');\n  var crcGot = (b[b.length - 2] & 0xFF) | ((b[b.length - 1] & 0xFF) << 8);\n  var crcCalc = crc16(b.slice(0, b.length - 2));\n  if (crcGot !== crcCalc) throw new Error('CRC mismatch');\n  if (b[0] !== 0x11) throw new Error('unit address mismatch');\n  var fn = b[1];\n  if (fn & 0x80) {\n    throw new Error('device exception code ' + b[2]);\n  }\n  if (fn === 0x17) {\n    if (b.length !== 11) throw new Error('bad step reply length');\n    if (b[2] !== 6) throw new Error('bad step reply byte count');\n    var A = (b[3] << 8) | b[4];\n    if (A & 0x8000) A = A - 0x10000;\n    var B = (b[5] << 8) | b[6];\n    if (B & 0x8000) B = B - 0x10000;\n    var flags = (b[7] << 8) | b[8];\n    return { applied: [A / 10000, B / 10000], limited: (flags & 1) === 1 };\n  }\n  if (fn === 0x06) {\n    if (b.length !== 8) throw new Error('bad write reply length');\n    var reg = (b[2] << 8) | b[3];\n    var val = (b[4] << 8) | b[5];\n    if (reg === 0x0200) {\n      if (val === 1) return { applied: { op: 'lift', position: 'up' }, limited: false };\n      if (val === 0) return { applied: { op: 'lift', position: 'down' }, limited: false };\n      throw new Error('invalid lift echo value');\n    }\n    if (reg === 0x0201) {\n      if (val === 1) return { applied: { op: 'grip', state: 'closed' }, limited: false };\n      if (val === 0) return { applied: { op: 'grip', state: 'open' }, limited: false };\n      throw new Error('invalid grip echo value');\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unexpected function code');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip, tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: 'stop', reason: 'invalid pixel state' };\n  }\n  if (typeof state.maxActions === 'number' && typeof state.step === 'number' && state.step >= state.maxActions) {\n    return { action: 'stop', reason: 'action budget reached' };\n  }\n  var e0 = tgt[0] - tip[0], e1 = tgt[1] - tip[1];\n  var err = Math.sqrt(e0 * e0 + e1 * e1);\n  if (err <= state.tolerancePx) {\n    return { action: 'verify' };\n  }\n  var dirs = [[0.1, 0], [0, 0.1], [-0.1, 0], [0, -0.1]];\n  var h = state.history || [];\n  var n = h.length;\n  var uu00 = 0, uu01 = 0, uu11 = 0, du00 = 0, du01 = 0, du10 = 0, du11 = 0, cnt = 0;\n  // exponentially weighted samples, most recent weighted highest; limited/zero-applied samples are skipped\n  for (var i = Math.max(0, n - 40); i < n; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var a = s.applied[0], b = s.applied[1], dx = s.delta[0], dy = s.delta[1];\n    if (!isFinite(a) || !isFinite(b) || !isFinite(dx) || !isFinite(dy)) continue;\n    if (Math.abs(a) + Math.abs(b) < 1e-6) continue;\n    var w = Math.pow(0.92, n - 1 - i);\n    cnt++;\n    uu00 += w * a * a; uu01 += w * a * b; uu11 += w * b * b;\n    du00 += w * dx * a; du01 += w * dx * b;\n    du10 += w * dy * a; du11 += w * dy * b;\n  }\n  // recent image motion, used to detect stagnation (e.g. pushing into a travel limit)\n  var recentMove = 0;\n  for (var j = Math.max(0, n - 6); j < n; j++) {\n    var r = h[j];\n    if (r && r.delta && isFinite(r.delta[0]) && isFinite(r.delta[1])) {\n      recentMove += Math.abs(r.delta[0]) + Math.abs(r.delta[1]);\n    }\n  }\n  var stagnant = n >= 6 && recentMove < 1.0 && err > state.tolerancePx;\n  var excited = cnt >= 3 && uu00 > 1e-3 && uu11 > 1e-3;\n  if (!excited || stagnant) {\n    return { action: 'move', u: dirs[n % 4] };\n  }\n  var lam = 1e-5;\n  var a00 = uu00 + lam, a11 = uu11 + lam, a01 = uu01;\n  var detA = a00 * a11 - a01 * a01;\n  if (!(detA > 0) || !isFinite(detA)) {\n    return { action: 'move', u: dirs[n % 4] };\n  }\n  var i00 = a11 / detA, i01 = -a01 / detA, i11 = a00 / detA;\n  // J maps applied input to pixel delta: J = M * inv(A)\n  var J00 = du00 * i00 + du01 * i01, J01 = du00 * i01 + du01 * i11;\n  var J10 = du10 * i00 + du11 * i01, J11 = du10 * i01 + du11 * i11;\n  if (!isFinite(J00) || !isFinite(J01) || !isFinite(J10) || !isFinite(J11)) {\n    return { action: 'move', u: dirs[n % 4] };\n  }\n  // damped least squares: u = J^T (J J^T + mu I)^-1 e\n  var JJ00 = J00 * J00 + J01 * J01, JJ01 = J00 * J10 + J01 * J11, JJ11 = J10 * J10 + J11 * J11;\n  var mu = 1e-3 * (JJ00 + JJ11) + 1e-9;\n  var b00 = JJ00 + mu, b11 = JJ11 + mu, bd = b00 * b11 - JJ01 * JJ01;\n  if (!(bd > 0)) {\n    return { action: 'move', u: dirs[n % 4] };\n  }\n  var z0 = (b11 * e0 - JJ01 * e1) / bd, z1 = (-JJ01 * e0 + b00 * e1) / bd;\n  var u0 = J00 * z0 + J10 * z1, u1 = J01 * z0 + J11 * z1;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: 'move', u: dirs[n % 4] };\n  }\n  // smaller steps close to the target to limit overshoot\n  var cap = err < 3 * state.tolerancePx ? 0.05 : 0.1;\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > cap) {\n    u0 = u0 * cap / m;\n    u1 = u1 * cap / m;\n  }\n  u0 = Math.max(-0.1, Math.min(0.1, u0));\n  u1 = Math.max(-0.1, Math.min(0.1, u1));\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-165312",
+   "label": "x-s8675-r1-claude",
+   "device": "VLAB-X",
+   "seed": 8675,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 80,
+   "frontCalls": 10,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 182,
+   "xyActions": 142,
+   "unconfirmed": 0,
+   "ratioToBaseline": 1.1,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.93,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 98,
+    "referenceActions": 69,
+    "ratio": 1.42
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 390,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 373335,
+    "output_tokens": 31388,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 182,
+     "trialActions": [
+      40,
+      35,
+      39,
+      34,
+      34
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 183,
+     "trialActions": [
+      43,
+      33,
+      36,
+      35,
+      36
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 182,
+     "trialActions": [
+      42,
+      34,
+      34,
+      34,
+      38
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i];\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = crc >> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction bytesToHex(arr) {\n  var s = '';\n  for (var i = 0; i < arr.length; i++) {\n    var h = (arr[i] & 0xFF).toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction hexToBytes(s) {\n  if (typeof s !== 'string') throw new Error('reply is not a string');\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(s)) throw new Error('malformed hex reply');\n  var out = [];\n  for (var i = 0; i < s.length; i += 2) {\n    out.push(parseInt(s.substr(i, 2), 16));\n  }\n  return out;\n}\n\nfunction appendCrcAndHex(payload) {\n  var crc = crc16(payload);\n  payload.push(crc & 0xFF);\n  payload.push((crc >> 8) & 0xFF);\n  return bytesToHex(payload);\n}\n\nfunction pushS16(payload, v) {\n  var u = v < 0 ? v + 65536 : v;\n  payload.push((u >> 8) & 0xFF);\n  payload.push(u & 0xFF);\n}\n\nfunction s16FromBytes(hi, lo) {\n  var u = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  return u >= 0x8000 ? u - 0x10000 : u;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('XY command must have 2 channels');\n    var q = [];\n    for (var i = 0; i < 2; i++) {\n      var x = command[i];\n      if (typeof x !== 'number' || !isFinite(x) || Math.abs(x) > 0.1 + 1e-12) {\n        throw new Error('channel value out of range');\n      }\n      var v = Math.round(x * 10000);\n      if (v > 1000) v = 1000;\n      if (v < -1000) v = -1000;\n      q.push(v);\n    }\n    var payload = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04];\n    pushS16(payload, q[0]);\n    pushS16(payload, q[1]);\n    return appendCrcAndHex(payload);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var lv;\n      if (command.position === 'up') lv = 1;\n      else if (command.position === 'down') lv = 0;\n      else throw new Error('invalid lift position');\n      return appendCrcAndHex([0x11, 0x06, 0x02, 0x00, 0x00, lv]);\n    }\n    if (command.op === 'grip') {\n      var gv;\n      if (command.state === 'open') gv = 0;\n      else if (command.state === 'closed') gv = 1;\n      else throw new Error('invalid grip state');\n      return appendCrcAndHex([0x11, 0x06, 0x02, 0x01, 0x00, gv]);\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  var b = hexToBytes(rawReply);\n  if (b.length < 5) throw new Error('reply too short');\n  if (b[0] !== 0x11) throw new Error('unit address mismatch');\n  var body = b.slice(0, b.length - 2);\n  var crc = crc16(body);\n  if (b[b.length - 2] !== (crc & 0xFF) || b[b.length - 1] !== ((crc >> 8) & 0xFF)) {\n    throw new Error('CRC mismatch');\n  }\n  var fn = b[1];\n  if (fn & 0x80) {\n    if (b.length !== 5) throw new Error('malformed exception reply');\n    throw new Error('device exception code ' + b[2] + ' (function ' + (fn & 0x7F) + ')');\n  }\n  if (fn === 0x17) {\n    if (b.length !== 11) throw new Error('bad step reply length');\n    if (b[2] !== 6) throw new Error('bad step reply byte count');\n    var a = s16FromBytes(b[3], b[4]);\n    var c = s16FromBytes(b[5], b[6]);\n    var flags = ((b[7] & 0xFF) << 8) | (b[8] & 0xFF);\n    return { applied: [a / 10000, c / 10000], limited: (flags & 1) === 1 };\n  }\n  if (fn === 0x06) {\n    if (b.length !== 8) throw new Error('bad write reply length');\n    var reg = ((b[2] & 0xFF) << 8) | (b[3] & 0xFF);\n    var val = ((b[4] & 0xFF) << 8) | (b[5] & 0xFF);\n    if (reg === 0x0200) {\n      if (val === 1) return { applied: { op: 'lift', position: 'up' }, limited: false };\n      if (val === 0) return { applied: { op: 'lift', position: 'down' }, limited: false };\n      throw new Error('unexpected lift echo value');\n    }\n    if (reg === 0x0201) {\n      if (val === 0) return { applied: { op: 'grip', state: 'open' }, limited: false };\n      if (val === 1) return { applied: { op: 'grip', state: 'closed' }, limited: false };\n      throw new Error('unexpected grip echo value');\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unsupported function code in reply');\n}\n",
+   "generatedControllerSource": "function fitWindow(samples, from) {\n  var s00 = 0, s01 = 0, s11 = 0;\n  var m = [[0, 0], [0, 0]];\n  var cnt = 0;\n  for (var i = from; i < samples.length; i++) {\n    var c = samples[i].c, d = samples[i].d;\n    s00 += c[0] * c[0];\n    s01 += c[0] * c[1];\n    s11 += c[1] * c[1];\n    for (var r = 0; r < 2; r++) {\n      m[r][0] += d[r] * c[0];\n      m[r][1] += d[r] * c[1];\n    }\n    cnt++;\n  }\n  if (cnt < 2) return { ok: false };\n  var rawDet = s00 * s11 - s01 * s01;\n  if (!(s00 > 1e-4 && s11 > 1e-4 && rawDet > 0.05 * s00 * s11)) {\n    return { ok: false, s00: s00, s11: s11 };\n  }\n  var a = s00 + 1e-6, b = s01, cc = s11 + 1e-6;\n  var det = a * cc - b * b;\n  var inv = [[cc / det, -b / det], [-b / det, a / det]];\n  var J = [[0, 0], [0, 0]];\n  for (var rr = 0; rr < 2; rr++) {\n    for (var k = 0; k < 2; k++) {\n      J[rr][k] = m[rr][0] * inv[0][k] + m[rr][1] * inv[1][k];\n    }\n  }\n  return { ok: true, J: J, s00: s00, s11: s11 };\n}\n\nfunction probeMove(samples, fitInfo) {\n  var ch;\n  if (fitInfo && fitInfo.s00 !== undefined) {\n    ch = (fitInfo.s00 <= fitInfo.s11) ? 0 : 1;\n  } else {\n    ch = (samples.length % 2 === 0) ? 0 : 1;\n  }\n  var sgn = (samples.length % 2 === 0) ? 1 : -1;\n  if (ch === 0) return { action: 'move', u: [0.1 * sgn, 0] };\n  return { action: 'move', u: [0, 0.1 * sgn] };\n}\n\nfunction control(state) {\n  var tip = state.tip, target = state.target;\n  if (!tip || !target || tip.length < 2 || target.length < 2) {\n    return { action: 'stop', reason: 'missing positions' };\n  }\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var e = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(e)) return { action: 'stop', reason: 'non-finite error' };\n  if (e <= state.tolerancePx) return { action: 'verify' };\n\n  var h = state.history || [];\n  var samples = [];\n  for (var i = 0; i < h.length; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var c = s.applied, d = s.delta;\n    if (!isFinite(c[0]) || !isFinite(c[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    samples.push({ c: c, d: d });\n  }\n\n  var n = samples.length;\n  var fit = fitWindow(samples, Math.max(0, n - 16));\n  if (!fit.ok) return probeMove(samples, fit);\n\n  // stale check on the most recent sample\n  var last = samples[n - 1];\n  var J = fit.J;\n  var pred0 = J[0][0] * last.c[0] + J[0][1] * last.c[1];\n  var pred1 = J[1][0] * last.c[0] + J[1][1] * last.c[1];\n  var rs = Math.sqrt((pred0 - last.d[0]) * (pred0 - last.d[0]) + (pred1 - last.d[1]) * (pred1 - last.d[1]));\n  var ds = Math.sqrt(last.d[0] * last.d[0] + last.d[1] * last.d[1]);\n  if (rs > Math.max(8, 0.6 * ds)) {\n    var fit2 = fitWindow(samples, Math.max(0, n - 5));\n    if (fit2.ok) {\n      J = fit2.J;\n    } else {\n      return probeMove(samples, fit);\n    }\n  }\n\n  var detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-9) return probeMove(samples, fit);\n\n  // command direction: c = J^-1 * e\n  var c0 = (J[1][1] * ex - J[0][1] * ey) / detJ;\n  var c1 = (-J[1][0] * ex + J[0][0] * ey) / detJ;\n  var mx = Math.max(Math.abs(c0), Math.abs(c1));\n  if (!isFinite(mx) || mx < 1e-12) return probeMove(samples, fit);\n\n  var mag = Math.max(0.02, 0.1 * Math.min(1, e / 40));\n  var u0 = (c0 / mx) * mag;\n  var u1 = (c1 / mx) * mag;\n  u0 = Math.max(-0.1, Math.min(0.1, Math.round(u0 * 10000) / 10000));\n  u1 = Math.max(-0.1, Math.min(0.1, Math.round(u1 * 10000) / 10000));\n  if (!isFinite(u0) || !isFinite(u1)) return { action: 'stop', reason: 'bad command' };\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-165312",
+   "label": "x-s8675-r2-claude",
+   "device": "VLAB-X",
+   "seed": 8675,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 88,
+   "frontCalls": 12,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 178,
+   "xyActions": 138,
+   "unconfirmed": 0,
+   "ratioToBaseline": 1.08,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 0.87,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 63,
+    "referenceActions": 69,
+    "ratio": 0.91
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界"
+    ]
+   ],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 382,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 430480,
+    "output_tokens": 39454,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 166,
+     "trialActions": [
+      38,
+      32,
+      37,
+      31,
+      28
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 159,
+     "trialActions": [
+      36,
+      30,
+      33,
+      31,
+      29
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 178,
+     "trialActions": [
+      36,
+      37,
+      40,
+      34,
+      31
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i];\n    for (var j = 0; j < 8; j++) {\n      if (crc & 1) {\n        crc = (crc >>> 1) ^ 0xA001;\n      } else {\n        crc = crc >>> 1;\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction toHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = (bytes[i] & 0xFF).toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction withCrc(bytes) {\n  var c = crc16(bytes);\n  var out = bytes.slice();\n  out.push(c & 0xFF);\n  out.push((c >> 8) & 0xFF);\n  return out;\n}\n\nfunction s16Bytes(v) {\n  var x = v;\n  if (x < 0) x += 65536;\n  return [(x >> 8) & 0xFF, x & 0xFF];\n}\n\nfunction parseHex(raw) {\n  if (typeof raw !== 'string') throw new Error('reply not string');\n  if (raw.length === 0) throw new Error('no reply from device');\n  if (raw.length % 2 !== 0) throw new Error('odd hex length');\n  if (!/^[0-9a-fA-F]+$/.test(raw)) throw new Error('invalid hex');\n  var bytes = [];\n  for (var i = 0; i < raw.length; i += 2) {\n    bytes.push(parseInt(raw.substr(i, 2), 16));\n  }\n  return bytes;\n}\n\nfunction checkFrame(bytes) {\n  if (bytes.length < 5) throw new Error('reply too short');\n  var n = bytes.length;\n  var body = bytes.slice(0, n - 2);\n  var c = crc16(body);\n  if ((c & 0xFF) !== bytes[n - 2] || ((c >> 8) & 0xFF) !== bytes[n - 1]) {\n    throw new Error('CRC mismatch');\n  }\n  if (bytes[0] !== 0x11) throw new Error('unit address mismatch');\n  if (bytes[1] & 0x80) {\n    var code = bytes[2];\n    throw new Error('device exception code ' + code);\n  }\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('step needs two channels');\n    var qs = [];\n    for (var i = 0; i < 2; i++) {\n      var x = command[i];\n      if (typeof x !== 'number' || !isFinite(x)) throw new Error('non-finite channel');\n      if (Math.abs(x) > 0.1 + 1e-9) throw new Error('channel out of range');\n      var q = Math.round(x * 10000);\n      if (q > 1000) q = 1000;\n      if (q < -1000) q = -1000;\n      qs.push(q);\n    }\n    var a = s16Bytes(qs[0]);\n    var b = s16Bytes(qs[1]);\n    var frame = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04,\n                 a[0], a[1], b[0], b[1]];\n    return toHex(withCrc(frame));\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var v;\n      if (command.position === 'up') v = 1;\n      else if (command.position === 'down') v = 0;\n      else throw new Error('invalid lift position');\n      return toHex(withCrc([0x11, 0x06, 0x02, 0x00, 0x00, v]));\n    }\n    if (command.op === 'grip') {\n      var g;\n      if (command.state === 'open') g = 0;\n      else if (command.state === 'closed') g = 1;\n      else throw new Error('invalid grip state');\n      return toHex(withCrc([0x11, 0x06, 0x02, 0x01, 0x00, g]));\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  var bytes = parseHex(rawReply);\n  checkFrame(bytes);\n  var fn = bytes[1];\n  if (fn === 0x17) {\n    if (bytes.length !== 11) throw new Error('bad step reply length');\n    if (bytes[2] !== 6) throw new Error('bad step byte count');\n    var va = (bytes[3] << 8) | bytes[4];\n    if (va & 0x8000) va -= 0x10000;\n    var vb = (bytes[5] << 8) | bytes[6];\n    if (vb & 0x8000) vb -= 0x10000;\n    var flags = (bytes[7] << 8) | bytes[8];\n    return { applied: [va / 10000, vb / 10000], limited: (flags & 1) !== 0 };\n  }\n  if (fn === 0x06) {\n    if (bytes.length !== 8) throw new Error('bad write reply length');\n    var reg = (bytes[2] << 8) | bytes[3];\n    var val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      if (val !== 0 && val !== 1) throw new Error('bad lift echo');\n      return { applied: { op: 'lift', position: val === 1 ? 'up' : 'down' }, limited: false };\n    }\n    if (reg === 0x0201) {\n      if (val !== 0 && val !== 1) throw new Error('bad grip echo');\n      return { applied: { op: 'grip', state: val === 1 ? 'closed' : 'open' }, limited: false };\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unexpected function code');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tol = (typeof state.tolerancePx === 'number') ? state.tolerancePx : 7;\n  var tip = state.tip, tgt = state.target;\n  if (!tip || !tgt) return { action: 'stop', reason: 'missing position' };\n  var ex = tgt[0] - tip[0], ey = tgt[1] - tip[1];\n  var dist = Math.sqrt(ex * ex + ey * ey);\n  if (dist <= tol) return { action: 'verify' };\n  if (typeof state.maxActions === 'number' && typeof state.step === 'number' && state.step >= state.maxActions) {\n    return { action: 'stop', reason: 'action budget exhausted' };\n  }\n  var h = state.history || [];\n  var start = Math.max(0, h.length - 40);\n  var c00 = 0, c01 = 0, c11 = 0;\n  var bx0 = 0, bx1 = 0, by0 = 0, by1 = 0;\n  var age = 0;\n  for (var i = h.length - 1; i >= start; i--) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var a = s.applied[0], b = s.applied[1], dx = s.delta[0], dy = s.delta[1];\n    if (!isFinite(a) || !isFinite(b) || !isFinite(dx) || !isFinite(dy)) continue;\n    var w = Math.pow(0.9, age);\n    age++;\n    c00 += w * a * a;\n    c01 += w * a * b;\n    c11 += w * b * b;\n    bx0 += w * dx * a;\n    bx1 += w * dx * b;\n    by0 += w * dy * a;\n    by1 += w * dy * b;\n  }\n\n  // Detect channels that recently hit a travel limit (applied smaller than commanded)\n  var blocked = [0, 0];\n  for (var k = h.length - 1; k >= Math.max(0, h.length - 2); k--) {\n    var sk = h[k];\n    if (!sk || !sk.command || !sk.applied) continue;\n    for (var ch = 0; ch < 2; ch++) {\n      var cmd = sk.command[ch], app = sk.applied[ch];\n      if (cmd !== 0 && isFinite(app) && Math.abs(app) < Math.abs(cmd) - 1e-6 && blocked[ch] === 0) {\n        blocked[ch] = cmd > 0 ? 1 : -1;\n      }\n    }\n  }\n\n  // Excitation: probe channels that have barely been used (away from a limit)\n  if (c00 < 0.002) return { action: 'move', u: [blocked[0] !== 0 ? -blocked[0] * 0.1 : 0.1, 0] };\n  if (c11 < 0.002) return { action: 'move', u: [0, blocked[1] !== 0 ? -blocked[1] * 0.1 : 0.1] };\n\n  // Jacobian J (rows x,y; cols channel a,b) from delta = J * applied, J = B * C^-1\n  var lam = 1e-6;\n  var C00 = c00 + lam, C11 = c11 + lam;\n  var det = C00 * C11 - c01 * c01;\n  if (!isFinite(det) || Math.abs(det) < 1e-12) return { action: 'move', u: [0.1, 0] };\n  var Jxa = (bx0 * C11 - bx1 * c01) / det;\n  var Jxb = (-bx0 * c01 + bx1 * C00) / det;\n  var Jya = (by0 * C11 - by1 * c01) / det;\n  var Jyb = (-by0 * c01 + by1 * C00) / det;\n  if (!isFinite(Jxa) || !isFinite(Jxb) || !isFinite(Jya) || !isFinite(Jyb)) return { action: 'move', u: [0.1, 0] };\n\n  // Min-norm regularized solve: u = (J^T J + mu I)^-1 J^T e\n  var mu = 1e-3;\n  var M00 = Jxa * Jxa + Jya * Jya + mu;\n  var M01 = Jxa * Jxb + Jya * Jyb;\n  var M11 = Jxb * Jxb + Jyb * Jyb + mu;\n  var r0 = Jxa * ex + Jya * ey;\n  var r1 = Jxb * ex + Jyb * ey;\n  var dM = M00 * M11 - M01 * M01;\n  if (!isFinite(dM) || Math.abs(dM) < 1e-18) return { action: 'move', u: [0.1, 0] };\n  var u = [(M11 * r0 - M01 * r1) / dM, (-M01 * r0 + M00 * r1) / dM];\n\n  // Handle travel limits: do not push further into a blocked channel\n  for (var c = 0; c < 2; c++) {\n    if (blocked[c] !== 0 && u[c] * blocked[c] > 0) {\n      var o = 1 - c;\n      var colx = (o === 0) ? Jxa : Jxb;\n      var coly = (o === 0) ? Jya : Jyb;\n      var den = colx * colx + coly * coly + mu;\n      var uo = (colx * ex + coly * ey) / den;\n      uo = Math.max(-0.1, Math.min(0.1, uo));\n      if (blocked[o] !== 0 && uo * blocked[o] > 0) {\n        // both blocked in that direction: back off on the blocked channel\n        u[c] = -blocked[c] * 0.1;\n        u[o] = 0;\n      } else if (Math.abs(uo) < 1e-6) {\n        u[c] = -blocked[c] * 0.1;\n        u[o] = 0;\n      } else {\n        u[c] = 0;\n        u[o] = uo;\n      }\n    }\n  }\n\n  var mx = Math.max(Math.abs(u[0]), Math.abs(u[1]));\n  if (!isFinite(mx) || mx < 1e-12) return { action: 'move', u: [0.1 * (blocked[0] !== 0 ? -blocked[0] : 1), 0] };\n\n  // Scale so the largest component is at the per-step limit\n  var sc = 0.1 / mx;\n  var o0 = u[0] * sc, o1 = u[1] * sc;\n\n  // Avoid overshoot: limit predicted displacement to 0.8 * distance\n  var p0 = Jxa * o0 + Jxb * o1, p1 = Jya * o0 + Jyb * o1;\n  var pred = Math.sqrt(p0 * p0 + p1 * p1);\n  if (pred > 1e-9 && pred > dist * 0.8) {\n    var kk = dist * 0.8 / pred;\n    o0 *= kk;\n    o1 *= kk;\n  }\n  if (!isFinite(o0) || !isFinite(o1)) return { action: 'stop', reason: 'non-finite control output' };\n  o0 = Math.max(-0.1, Math.min(0.1, o0));\n  o1 = Math.max(-0.1, Math.min(0.1, o1));\n  return { action: 'move', u: [o0, o1] };\n}\n"
+  },
+  {
+   "batch": "batch-20261015-165312",
+   "label": "x-s8675-r3-claude",
+   "device": "VLAB-X",
+   "seed": 8675,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 83,
+   "frontCalls": 10,
+   "transientRetries": 1,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 151,
+   "xyActions": 111,
+   "unconfirmed": 0,
+   "ratioToBaseline": 0.92,
+   "controllerChannelKind": "linear",
+   "controllerTestRatio": 1.06,
+   "twoLinkReportOnly": {
+    "reached": true,
+    "actions": 64,
+    "referenceActions": 69,
+    "ratio": 0.93
+   },
+   "driverGateAttempts": [
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [],
+   "driverRuntime": {
+    "requests": 328,
+    "failures": 0,
+    "programErrors": 8
+   },
+   "usage": {
+    "input_tokens": 380038,
+    "output_tokens": 31071,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "5e37851",
+    "dirtySourceOrTests": false
+   },
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 151,
+     "trialActions": [
+      35,
+      28,
+      32,
+      28,
+      28
+     ]
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 150,
+     "trialActions": [
+      34,
+      27,
+      31,
+      29,
+      29
+     ]
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 151,
+     "trialActions": [
+      33,
+      29,
+      29,
+      29,
+      31
+     ]
+    }
+   },
+   "generatedDriverSource": "function crc16(bytes) {\n  var crc = 0xFFFF;\n  for (var i = 0; i < bytes.length; i++) {\n    crc ^= bytes[i];\n    for (var k = 0; k < 8; k++) {\n      if (crc & 1) { crc = (crc >>> 1) ^ 0xA001; } else { crc = crc >>> 1; }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction hexToBytes(s) {\n  if (typeof s !== 'string') throw new Error('reply must be a string');\n  if (s.length === 0) throw new Error('no reply from device');\n  if (s.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(s)) throw new Error('malformed hex reply');\n  var out = [];\n  for (var i = 0; i < s.length; i += 2) out.push(parseInt(s.substr(i, 2), 16));\n  return out;\n}\n\nfunction bytesToHex(bytes) {\n  var s = '';\n  for (var i = 0; i < bytes.length; i++) {\n    var h = bytes[i].toString(16);\n    if (h.length < 2) h = '0' + h;\n    s += h;\n  }\n  return s;\n}\n\nfunction frame(body) {\n  var c = crc16(body);\n  return bytesToHex(body.concat([c & 0xFF, (c >> 8) & 0xFF]));\n}\n\nfunction s16be(v) {\n  var u = v & 0xFFFF;\n  return [(u >> 8) & 0xFF, u & 0xFF];\n}\n\nfunction s16FromBytes(hi, lo) {\n  var u = ((hi & 0xFF) << 8) | (lo & 0xFF);\n  return u >= 0x8000 ? u - 0x10000 : u;\n}\n\nfunction checkedBytes(raw) {\n  var b = hexToBytes(raw);\n  if (b.length < 5) throw new Error('reply too short');\n  var body = b.slice(0, b.length - 2);\n  var c = crc16(body);\n  if (b[b.length - 2] !== (c & 0xFF) || b[b.length - 1] !== ((c >> 8) & 0xFF)) {\n    throw new Error('CRC mismatch');\n  }\n  if (b[0] !== 0x11) throw new Error('unit address mismatch');\n  return b;\n}\n\nfunction checkException(b) {\n  if (b[1] & 0x80) {\n    if (b.length !== 5) throw new Error('malformed exception reply');\n    throw new Error('device exception code ' + b[2]);\n  }\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('XY command must have 2 channels');\n    var vals = [];\n    for (var i = 0; i < 2; i++) {\n      var x = command[i];\n      if (typeof x !== 'number' || !isFinite(x) || x < -0.1 || x > 0.1) {\n        throw new Error('channel value out of range');\n      }\n      vals.push(Math.round(x * 10000));\n    }\n    var a = s16be(vals[0]);\n    var c = s16be(vals[1]);\n    var body = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04,\n      a[0], a[1], c[0], c[1]];\n    return frame(body);\n  }\n  if (command && typeof command === 'object') {\n    if (command.op === 'lift') {\n      var lv;\n      if (command.position === 'up') lv = 1;\n      else if (command.position === 'down') lv = 0;\n      else throw new Error('invalid lift position');\n      return frame([0x11, 0x06, 0x02, 0x00, 0x00, lv]);\n    }\n    if (command.op === 'grip') {\n      var gv;\n      if (command.state === 'closed') gv = 1;\n      else if (command.state === 'open') gv = 0;\n      else throw new Error('invalid grip state');\n      return frame([0x11, 0x06, 0x02, 0x01, 0x00, gv]);\n    }\n  }\n  throw new Error('unsupported command');\n}\n\nfunction decode(rawReply) {\n  var b = checkedBytes(rawReply);\n  checkException(b);\n  if (b[1] === 0x17) {\n    if (b.length !== 11 || b[2] !== 6) throw new Error('malformed step reply');\n    var a = s16FromBytes(b[3], b[4]) / 10000;\n    var c = s16FromBytes(b[5], b[6]) / 10000;\n    var flags = ((b[7] & 0xFF) << 8) | (b[8] & 0xFF);\n    return { applied: [a, c], limited: (flags & 1) === 1 };\n  }\n  if (b[1] === 0x06) {\n    if (b.length !== 8) throw new Error('malformed write reply');\n    var reg = ((b[2] & 0xFF) << 8) | (b[3] & 0xFF);\n    var val = ((b[4] & 0xFF) << 8) | (b[5] & 0xFF);\n    if (reg === 0x0200) {\n      if (val !== 0 && val !== 1) throw new Error('invalid lift echo');\n      return { applied: { op: 'lift', position: val === 1 ? 'up' : 'down' }, limited: false };\n    }\n    if (reg === 0x0201) {\n      if (val !== 0 && val !== 1) throw new Error('invalid grip echo');\n      return { applied: { op: 'grip', state: val === 1 ? 'closed' : 'open' }, limited: false };\n    }\n    throw new Error('unexpected register echo');\n  }\n  throw new Error('unsupported function code in reply');\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip;\n  var tgt = state.target;\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: 'stop', reason: 'invalid error' };\n  if (err <= state.tolerancePx) return { action: 'verify' };\n\n  var hist = state.history || [];\n  var n = hist.length;\n  var S00 = 0, S01 = 0, S11 = 0;\n  var D00 = 0, D01 = 0, D10 = 0, D11 = 0;\n  var i, h, w, a, d;\n  for (i = 0; i < n; i++) {\n    h = hist[i];\n    if (!h || !h.applied || !h.delta) continue;\n    a = h.applied;\n    d = h.delta;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    w = Math.pow(0.9, n - 1 - i);\n    S00 += w * a[0] * a[0];\n    S01 += w * a[0] * a[1];\n    S11 += w * a[1] * a[1];\n    D00 += w * d[0] * a[0];\n    D01 += w * d[0] * a[1];\n    D10 += w * d[1] * a[0];\n    D11 += w * d[1] * a[1];\n  }\n\n  // Excitation check: probe the least excited channel with a pure single-channel move.\n  if (Math.min(S00, S11) < 0.005) {\n    var c = (S00 <= S11) ? 0 : 1;\n    // If the most recent non-zero command on this channel was clearly limited, probe the opposite sign.\n    var sign = 1;\n    for (i = n - 1; i >= 0; i--) {\n      h = hist[i];\n      if (!h || !h.command || !h.applied) continue;\n      if (h.command[c] !== 0) {\n        if (Math.abs(h.applied[c]) < 0.5 * Math.abs(h.command[c])) {\n          sign = -h.command[c] / Math.abs(h.command[c]);\n        } else {\n          sign = h.command[c] / Math.abs(h.command[c]);\n        }\n        break;\n      }\n    }\n    var pu = [0, 0];\n    pu[c] = 0.1 * sign;\n    return { action: 'move', u: pu };\n  }\n\n  // Least-squares Jacobian J (pixels per unit command): J = D * inv(S + lambda I)\n  var lam = 1e-9;\n  var s00 = S00 + lam, s11 = S11 + lam, s01 = S01;\n  var det = s00 * s11 - s01 * s01;\n  if (!isFinite(det) || Math.abs(det) < 1e-18) return { action: 'stop', reason: 'singular excitation' };\n  var I00 = s11 / det, I01 = -s01 / det, I10 = -s01 / det, I11 = s00 / det;\n  var J00 = D00 * I00 + D01 * I10;\n  var J01 = D00 * I01 + D01 * I11;\n  var J10 = D10 * I00 + D11 * I10;\n  var J11 = D10 * I01 + D11 * I11;\n\n  // Damped least squares: u = (J^T J + mu I)^-1 J^T e\n  var mu = 1e-6;\n  var m00 = J00 * J00 + J10 * J10 + mu;\n  var m01 = J00 * J01 + J10 * J11;\n  var m11 = J01 * J01 + J11 * J11 + mu;\n  var r0 = J00 * ex + J10 * ey;\n  var r1 = J01 * ex + J11 * ey;\n  var md = m00 * m11 - m01 * m01;\n  if (!isFinite(md) || Math.abs(md) < 1e-18) return { action: 'stop', reason: 'ill-conditioned mapping' };\n  var u0 = (m11 * r0 - m01 * r1) / md;\n  var u1 = (-m01 * r0 + m00 * r1) / md;\n  if (!isFinite(u0) || !isFinite(u1)) return { action: 'stop', reason: 'non-finite solution' };\n\n  var mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (mx < 1e-6) {\n    // Model predicts no motion; probe the less excited channel again.\n    var pc = (S00 <= S11) ? 0 : 1;\n    var pv = [0, 0];\n    pv[pc] = 0.1;\n    return { action: 'move', u: pv };\n  }\n  if (mx > 0.1) {\n    var k = 0.1 / mx;\n    u0 *= k;\n    u1 *= k;\n  }\n  return { action: 'move', u: [u0, u1] };\n}\n"
+  }
+ ]
+}

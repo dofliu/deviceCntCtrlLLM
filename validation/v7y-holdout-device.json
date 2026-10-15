@@ -1,0 +1,16 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "device": "VLAB-Y (held-out; five-bar parallel arm, JSON-line protocol)",
+  "date": "2026-10-15",
+  "node": "v22.22.0",
+  "passed": true,
+  "checks": [
+    "five-bar work disk radius 107-125 px over seeds 0-119; all trial start poses reachable",
+    "channel mapping across the ten trial positions (max direction change / max gain ratio): seed 2026 VLAB-Y 85 deg / x2.11, VLAB-P2 180 deg / x1.01; seed 3140 VLAB-Y 88 deg / x1.69, VLAB-P2 180 deg / x1.01; seed 8675 VLAB-Y 88 deg / x2.12, VLAB-P2 180 deg / x1.01",
+    "singularity stop: channel A at +0.1 stopped after 18 steps with applied 0.0944 and limited:true; the reverse command moves away",
+    "VLAB-Y link: JSON-line protocol shared with VLAB-P2, own model, firmware and baud rate; handshake reports VLAB-Y; the template driver passes the unchanged driver tests; the VLAB-P2 hello reply is unchanged",
+    "isolation: VLAB-Y is not listed by default and cannot start without includeHoldout; VLAB-X runs keep the [P2, G3, X] library; VLAB-Y runs add VLAB-Y to read_manual",
+    "offline single trial on VLAB-Y (seed 7, no template, spec-synthesized driver, reference controller module under the rotary gate): completed in 39 actions"
+  ]
+}

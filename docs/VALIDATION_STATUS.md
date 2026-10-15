@@ -31,6 +31,21 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 第二台保留設備 VLAB-Y（2026-10-15，離線 Node）
+
+紀錄：`validation/v7y-holdout-device.json`、`validation/v7y-offline-baseline.json`，新測試 `test_v7y_holdout_fivebar`。沒有呼叫真實模型，也沒有修改代理、閘門、提示或參考模組。
+- 五連桿平行手臂（閉迴路）＋ P2 的 JSON 單行協定（型號、韌體、鮑率不同）；手冊 `channelKind:'rotary'`，E 閘門的二連桿案例適用。
+- 奇異位形前兩馬達一起停止並回報 limited；反向命令可離開。seed 0–119 的任務圓盤半徑 107–125 px，所有起始姿態可達。
+- 在 10 個取放位置量測通道映射：VLAB-Y 方向變化 85–88°、增益比最高 2.1；VLAB-P2 為 180°、增益不變。
+- 離線矩陣 16/16 組合 5/5（範本有無 × 內建／參考模組 × seed 7／2026／3140／8675）；參考模組基準 166／160／179（seed 2026／3140／8675）。
+- 與 main 逐字比對：P2／G3（預設）與 VLAB-X（保留）實驗的系統指示、工具定義、手冊、每一步模型上下文、設備通訊與動作數完全相同。VLAB-Y 只在自己的實驗加入手冊庫。
+- 回歸（雲端 Linux，Node v22.22.0）：全部 26 個 Node 測試、5 個橋接 Python 測試、無頭 Chromium 煙霧測試通過；`run_experiments.py --offline --holdout --devices Y` 與 `replay_controller.cjs --device Y` 可執行，沒有 `--holdout` 時拒絕。需要 Python Playwright 的舊 UI 測試因環境未安裝無法執行（main 上相同）。被測試改寫的舊 `validation/` 檔已還原；其中 `v7-offline-matrix.json` 重跑的動作數與 2026-10-12 的紀錄不同，但 main 與本分支重跑的 12 列完全相同，差異來自之後已合併的修改（例如 B 區目標固定），不是本次變更。
+- 真實模型評估待作者確認後執行。
+
+### VLAB-X 保留評估（2026-10-15，使用者本機，E 版凍結後）
+
+紀錄：`validation/live-cli-holdout-X-2026-10-15.json`（commit 5e37851）。9/9 組、45/45 回合，模擬器真值確認；2 次逾時／5xx 自動重試，無中斷、無未確認動作。9 支控制程式跨三個 seed 重播 27/27 完成，同 seed 動作數與真實相同。動作數對離線參考模組 0.91–1.10×（中位 0.98）。驅動 8/9、控制程式 4/9 第一次通過閘門。命令列結果；結果未用於修改系統。
+
 ### E 版 P2 真實三次重複（2026-10-15，使用者本機）
 
 紀錄：`validation/live-cli-batch-E-2026-10-15.json`。9/9 組、45/45 回合，模擬器真值確認；4 次逾時／5xx 自動重試，無中斷。9 支控制程式跨三個 seed 重播 27/27 完成。動作倍率中位數 1.06（0.95–1.51），2 支 >1.3×。命令列結果。
