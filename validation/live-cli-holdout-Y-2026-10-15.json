@@ -1,0 +1,1340 @@
+{
+ "kind": "live-model-holdout-evaluation",
+ "version": "E (frozen; runs report commit c10bed1, clean)",
+ "runner": "run_experiments.py --holdout -> tests/live_claude_v7.cjs (headless-node, command line; report separately from browser runs)",
+ "source": "user local machine, batch-20261015-210756 (seed 2026), -223019 (3140), -230556 (8675), run one after another",
+ "model": "claude-haiku-5-5",
+ "device": "VLAB-Y (second held-out device: five-bar parallel arm, development JSON-line protocol; only the kinematic class is new)",
+ "condition": {
+  "manualTemplate": "off",
+  "controllerMode": "generated",
+  "trials": 5,
+  "gate": "E",
+  "transientRetry": true,
+  "holdout": true
+ },
+ "freeze": "System frozen at E. These results did not and must not change the gate, prompts, reference module or thresholds.",
+ "baseline": {
+  "source": "validation/v7y-offline-baseline.json",
+  "referenceModuleTemplateOff": {
+   "2026": 166,
+   "3140": 160,
+   "8675": 179
+  },
+  "note": "ratioToBaseline = live actions / offline reference control module actions on the same seed (completed runs only)"
+ },
+ "summary": {
+  "runs": 9,
+  "completeRuns": 8,
+  "trials": "40/45",
+  "ratioMedian": 1.0,
+  "ratioRange": [
+   0.95,
+   1.05
+  ],
+  "modelCallsRange": [
+   14,
+   95
+  ],
+  "transientRetriesTotal": 0,
+  "rateLimitRetriesTotal": 0,
+  "unconfirmedTotal": 0,
+  "limitedAcksTotal": 0,
+  "driverFirstTry": 0,
+  "controllerFirstTry": 2,
+  "controllerGateRunsTotal": 19,
+  "runsWithElbowCaseRejection": 5,
+  "decisionRejectionsTotal": 6,
+  "crossSeedReplaysComplete": "24/24",
+  "ownSeedReplayMatchesLive": true,
+  "gateRejectionAnalysis": {
+   "rejectedVersions": 11,
+   "wouldCompleteAllThreeSeeds": 10,
+   "elbowCaseOnlyRejections": 5,
+   "note": "Analysis only: every controller version the E gate rejected in these runs, replayed offline on VLAB-Y with --ignore-gate over five trials per seed. Not a live result; the gate was not changed."
+  }
+ },
+ "notes": [
+  "8/9 runs 5/5 with simulator truth (40/45 trials); no control failure during manipulation, zero unconfirmed actuations, no transient or rate-limit retries.",
+  "Completed runs: actions 157-180, 0.95-1.05x the offline reference module (median 1.00). Each completed controller replayed offline on all three seeds: 24/24 complete; own-seed replays reproduce live action counts exactly.",
+  "The device never stopped at a singularity margin in any run (0 limited ACKs over all XY actions); the singularity-stop behaviour was not exercised by the live tasks.",
+  "y-s8675-r2 failed before any motion: the E gate rejected controller v1 only on the elbow-limit two-link case; the model rewrote it adding a retreat rule that reverses every full-size step (|applied| >= 0.09), so v2 failed all nine cases; the model then called stop, stating that write_controller was not in allowedTools although it was offered (same tool list as the call two steps earlier). Classified as a model decision error following a gate rejection; no device command was sent.",
+  "Gate rejection analysis (offline, --ignore-gate): 10 of the 11 rejected controller versions complete 5/5 on all three seeds of VLAB-Y; the eleventh is the broken v2. On this device no gate rejection prevented a failure; five of the rejections were on the elbow-limit case alone. This is an observation about the frozen gate (built from P2/G3 failures), recorded without changing the gate.",
+  "Driver: 0/9 passed the JSON-line driver test first time (each first driver accepted a failed or corrupted reply); all passed on the second attempt. Recorded P2 runs on the same protocol show the same pattern (6/6 with a first failure), so this is a protocol-family habit, not specific to the five-bar.",
+  "Controller gate: 2/9 passed first time, 19 gate runs in total; 5 runs had an elbow-case rejection (P2 E-version runs: 2/9 first time, 17 gate runs, 3 runs with an elbow-case rejection).",
+  "Validity limits: one model, 3 seeds x 3 repeats; device proportions were chosen offline with the frozen pre-written controllers; the five-bar nonlinearity differs in kind from P2 (smaller direction change, larger gain change) and is not uniformly harder."
+ ],
+ "gateRejectedVersions": [
+  {
+   "label": "y-s2026-r1-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "接近目標時目標量測偏移",
+    "二連桿長距離多目標",
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 167
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 190
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 178
+    }
+   }
+  },
+  {
+   "label": "y-s2026-r2-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 158
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 155
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 179
+    }
+   }
+  },
+  {
+   "label": "y-s2026-r3-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "接近目標時目標量測偏移",
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 173
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 176
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 170
+    }
+   }
+  },
+  {
+   "label": "y-s2026-r3-claude",
+   "version": 2,
+   "gateFailedCases": [
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 162
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 178
+    }
+   }
+  },
+  {
+   "label": "y-s2026-r3-claude",
+   "version": 3,
+   "gateFailedCases": [
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 172
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 172
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 184
+    }
+   }
+  },
+  {
+   "label": "y-s3140-r1-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "接近目標時目標量測偏移",
+    "二連桿長距離多目標"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 166
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 178
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 176
+    }
+   }
+  },
+  {
+   "label": "y-s8675-r1-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "起點貼近行程邊界",
+    "接近目標時目標量測偏移"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 159
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 174
+    }
+   }
+  },
+  {
+   "label": "y-s8675-r2-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 157
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 154
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 169
+    }
+   }
+  },
+  {
+   "label": "y-s8675-r2-claude",
+   "version": 2,
+   "gateFailedCases": [
+    "旋轉 0.3 rad、正向通道",
+    "通道交換且 A 反向",
+    "大角度旋轉與 B 反向",
+    "位置相依的非線性映射",
+    "到達後通道 A 反向的恢復",
+    "起點貼近行程邊界",
+    "接近目標時目標量測偏移",
+    "二連桿長距離多目標",
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 0,
+     "actions": 180
+    },
+    "3140": {
+     "completed": 0,
+     "actions": 180
+    },
+    "8675": {
+     "completed": 0,
+     "actions": 180
+    }
+   }
+  },
+  {
+   "label": "y-s8675-r3-claude",
+   "version": 1,
+   "gateFailedCases": [
+    "起點貼近行程邊界"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 166
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 158
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 180
+    }
+   }
+  },
+  {
+   "label": "y-s8675-r3-claude",
+   "version": 2,
+   "gateFailedCases": [
+    "二連桿肘關節極限繞行"
+   ],
+   "replayIgnoringGate": {
+    "2026": {
+     "completed": 5,
+     "actions": 166
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 158
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 180
+    }
+   }
+  }
+ ],
+ "runs": [
+  {
+   "batch": "batch-20261015-210756",
+   "label": "y-s2026-r1-claude",
+   "device": "VLAB-Y",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 87,
+   "frontCalls": 15,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 1,
+   "actions": 157,
+   "xyActions": 117,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 0.95,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 0.93,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 67,
+    "referenceActions": 69,
+    "ratio": 0.97,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "接近目標時目標量測偏移",
+     "二連桿長距離多目標",
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 433881,
+    "output_tokens": 45062,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var line;\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !isFinite(command[0]) || !isFinite(command[1])) {\n      throw new Error('invalid xy command');\n    }\n    if (Math.abs(command[0]) > 0.1 || Math.abs(command[1]) > 0.1) {\n      throw new Error('xy out of range');\n    }\n    line = JSON.stringify({op: 'step', channels: [command[0], command[1]]});\n  } else if (command && typeof command === 'object' && command.op === 'lift') {\n    if (command.position !== 'up' && command.position !== 'down') {\n      throw new Error('invalid lift position');\n    }\n    line = JSON.stringify({op: 'lift', position: command.position});\n  } else if (command && typeof command === 'object' && command.op === 'grip') {\n    if (command.state !== 'open' && command.state !== 'closed') {\n      throw new Error('invalid grip state');\n    }\n    line = JSON.stringify({op: 'grip', state: command.state});\n  } else {\n    throw new Error('unsupported command');\n  }\n  return line + '\\n';\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') {\n    throw new Error('malformed reply: not a string');\n  }\n  var text = rawReply;\n  if (text.length > 0 && text.charAt(text.length - 1) === '\\n') {\n    text = text.slice(0, -1);\n  }\n  if (text.length === 0 || text.indexOf('\\n') >= 0 || text.indexOf('\\r') >= 0) {\n    throw new Error('malformed reply: expected exactly one line');\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error('malformed reply: invalid JSON');\n  }\n  if (!reply || typeof reply !== 'object' || Array.isArray(reply)) {\n    throw new Error('malformed reply: not an object');\n  }\n  if (reply.ok !== true) {\n    throw new Error('device error: ' + (reply.error !== undefined ? String(reply.error) : 'ok false'));\n  }\n  if (reply.accepted === undefined || reply.accepted === null) {\n    throw new Error('malformed reply: missing accepted');\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2 || typeof acc[0] !== 'number' || typeof acc[1] !== 'number' || !isFinite(acc[0]) || !isFinite(acc[1])) {\n      throw new Error('malformed reply: invalid accepted xy');\n    }\n  } else if (typeof acc === 'object') {\n    if (acc.op !== 'lift' && acc.op !== 'grip') {\n      throw new Error('malformed reply: invalid accepted op');\n    }\n    if (acc.op === 'lift' && acc.position !== 'up' && acc.position !== 'down') {\n      throw new Error('malformed reply: invalid lift position');\n    }\n    if (acc.op === 'grip' && acc.state !== 'open' && acc.state !== 'closed') {\n      throw new Error('malformed reply: invalid grip state');\n    }\n  } else {\n    throw new Error('malformed reply: invalid accepted');\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== 'boolean') {\n    throw new Error('malformed reply: invalid limited');\n  }\n  return {applied: acc, limited: reply.limited === true};\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var lim = 0.1;\n  var tip = state.tip;\n  var target = state.target;\n  var tol = state.tolerancePx;\n  var ex = target[0] - tip[0];\n  var ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n\n  if (state.maxActions !== undefined && state.maxActions !== null && state.step >= state.maxActions) {\n    return {action: 'stop', reason: 'action budget reached'};\n  }\n  if (err <= tol) {\n    return {action: 'verify'};\n  }\n\n  var h = state.history || [];\n  var n = h.length;\n  var probes = [[lim, 0], [0, lim], [-lim, 0], [0, -lim]];\n  var cyc = probes[n % 4];\n\n  // Weighted recency fit of delta = J * applied using all valid samples (applied is the true motion).\n  var start = Math.max(0, n - 40);\n  var S00 = 0, S01 = 0, S11 = 0;\n  var D00 = 0, D01 = 0, D10 = 0, D11 = 0;\n  var cnt = 0;\n  for (var i = start; i < n; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) continue;\n    var a = s.applied, d = s.delta;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    var w = Math.pow(0.92, n - 1 - i);\n    S00 += w * a[0] * a[0];\n    S01 += w * a[0] * a[1];\n    S11 += w * a[1] * a[1];\n    D00 += w * d[0] * a[0];\n    D01 += w * d[0] * a[1];\n    D10 += w * d[1] * a[0];\n    D11 += w * d[1] * a[1];\n    cnt++;\n  }\n  if (cnt < 2) {\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n  var lam = 1e-7;\n  var A00 = S00 + lam, A01 = S01, A11 = S11 + lam;\n  var detA = A00 * A11 - A01 * A01;\n  if (!(detA > 1e-9)) {\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n  var I00 = A11 / detA, I01 = -A01 / detA, I10 = -A01 / detA, I11 = A00 / detA;\n  // J = D * inv(S)\n  var J00 = D00 * I00 + D01 * I10;\n  var J01 = D00 * I01 + D01 * I11;\n  var J10 = D10 * I00 + D11 * I10;\n  var J11 = D10 * I01 + D11 * I11;\n  if (!isFinite(J00) || !isFinite(J01) || !isFinite(J10) || !isFinite(J11)) {\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n  var detJ = J00 * J11 - J01 * J10;\n  var normJ2 = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n\n  // Limit-aware escape: identify clipped channel from command vs applied.\n  if (n > 0 && h[n - 1].limited && h[n - 1].command) {\n    var lc = h[n - 1].command, la = h[n - 1].applied;\n    var dc0 = Math.abs(lc[0] - la[0]), dc1 = Math.abs(lc[1] - la[1]);\n    var c = dc0 >= dc1 ? 0 : 1;\n    var j = 1 - c;\n    var uc = (lc[c] > 0 ? -1 : 1) * lim * 0.5;\n    if (lc[c] === 0) uc = 0;\n    var Jc0 = c === 0 ? J00 : J01, Jc1 = c === 0 ? J10 : J11;\n    var Jj0 = j === 0 ? J00 : J01, Jj1 = j === 0 ? J10 : J11;\n    var rx = ex - Jc0 * uc, ry = ey - Jc1 * uc;\n    var nj = Jj0 * Jj0 + Jj1 * Jj1;\n    var uj;\n    if (nj > 1e-9 * (normJ2 + 1e-12) && isFinite(nj)) {\n      uj = (rx * Jj0 + ry * Jj1) / nj;\n    } else {\n      uj = cyc[j === 0 ? 0 : 1];\n    }\n    if (uj > lim) uj = lim;\n    if (uj < -lim) uj = -lim;\n    var esc = [0, 0];\n    esc[c] = uc;\n    esc[j] = uj;\n    if (!isFinite(esc[0]) || !isFinite(esc[1])) {\n      return {action: 'move', u: [cyc[0], cyc[1]]};\n    }\n    return {action: 'move', u: esc};\n  }\n\n  if (!(Math.abs(detJ) > 0.05 * normJ2) || normJ2 <= 0) {\n    // Poorly excited or degenerate: keep probing both channels.\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n\n  var Ij00 = J11 / detJ, Ij01 = -J01 / detJ, Ij10 = -J10 / detJ, Ij11 = J00 / detJ;\n  var u0 = Ij00 * ex + Ij01 * ey;\n  var u1 = Ij10 * ex + Ij11 * ey;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 1e-9) {\n    return {action: 'move', u: [cyc[0], cyc[1]]};\n  }\n  if (m > lim) {\n    var sc = lim / m;\n    u0 *= sc;\n    u1 *= sc;\n  }\n  // Damp near the target to reduce overshoot from measurement noise.\n  if (err < 15) {\n    var g = Math.max(0.3, err / 15);\n    u0 *= g;\n    u1 *= g;\n  }\n  return {action: 'move', u: [u0, u1]};\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 157,
+     "trialActions": [
+      40,
+      27,
+      32,
+      26,
+      32
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 158,
+     "trialActions": [
+      39,
+      33,
+      35,
+      25,
+      26
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 171,
+     "trialActions": [
+      31,
+      41,
+      27,
+      38,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-210756",
+   "label": "y-s2026-r2-claude",
+   "device": "VLAB-Y",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 88,
+   "frontCalls": 14,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 161,
+   "xyActions": 121,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 0.97,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 0.98,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 69,
+    "referenceActions": 69,
+    "ratio": 1,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 426112,
+    "output_tokens": 37446,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var obj;\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !isFinite(command[0]) || !isFinite(command[1])) {\n      throw new Error('invalid xy command');\n    }\n    if (Math.abs(command[0]) > 0.1 || Math.abs(command[1]) > 0.1) {\n      throw new Error('xy command out of range');\n    }\n    obj = { op: 'step', channels: [command[0], command[1]] };\n  } else if (command && typeof command === 'object' && command.op === 'lift') {\n    if (command.position !== 'up' && command.position !== 'down') {\n      throw new Error('invalid lift position');\n    }\n    obj = { op: 'lift', position: command.position };\n  } else if (command && typeof command === 'object' && command.op === 'grip') {\n    if (command.state !== 'open' && command.state !== 'closed') {\n      throw new Error('invalid grip state');\n    }\n    obj = { op: 'grip', state: command.state };\n  } else {\n    throw new Error('unsupported command');\n  }\n  return JSON.stringify(obj) + '\\n';\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') {\n    throw new Error('reply must be a string');\n  }\n  var text = rawReply.replace(/\\n$/, '');\n  if (text.indexOf('\\n') !== -1 || text.trim().length === 0) {\n    throw new Error('malformed reply frame');\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error('malformed reply json');\n  }\n  if (!reply || typeof reply !== 'object' || Array.isArray(reply)) {\n    throw new Error('reply must be an object');\n  }\n  if (reply.ok !== true) {\n    throw new Error('device error: ' + (reply.error || 'ok false'));\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== 'boolean') {\n    throw new Error('invalid limited field');\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2 || typeof acc[0] !== 'number' || typeof acc[1] !== 'number' || !isFinite(acc[0]) || !isFinite(acc[1])) {\n      throw new Error('invalid accepted xy');\n    }\n  } else if (acc && typeof acc === 'object') {\n    if (acc.op === 'lift') {\n      if (acc.position !== 'up' && acc.position !== 'down') {\n        throw new Error('invalid accepted lift');\n      }\n    } else if (acc.op === 'grip') {\n      if (acc.state !== 'open' && acc.state !== 'closed') {\n        throw new Error('invalid accepted grip');\n      }\n    } else {\n      throw new Error('unknown accepted op');\n    }\n  } else {\n    throw new Error('missing accepted field');\n  }\n  return { applied: acc, limited: reply.limited === true };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tol = (state.tolerancePx > 0) ? state.tolerancePx : 7;\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: 'stop', reason: 'missing or non-finite position' };\n  }\n  var e0 = tgt[0] - tip[0];\n  var e1 = tgt[1] - tip[1];\n  var err = Math.sqrt(e0 * e0 + e1 * e1);\n  if (!isFinite(err)) {\n    return { action: 'stop', reason: 'non-finite error' };\n  }\n  if (err <= tol) {\n    return { action: 'verify' };\n  }\n\n  var h = state.history || [];\n  var start = Math.max(0, h.length - 12);\n  var S00 = 1e-9, S01 = 0, S11 = 1e-9;\n  var T00 = 0, T01 = 0, T10 = 0, T11 = 0;\n  var n = 0;\n  var ex = [0, 0];\n  for (var i = start; i < h.length; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) { continue; }\n    var a0 = s.applied[0], a1 = s.applied[1];\n    var d0 = s.delta[0], d1 = s.delta[1];\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(d0) || !isFinite(d1)) { continue; }\n    S00 += a0 * a0;\n    S01 += a0 * a1;\n    S11 += a1 * a1;\n    T00 += d0 * a0;\n    T01 += d0 * a1;\n    T10 += d1 * a0;\n    T11 += d1 * a1;\n    if (Math.abs(a0) + Math.abs(a1) > 1e-9) { n += 1; }\n    ex[0] += Math.abs(a0);\n    ex[1] += Math.abs(a1);\n  }\n\n  // Detect channels blocked at the travel limit from the most recent sample.\n  var blocked = [0, 0];\n  var last = h.length > 0 ? h[h.length - 1] : null;\n  if (last && last.limited === true && last.command && last.applied) {\n    for (var c = 0; c < 2; c++) {\n      var cmd = last.command[c], ap = last.applied[c];\n      if (isFinite(cmd) && isFinite(ap) && Math.abs(cmd) > 1e-9 && Math.abs(ap) < 0.5 * Math.abs(cmd)) {\n        blocked[c] = cmd > 0 ? 1 : -1;\n      }\n    }\n  }\n\n  var u = null;\n  var detS = S00 * S11 - S01 * S01;\n  if (n >= 3 && detS > 0) {\n    var iS00 = S11 / detS, iS01 = -S01 / detS, iS11 = S00 / detS;\n    var J00 = T00 * iS00 + T01 * iS01;\n    var J01 = T00 * iS01 + T01 * iS11;\n    var J10 = T10 * iS00 + T11 * iS01;\n    var J11 = T10 * iS01 + T11 * iS11;\n    var frob2 = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n    var detJ = J00 * J11 - J01 * J10;\n    if (frob2 > 0 && detJ * detJ >= 0.01 * frob2 * frob2) {\n      var u0 = (J11 * e0 - J01 * e1) / detJ;\n      var u1 = (-J10 * e0 + J00 * e1) / detJ;\n      if (isFinite(u0) && isFinite(u1)) {\n        u = [u0, u1];\n      }\n    }\n  }\n\n  if (u) {\n    // Do not push further into a blocked travel limit.\n    for (var k = 0; k < 2; k++) {\n      if ((blocked[k] === 1 && u[k] > 0) || (blocked[k] === -1 && u[k] < 0)) {\n        u[k] = 0;\n      }\n    }\n    if (u[0] === 0 && u[1] === 0) { u = null; }\n  }\n\n  if (!u) {\n    // Exploration: excite the least-used channel, alternating sign, retreating from a limit.\n    var pc = (ex[0] <= ex[1]) ? 0 : 1;\n    var sgn;\n    if (blocked[pc] !== 0) {\n      sgn = -blocked[pc];\n    } else {\n      sgn = (last && last.applied && last.applied[pc] > 0) ? -1 : 1;\n    }\n    var pu = [0, 0];\n    pu[pc] = sgn * 0.1;\n    return { action: 'move', u: pu };\n  }\n\n  var m = Math.max(Math.abs(u[0]), Math.abs(u[1]));\n  if (!isFinite(m) || m === 0) {\n    var qc = (ex[0] <= ex[1]) ? 0 : 1;\n    var qu = [0, 0];\n    qu[qc] = 0.1;\n    return { action: 'move', u: qu };\n  }\n  var gain = (err > 3 * tol) ? 0.7 : 0.5;\n  var scale = Math.min(gain, 0.1 / m);\n  var v0 = Math.max(-0.1, Math.min(0.1, u[0] * scale));\n  var v1 = Math.max(-0.1, Math.min(0.1, u[1] * scale));\n  if (!isFinite(v0) || !isFinite(v1)) {\n    return { action: 'stop', reason: 'non-finite control output' };\n  }\n  return { action: 'move', u: [v0, v1] };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 161,
+     "trialActions": [
+      44,
+      28,
+      31,
+      26,
+      32
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160,
+     "trialActions": [
+      40,
+      34,
+      33,
+      26,
+      27
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 172,
+     "trialActions": [
+      32,
+      40,
+      28,
+      38,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-210756",
+   "label": "y-s2026-r3-claude",
+   "device": "VLAB-Y",
+   "seed": 2026,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 93,
+   "frontCalls": 20,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 2,
+   "actions": 174,
+   "xyActions": 134,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 1.05,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 1.05,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 81,
+    "referenceActions": 69,
+    "ratio": 1.17,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    false,
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "接近目標時目標量測偏移",
+     "二連桿肘關節極限繞行"
+    ],
+    [
+     "二連桿肘關節極限繞行"
+    ],
+    [
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 513694,
+    "output_tokens": 64961,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var obj;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"step requires exactly 2 channels\");\n    }\n    for (var i = 0; i < 2; i++) {\n      if (typeof command[i] !== \"number\") {\n        throw new Error(\"channel value must be a number\");\n      }\n      var v = command[i];\n      if (!isFinite(v) || Math.abs(v) > 0.1) {\n        throw new Error(\"channel value out of range [-0.1, 0.1]\");\n      }\n    }\n    obj = { op: \"step\", channels: [command[0], command[1]] };\n  } else if (command !== null && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"lift position must be up or down\");\n      }\n      obj = { op: \"lift\", position: command.position };\n    } else if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"grip state must be open or closed\");\n      }\n      obj = { op: \"grip\", state: command.state };\n    } else {\n      throw new Error(\"unknown command op\");\n    }\n  } else {\n    throw new Error(\"unsupported command type\");\n  }\n  return JSON.stringify(obj) + \"\\n\";\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"reply must be a string\");\n  }\n  var text = rawReply.replace(/\\s+$/, \"\");\n  if (text.length === 0 || text.indexOf(\"\\n\") !== -1) {\n    throw new Error(\"malformed reply: expected one JSON line\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"malformed reply: invalid JSON\");\n  }\n  if (reply === null || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"malformed reply: not an object\");\n  }\n  if (reply.ok === false) {\n    throw new Error(reply.error ? String(reply.error) : \"device returned ok:false\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"malformed reply: ok must be true\");\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== \"boolean\") {\n    throw new Error(\"malformed reply: limited must be boolean\");\n  }\n  if (reply.accepted === undefined || reply.accepted === null) {\n    throw new Error(\"malformed reply: missing accepted\");\n  }\n  var applied = reply.accepted;\n  if (Array.isArray(applied)) {\n    if (applied.length !== 2) {\n      throw new Error(\"malformed reply: accepted must have 2 channels\");\n    }\n    for (var j = 0; j < 2; j++) {\n      if (typeof applied[j] !== \"number\" || !isFinite(applied[j]) || Math.abs(applied[j]) > 0.1) {\n        throw new Error(\"malformed reply: accepted channel out of range\");\n      }\n    }\n  } else if (typeof applied === \"object\") {\n    if (applied.op === \"lift\") {\n      if (applied.position !== \"up\" && applied.position !== \"down\") {\n        throw new Error(\"malformed reply: invalid lift position\");\n      }\n    } else if (applied.op === \"grip\") {\n      if (applied.state !== \"open\" && applied.state !== \"closed\") {\n        throw new Error(\"malformed reply: invalid grip state\");\n      }\n    } else {\n      throw new Error(\"malformed reply: unknown accepted op\");\n    }\n  } else {\n    throw new Error(\"malformed reply: invalid accepted\");\n  }\n  return { applied: applied, limited: reply.limited === true };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip, target = state.target;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (err <= state.tolerancePx) return { action: \"verify\" };\n  var h = state.history || [], n = h.length, st = Math.max(0, n - 40);\n  var m00 = 0, m01 = 0, m11 = 0, p00 = 0, p01 = 0, p10 = 0, p11 = 0, cnt = 0, k;\n  var ex0 = 0, ex1 = 0;\n  for (k = st; k < n; k++) {\n    var s = h[k], a = s.applied, d = s.delta;\n    if (!a || !d) continue;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    ex0 += Math.abs(a[0]); ex1 += Math.abs(a[1]);\n    if (Math.abs(a[0]) + Math.abs(a[1]) < 1e-9) continue;\n    var w = 0.3 + (k - st + 1) / (n - st);\n    m00 += w * a[0] * a[0]; m01 += w * a[0] * a[1]; m11 += w * a[1] * a[1];\n    p00 += w * d[0] * a[0]; p01 += w * d[0] * a[1];\n    p10 += w * d[1] * a[0]; p11 += w * d[1] * a[1];\n    cnt++;\n  }\n  var blockSign = [0, 0];\n  if (n > 0) {\n    var L = h[n - 1];\n    if (L && L.limited && L.command && L.applied) {\n      for (var i = 0; i < 2; i++) {\n        var c = L.command[i], ap = L.applied[i];\n        if (Math.abs(c) > 1e-9 && Math.abs(ap) < 0.5 * Math.abs(c)) blockSign[i] = c > 0 ? 1 : -1;\n      }\n    }\n  }\n  var par = (n % 2 === 0) ? 1 : -1;\n  function clipOK(d) {\n    for (var q = 0; q < 2; q++) {\n      if (blockSign[q] !== 0 && blockSign[q] * d[q] > 0) return false;\n    }\n    return true;\n  }\n  function retreat(sec) {\n    // move pinned channels back off the limit; free channel takes a sign that is allowed\n    var u = [0, 0];\n    for (var q = 0; q < 2; q++) {\n      if (blockSign[q] !== 0) u[q] = -0.1 * blockSign[q];\n    }\n    for (var j = 0; j < 2; j++) {\n      if (blockSign[j] === 0) {\n        var cand = [sec * 0.1 * par, -sec * 0.1 * par];\n        var pick = 0;\n        if (clipOK([u[0] + 0, u[1] + 0]) && cand[j] !== 0) pick = cand[j];\n        u[j] = pick;\n        break;\n      }\n    }\n    if (!clipOK(u)) u = [-0.1 * blockSign[0], -0.1 * blockSign[1]];\n    if (Math.abs(u[0]) < 1e-9 && Math.abs(u[1]) < 1e-9) u = [0.1 * par, 0];\n    return { action: \"move\", u: u };\n  }\n  function probe() {\n    var pref = ex0 <= ex1 ? [0, 1] : [1, 0];\n    var order = [1, -1];\n    if (par < 0) order = [-1, 1];\n    for (var c2 = 0; c2 < 2; c2++) {\n      for (var o = 0; o < 2; o++) {\n        var d = [0, 0];\n        d[pref[c2]] = 0.1 * order[o];\n        if (clipOK(d)) return { action: \"move\", u: d };\n      }\n    }\n    return retreat(1);\n  }\n  if (n === 0 || cnt < 2) return probe();\n  var lam = 1e-4 * (m00 + m11) + 1e-12;\n  var a00 = m00 + lam, a11 = m11 + lam, a01 = m01;\n  var det = a00 * a11 - a01 * a01;\n  var ir00 = a11 / det, ir01 = -a01 / det, ir11 = a00 / det;\n  var J00 = p00 * ir00 + p01 * ir01, J01 = p00 * ir01 + p01 * ir11;\n  var J10 = p10 * ir00 + p11 * ir01, J11 = p10 * ir01 + p11 * ir11;\n  var jd = J00 * J11 - J01 * J10;\n  var jn = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n  if (!isFinite(jd) || Math.abs(jd) < 1e-4 * jn + 1e-12) return probe();\n  var g = err > 30 ? 1 : 0.5;\n  var gx = ex * g, gy = ey * g;\n  var gn = Math.sqrt(gx * gx + gy * gy) + 1e-12;\n  var u0 = (J11 * gx - J01 * gy) / jd;\n  var u1 = (-J10 * gx + J00 * gy) / jd;\n  if (!isFinite(u0) || !isFinite(u1)) return probe();\n  var b0 = blockSign[0] !== 0 && blockSign[0] * u0 > 0;\n  var b1 = blockSign[1] !== 0 && blockSign[1] * u1 > 0;\n  if (b0 && b1) return retreat(1);\n  if (b0) {\n    var c1x = J01, c1y = J11;\n    var cc = c1x * c1x + c1y * c1y;\n    var rel = cc > 1e-12 ? (c1x * gx + c1y * gy) / (Math.sqrt(cc) * gn) : 0;\n    if (rel < 0.2) return retreat(1);\n    u0 = 0;\n    u1 = (c1x * gx + c1y * gy) / cc;\n  } else if (b1) {\n    var c0x = J00, c0y = J10;\n    var cc0 = c0x * c0x + c0y * c0y;\n    var rel0 = cc0 > 1e-12 ? (c0x * gx + c0y * gy) / (Math.sqrt(cc0) * gn) : 0;\n    if (rel0 < 0.2) return retreat(1);\n    u1 = 0;\n    u0 = (c0x * gx + c0y * gy) / cc0;\n  }\n  var mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (!isFinite(mx) || mx < 1e-9) return probe();\n  if (mx > 0.1) { u0 = u0 * 0.1 / mx; u1 = u1 * 0.1 / mx; }\n  return { action: \"move\", u: [u0, u1] };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 174,
+     "trialActions": [
+      45,
+      28,
+      36,
+      31,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 172,
+     "trialActions": [
+      38,
+      36,
+      39,
+      29,
+      30
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 183,
+     "trialActions": [
+      33,
+      42,
+      31,
+      41,
+      36
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-223019",
+   "label": "y-s3140-r1-claude",
+   "device": "VLAB-Y",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 86,
+   "frontCalls": 14,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 167,
+   "xyActions": 127,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 1.04,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 1.05,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 75,
+    "referenceActions": 69,
+    "ratio": 1.09,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "接近目標時目標量測偏移",
+     "二連桿長距離多目標"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 421130,
+    "output_tokens": 36404,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var frame;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step requires exactly 2 channels\");\n    for (var i = 0; i < 2; i++) {\n      var v = command[i];\n      if (typeof v !== \"number\" || !isFinite(v) || v < -0.1 || v > 0.1) {\n        throw new Error(\"channel out of range [-0.1,0.1]\");\n      }\n    }\n    frame = { op: \"step\", channels: [command[0], command[1]] };\n  } else if (command && typeof command === \"object\" && command.op === \"lift\") {\n    if (command.position !== \"up\" && command.position !== \"down\") {\n      throw new Error(\"lift position must be up or down\");\n    }\n    frame = { op: \"lift\", position: command.position };\n  } else if (command && typeof command === \"object\" && command.op === \"grip\") {\n    if (command.state !== \"open\" && command.state !== \"closed\") {\n      throw new Error(\"grip state must be open or closed\");\n    }\n    frame = { op: \"grip\", state: command.state };\n  } else {\n    throw new Error(\"unsupported command\");\n  }\n  return JSON.stringify(frame) + \"\\n\";\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"reply must be a string\");\n  if (rawReply.length === 0 || rawReply.charAt(rawReply.length - 1) !== \"\\n\") {\n    throw new Error(\"reply must end with LF\");\n  }\n  var text = rawReply.slice(0, -1);\n  if (text.indexOf(\"\\n\") !== -1 || text.indexOf(\"\\r\") !== -1) {\n    throw new Error(\"reply must be exactly one line\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"malformed JSON reply\");\n  }\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"reply must be a JSON object\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"device rejected command: \" + (reply.error || \"ok:false\"));\n  }\n  if (typeof reply.limited !== \"boolean\") {\n    throw new Error(\"missing limited flag\");\n  }\n  var applied = reply.accepted;\n  if (Array.isArray(applied)) {\n    if (applied.length !== 2 || typeof applied[0] !== \"number\" || typeof applied[1] !== \"number\" ||\n        !isFinite(applied[0]) || !isFinite(applied[1])) {\n      throw new Error(\"invalid accepted step array\");\n    }\n  } else if (applied && typeof applied === \"object\") {\n    if (applied.op === \"lift\") {\n      if (applied.position !== \"up\" && applied.position !== \"down\") throw new Error(\"invalid lift accepted\");\n    } else if (applied.op === \"grip\") {\n      if (applied.state !== \"open\" && applied.state !== \"closed\") throw new Error(\"invalid grip accepted\");\n    } else {\n      throw new Error(\"invalid accepted object\");\n    }\n  } else {\n    throw new Error(\"missing accepted field\");\n  }\n  return { applied: applied, limited: reply.limited };\n}\n",
+   "generatedControllerSource": "function clampU(v) {\n  if (!isFinite(v)) return 0;\n  if (v > 0.1) return 0.1;\n  if (v < -0.1) return -0.1;\n  return v;\n}\n\nfunction sgn(v) {\n  return v > 0 ? 1 : (v < 0 ? -1 : 0);\n}\n\nfunction probeMove(hist, n, cnt0, cnt1) {\n  var c = cnt0 <= cnt1 ? 0 : 1;\n  var sign = 1;\n  for (var k = n - 1; k >= 0; k--) {\n    var h = hist[k];\n    if (!h || !h.command || !h.applied) continue;\n    if (Math.abs(h.command[c]) > 1e-9) {\n      if (h.limited && Math.abs(h.applied[c]) < 1e-6) {\n        sign = -sgn(h.command[c]);\n      }\n      break;\n    }\n  }\n  var u = [0, 0];\n  u[c] = 0.1 * sign;\n  return { action: 'move', u: [clampU(u[0]), clampU(u[1])] };\n}\n\nfunction control(state) {\n  var tip = state.tip, target = state.target;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return { action: 'stop', reason: 'invalid tip or target' };\n  }\n  var tol = state.tolerancePx || 7;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (err <= tol) return { action: 'verify' };\n\n  var hist = state.history || [];\n  var n = hist.length;\n\n  // Stuck at a travel limit: last 3 moves limited with almost no image motion -> retreat.\n  if (n >= 3) {\n    var stuck = true;\n    for (var q = n - 3; q < n; q++) {\n      var hh = hist[q];\n      if (!hh || !hh.limited || !hh.delta || Math.sqrt(hh.delta[0] * hh.delta[0] + hh.delta[1] * hh.delta[1]) > 1.0) {\n        stuck = false;\n        break;\n      }\n    }\n    if (stuck && hist[n - 1] && hist[n - 1].command) {\n      var lc = hist[n - 1].command;\n      var ru = [clampU(-0.1 * sgn(lc[0])), clampU(-0.1 * sgn(lc[1]))];\n      if (ru[0] !== 0 || ru[1] !== 0) return { action: 'move', u: ru };\n    }\n  }\n\n  // Recency-weighted local Jacobian estimate over the last 40 samples.\n  var start = Math.max(0, n - 40);\n  var S00 = 0, S01 = 0, S11 = 0, R00 = 0, R01 = 0, R10 = 0, R11 = 0;\n  var cnt0 = 0, cnt1 = 0;\n  for (var k = start; k < n; k++) {\n    var h = hist[k];\n    if (!h || !h.command || !h.applied || !h.delta) continue;\n    var c = h.command, a = h.applied, d = h.delta;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) continue;\n    var w = Math.pow(0.92, n - 1 - k);\n    S00 += w * a[0] * a[0];\n    S01 += w * a[0] * a[1];\n    S11 += w * a[1] * a[1];\n    R00 += w * d[0] * a[0];\n    R01 += w * d[0] * a[1];\n    R10 += w * d[1] * a[0];\n    R11 += w * d[1] * a[1];\n    if (Math.abs(c[0]) > 1e-9) cnt0++;\n    if (Math.abs(c[1]) > 1e-9) cnt1++;\n  }\n\n  if (cnt0 < 2 || cnt1 < 2) return probeMove(hist, n, cnt0, cnt1);\n\n  var lam = 1e-9 + 1e-4 * (S00 + S11);\n  var a00 = S00 + lam, a11 = S11 + lam, a01 = S01;\n  var det = a00 * a11 - a01 * a01;\n  if (!isFinite(det) || Math.abs(det) < 1e-12) return probeMove(hist, n, cnt0, cnt1);\n\n  var J00 = (R00 * a11 - R01 * a01) / det;\n  var J01 = (-R00 * a01 + R01 * a00) / det;\n  var J10 = (R10 * a11 - R11 * a01) / det;\n  var J11 = (-R10 * a01 + R11 * a00) / det;\n\n  var detJ = J00 * J11 - J01 * J10;\n  var normJ2 = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n  if (!isFinite(detJ) || !isFinite(normJ2) || normJ2 < 1e-9 || Math.abs(detJ) < 1e-3 * normJ2) {\n    return probeMove(hist, n, cnt0, cnt1);\n  }\n\n  var u0 = (J11 * ex - J01 * ey) / detJ;\n  var u1 = (-J10 * ex + J00 * ey) / detJ;\n  if (!isFinite(u0) || !isFinite(u1)) return probeMove(hist, n, cnt0, cnt1);\n\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 1e-12) return probeMove(hist, n, cnt0, cnt1);\n\n  // Far: full-speed step (max component 0.1). Near: damped Newton step to avoid overshoot\n  // when target measurement is noisy or the Jacobian is stale.\n  var g;\n  if (err > 4 * tol) {\n    g = 0.1 / m;\n  } else {\n    g = Math.min(1, 0.1 / m) * 0.6;\n    if (m * g < 0.01) g = 0.01 / m;\n  }\n  var out = [clampU(u0 * g), clampU(u1 * g)];\n  return { action: 'move', u: out };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 170,
+     "trialActions": [
+      45,
+      29,
+      34,
+      28,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 167,
+     "trialActions": [
+      41,
+      35,
+      37,
+      26,
+      28
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 183,
+     "trialActions": [
+      34,
+      43,
+      28,
+      40,
+      38
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-223019",
+   "label": "y-s3140-r2-claude",
+   "device": "VLAB-Y",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 84,
+   "frontCalls": 12,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 158,
+   "xyActions": 118,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 0.99,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 0.92,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 63,
+    "referenceActions": 69,
+    "ratio": 0.91,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 391074,
+    "output_tokens": 30629,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"channels must have exactly 2 values\");\n    }\n    for (var i = 0; i < 2; i++) {\n      var v = command[i];\n      if (typeof v !== \"number\" || !isFinite(v) || Math.abs(v) > 0.1) {\n        throw new Error(\"channel value out of range: \" + v);\n      }\n    }\n    return JSON.stringify({ op: \"step\", channels: [command[0], command[1]] }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"unsupported command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"reply must be a string\");\n  }\n  var text = rawReply.trim();\n  if (text.length === 0 || text.indexOf(\"\\n\") !== -1 && text.split(\"\\n\").filter(function (s) { return s.trim().length > 0; }).length !== 1) {\n    throw new Error(\"malformed frame\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"invalid JSON reply\");\n  }\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"reply is not an object\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"device error: \" + (reply.error || \"ok is false\"));\n  }\n  if (reply.accepted === undefined || reply.accepted === null) {\n    throw new Error(\"missing accepted field\");\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== \"boolean\") {\n    throw new Error(\"invalid limited field\");\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) {\n      throw new Error(\"accepted channels must have 2 values\");\n    }\n    for (var i = 0; i < 2; i++) {\n      if (typeof acc[i] !== \"number\" || !isFinite(acc[i]) || Math.abs(acc[i]) > 0.1) {\n        throw new Error(\"accepted channel invalid\");\n      }\n    }\n  } else if (typeof acc === \"object\") {\n    if (acc.op === \"lift\") {\n      if (acc.position !== \"up\" && acc.position !== \"down\") {\n        throw new Error(\"accepted lift invalid\");\n      }\n    } else if (acc.op === \"grip\") {\n      if (acc.state !== \"open\" && acc.state !== \"closed\") {\n        throw new Error(\"accepted grip invalid\");\n      }\n    } else {\n      throw new Error(\"accepted op invalid\");\n    }\n  } else {\n    throw new Error(\"accepted has invalid type\");\n  }\n  return { applied: acc, limited: reply.limited === true };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tol = state.tolerancePx;\n  var ex = state.target[0] - state.tip[0];\n  var ey = state.target[1] - state.tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!(err > tol)) {\n    return { action: \"verify\" };\n  }\n  var hist = state.history || [];\n  var n = hist.length;\n\n  // Recent limited samples: if the last command hit a travel limit, move the\n  // non-limited channel with alternating sign to step the arm off the boundary.\n  if (n > 0 && hist[n - 1].limited) {\n    var limCount = 0;\n    for (var q = 0; q < n; q++) {\n      if (hist[q].limited) { limCount++; }\n    }\n    var lc = hist[n - 1].command;\n    var applied = hist[n - 1].applied;\n    var limitedCh = 0;\n    if (Math.abs(applied[0] - lc[0]) > Math.abs(applied[1] - lc[1])) { limitedCh = 0; } else { limitedCh = 1; }\n    var otherCh = 1 - limitedCh;\n    var sgn = (limCount % 2 === 0) ? 1 : -1;\n    var ru = [0, 0];\n    ru[otherCh] = 0.1 * sgn;\n    ru[limitedCh] = -0.05 * (lc[limitedCh] >= 0 ? 1 : -1);\n    return { action: \"move\", u: ru };\n  }\n\n  // Weighted least squares fit of local Jacobian J (delta = J * applied).\n  var Saa = [[0, 0], [0, 0]];\n  var Sda = [[0, 0], [0, 0]];\n  var cnt = 0;\n  for (var i = 0; i < n; i++) {\n    var h = hist[i];\n    if (!h || !h.applied || !h.delta) { continue; }\n    var a = h.applied;\n    var d = h.delta;\n    if (!isFinite(a[0]) || !isFinite(a[1]) || !isFinite(d[0]) || !isFinite(d[1])) { continue; }\n    if (Math.abs(a[0]) + Math.abs(a[1]) < 1e-9) { continue; }\n    var w = Math.pow(0.9, n - 1 - i);\n    cnt++;\n    for (var r = 0; r < 2; r++) {\n      for (var c = 0; c < 2; c++) {\n        Saa[r][c] += w * a[r] * a[c];\n        Sda[r][c] += w * d[r] * a[c];\n      }\n    }\n  }\n\n  var tr = Saa[0][0] + Saa[1][1];\n  var detS = Saa[0][0] * Saa[1][1] - Saa[0][1] * Saa[1][0];\n  if (cnt < 2 || !(tr > 1e-9) || detS / (tr * tr) < 1e-3) {\n    // Excite the less-explored channel to build rank-2 information.\n    if (Saa[0][0] <= Saa[1][1]) { return { action: \"move\", u: [0.1, 0] }; }\n    return { action: \"move\", u: [0, 0.1] };\n  }\n\n  var lam = 1e-6 * tr;\n  var A00 = Saa[0][0] + lam, A01 = Saa[0][1], A10 = Saa[1][0], A11 = Saa[1][1] + lam;\n  var det = A00 * A11 - A01 * A10;\n  var inv = [[A11 / det, -A01 / det], [-A10 / det, A00 / det]];\n  // J = Sda * inv(Saa)\n  var J = [[0, 0], [0, 0]];\n  for (var r2 = 0; r2 < 2; r2++) {\n    for (var c2 = 0; c2 < 2; c2++) {\n      J[r2][c2] = Sda[r2][0] * inv[0][c2] + Sda[r2][1] * inv[1][c2];\n    }\n  }\n\n  // Damped least squares: u = (J^T J + mu I)^-1 J^T e\n  var JtJ00 = J[0][0] * J[0][0] + J[1][0] * J[1][0];\n  var JtJ01 = J[0][0] * J[0][1] + J[1][0] * J[1][1];\n  var JtJ11 = J[0][1] * J[0][1] + J[1][1] * J[1][1];\n  var mu = 1e-3 * (JtJ00 + JtJ11) + 1e-12;\n  var B00 = JtJ00 + mu, B11 = JtJ11 + mu;\n  var bdet = B00 * B11 - JtJ01 * JtJ01;\n  var Jte0 = J[0][0] * ex + J[1][0] * ey;\n  var Jte1 = J[0][1] * ex + J[1][1] * ey;\n  var u0 = (B11 * Jte0 - JtJ01 * Jte1) / bdet;\n  var u1 = (-JtJ01 * Jte0 + B00 * Jte1) / bdet;\n\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: \"move\", u: [0.1, 0] };\n  }\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 1e-9) {\n    return { action: \"move\", u: [0.1, 0] };\n  }\n\n  // Predicted image displacement of this u\n  var pdx = J[0][0] * u0 + J[0][1] * u1;\n  var pdy = J[1][0] * u0 + J[1][1] * u1;\n  var pm = Math.sqrt(pdx * pdx + pdy * pdy);\n  var sDes = Math.min(60, Math.max(3, 0.5 * err));\n  var k = Math.min(1, 0.1 / m);\n  if (pm > 1e-9) {\n    k = Math.min(k, sDes / pm);\n  }\n  var uo = [u0 * k, u1 * k];\n  uo[0] = Math.max(-0.1, Math.min(0.1, uo[0]));\n  uo[1] = Math.max(-0.1, Math.min(0.1, uo[1]));\n  if (!isFinite(uo[0]) || !isFinite(uo[1])) {\n    return { action: \"stop\", reason: \"numeric failure\" };\n  }\n  return { action: \"move\", u: uo };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 165,
+     "trialActions": [
+      42,
+      28,
+      33,
+      28,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 158,
+     "trialActions": [
+      37,
+      32,
+      34,
+      26,
+      29
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 178,
+     "trialActions": [
+      33,
+      42,
+      31,
+      40,
+      32
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-223019",
+   "label": "y-s3140-r3-claude",
+   "device": "VLAB-Y",
+   "seed": 3140,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 85,
+   "frontCalls": 12,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 160,
+   "xyActions": 120,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 1.0,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 0.96,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 72,
+    "referenceActions": 69,
+    "ratio": 1.04,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    true
+   ],
+   "controllerGateFailures": [],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 394502,
+    "output_tokens": 32663,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var frame;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step requires two channels\");\n    var a = command[0], b = command[1];\n    if (typeof a !== \"number\" || typeof b !== \"number\" || !isFinite(a) || !isFinite(b)) throw new Error(\"step channels must be finite numbers\");\n    if (Math.abs(a) > 0.1 || Math.abs(b) > 0.1) throw new Error(\"step channel out of range\");\n    frame = { op: \"step\", channels: [a, b] };\n  } else if (command && typeof command === \"object\" && command.op === \"lift\") {\n    if (command.position !== \"up\" && command.position !== \"down\") throw new Error(\"invalid lift position\");\n    frame = { op: \"lift\", position: command.position };\n  } else if (command && typeof command === \"object\" && command.op === \"grip\") {\n    if (command.state !== \"open\" && command.state !== \"closed\") throw new Error(\"invalid grip state\");\n    frame = { op: \"grip\", state: command.state };\n  } else {\n    throw new Error(\"unsupported command\");\n  }\n  return JSON.stringify(frame) + \"\\n\";\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"reply must be a string\");\n  var text = rawReply.replace(/\\r?\\n$/, \"\");\n  if (text.indexOf(\"\\n\") >= 0 || text.indexOf(\"\\r\") >= 0) throw new Error(\"reply must be exactly one frame\");\n  var reply = JSON.parse(text);\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) throw new Error(\"reply must be a JSON object\");\n  if (reply.ok !== true) {\n    throw new Error(\"device error: \" + (reply.error !== undefined ? String(reply.error) : \"ok false\"));\n  }\n  if (typeof reply.limited !== \"boolean\") throw new Error(\"reply missing boolean limited\");\n  if (reply.accepted === undefined || reply.accepted === null) throw new Error(\"reply missing accepted\");\n  var acc = reply.accepted;\n  var applied;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) throw new Error(\"accepted step must have two channels\");\n    if (typeof acc[0] !== \"number\" || typeof acc[1] !== \"number\" || !isFinite(acc[0]) || !isFinite(acc[1])) throw new Error(\"accepted channels must be finite numbers\");\n    if (Math.abs(acc[0]) > 0.1 || Math.abs(acc[1]) > 0.1) throw new Error(\"accepted channel out of range\");\n    applied = [acc[0], acc[1]];\n  } else if (typeof acc === \"object\") {\n    if (acc.op === \"lift\" && (acc.position === \"up\" || acc.position === \"down\")) {\n      applied = { op: \"lift\", position: acc.position };\n    } else if (acc.op === \"grip\" && (acc.state === \"open\" || acc.state === \"closed\")) {\n      applied = { op: \"grip\", state: acc.state };\n    } else {\n      throw new Error(\"unrecognized accepted object\");\n    }\n  } else {\n    throw new Error(\"accepted has invalid type\");\n  }\n  return { applied: applied, limited: reply.limited };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tip = state.tip, target = state.target;\n  var tol = state.tolerancePx || 7;\n  var lim = 0.1;\n  if (!tip || !target || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(target[0]) || !isFinite(target[1])) {\n    return { action: \"stop\", reason: \"invalid measurement\" };\n  }\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (err <= tol) return { action: \"verify\" };\n\n  var hist = state.history || [];\n  var n = hist.length;\n\n  // Weighted ridge fit of delta = J * applied, favoring recent samples.\n  var m00 = 1e-6, m01 = 0, m11 = 1e-6;\n  var b00 = 0, b01 = 0, b10 = 0, b11 = 0;\n  var used = 0;\n  for (var k = 0; k < n; k++) {\n    var h = hist[k];\n    if (!h || !h.applied || !h.delta) continue;\n    var a0 = h.applied[0], a1 = h.applied[1], d0 = h.delta[0], d1 = h.delta[1];\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(d0) || !isFinite(d1)) continue;\n    var w = Math.pow(0.9, n - 1 - k);\n    m00 += w * a0 * a0; m01 += w * a0 * a1; m11 += w * a1 * a1;\n    b00 += w * a0 * d0; b01 += w * a0 * d1;\n    b10 += w * a1 * d0; b11 += w * a1 * d1;\n    used++;\n  }\n\n  // Last valid applied command (for probing and retreat).\n  var lastA = null, lastD = null;\n  for (var q = n - 1; q >= 0; q--) {\n    var hq = hist[q];\n    if (hq && hq.applied && hq.delta && isFinite(hq.applied[0]) && isFinite(hq.applied[1]) && isFinite(hq.delta[0]) && isFinite(hq.delta[1])) {\n      lastA = hq.applied; lastD = hq.delta; break;\n    }\n  }\n\n  // Stall detection: recent commands moved but image progress is negligible (e.g. elbow limit).\n  if (n >= 3) {\n    var stalled = true;\n    for (var s = n - 3; s < n; s++) {\n      var hs = hist[s];\n      if (!hs || !hs.applied || !hs.delta) { stalled = false; break; }\n      var an = Math.sqrt(hs.applied[0] * hs.applied[0] + hs.applied[1] * hs.applied[1]);\n      var dn = Math.sqrt(hs.delta[0] * hs.delta[0] + hs.delta[1] * hs.delta[1]);\n      if (!(an > 0.01 && dn < 1.0)) { stalled = false; break; }\n    }\n    if (stalled && lastA) {\n      var r0, r1;\n      if (n % 2 === 0) { r0 = -lastA[0]; r1 = -lastA[1]; }\n      else { r0 = -lastA[1]; r1 = lastA[0]; }\n      var rm = Math.max(Math.abs(r0), Math.abs(r1));\n      if (rm > 0) {\n        var rs = lim / rm;\n        return { action: \"move\", u: [r0 * rs, r1 * rs] };\n      }\n    }\n  }\n\n  var detM = m00 * m11 - m01 * m01;\n  var J00 = 0, J01 = 0, J10 = 0, J11 = 0, detJ = 0, okJ = false;\n  if (detM > 0 && used >= 2) {\n    var C00 = (m11 * b00 - m01 * b10) / detM;\n    var C01 = (m11 * b01 - m01 * b11) / detM;\n    var C10 = (-m01 * b00 + m00 * b10) / detM;\n    var C11 = (-m01 * b01 + m00 * b11) / detM;\n    J00 = C00; J01 = C10; J10 = C01; J11 = C11; // J = C^T\n    detJ = J00 * J11 - J01 * J10;\n    var normJ2 = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n    okJ = isFinite(detJ) && normJ2 > 0 && Math.abs(detJ) > 1e-3 * normJ2;\n  }\n\n  if (!okJ) {\n    // Probe: excite a direction not yet well explained by history.\n    var p0, p1;\n    if (lastA && (Math.abs(lastA[0]) + Math.abs(lastA[1])) > 0.01) {\n      var sg = (n % 2 === 0) ? 1 : -1;\n      p0 = -lastA[1] * sg; p1 = lastA[0] * sg;\n    } else {\n      var dirs = [[lim, 0], [0, lim], [-lim, 0], [0, -lim]];\n      var dsel = dirs[n % 4];\n      p0 = dsel[0]; p1 = dsel[1];\n    }\n    var pm = Math.max(Math.abs(p0), Math.abs(p1));\n    if (pm === 0) return { action: \"move\", u: [lim, 0] };\n    var ps = lim / pm;\n    return { action: \"move\", u: [p0 * ps, p1 * ps] };\n  }\n\n  // Newton-like step: solve J u = e.\n  var u0 = (J11 * ex - J01 * ey) / detJ;\n  var u1 = (-J10 * ex + J00 * ey) / detJ;\n  if (!isFinite(u0) || !isFinite(u1)) {\n    return { action: \"move\", u: [lim, 0] };\n  }\n  var mx = Math.max(Math.abs(u0), Math.abs(u1));\n  if (mx === 0) return { action: \"verify\" };\n  var scale;\n  if (err > 30) scale = lim / mx;\n  else scale = (mx > lim ? lim / mx : 1) * 0.7;\n  var v0 = u0 * scale, v1 = u1 * scale;\n  if (v0 > lim) v0 = lim; if (v0 < -lim) v0 = -lim;\n  if (v1 > lim) v1 = lim; if (v1 < -lim) v1 = -lim;\n  return { action: \"move\", u: [v0, v1] };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 165,
+     "trialActions": [
+      44,
+      28,
+      33,
+      27,
+      33
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160,
+     "trialActions": [
+      39,
+      34,
+      33,
+      26,
+      28
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 175,
+     "trialActions": [
+      31,
+      42,
+      28,
+      39,
+      35
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-230556",
+   "label": "y-s8675-r1-claude",
+   "device": "VLAB-Y",
+   "seed": 8675,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 89,
+   "frontCalls": 16,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 2,
+   "actions": 179,
+   "xyActions": 139,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 1.0,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 0.93,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 62,
+    "referenceActions": 69,
+    "ratio": 0.9,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界",
+     "接近目標時目標量測偏移"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 455048,
+    "output_tokens": 49787,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"step requires exactly 2 channels\");\n    var a = Number(command[0]);\n    var b = Number(command[1]);\n    if (!isFinite(a) || !isFinite(b)) throw new Error(\"non-finite channel value\");\n    if (Math.abs(a) > 0.1 || Math.abs(b) > 0.1) throw new Error(\"channel out of range [-0.1, 0.1]\");\n    return JSON.stringify({ op: \"step\", channels: [a, b] }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") throw new Error(\"invalid lift position\");\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") throw new Error(\"invalid grip state\");\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"unsupported command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") throw new Error(\"reply must be a string\");\n  var text = rawReply.trim();\n  if (text.length === 0) throw new Error(\"empty reply\");\n  if (text.indexOf(\"\\n\") !== -1 || text.indexOf(\"\\r\") !== -1) throw new Error(\"reply must be a single line\");\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"malformed JSON reply\");\n  }\n  if (reply === null || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"reply must be a JSON object\");\n  }\n  if (reply.ok === false) {\n    throw new Error(reply.error ? String(reply.error) : \"device returned ok:false\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"missing or invalid ok field\");\n  }\n  if (reply.accepted === undefined || reply.accepted === null) {\n    throw new Error(\"missing accepted field\");\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) throw new Error(\"accepted channels must have length 2\");\n    for (var i = 0; i < 2; i++) {\n      if (typeof acc[i] !== \"number\" || !isFinite(acc[i])) throw new Error(\"accepted channel not finite\");\n      if (Math.abs(acc[i]) > 0.1 + 1e-9) throw new Error(\"accepted channel out of range\");\n    }\n  } else if (typeof acc === \"object\") {\n    if (acc.op === \"lift\") {\n      if (acc.position !== \"up\" && acc.position !== \"down\") throw new Error(\"invalid accepted lift position\");\n    } else if (acc.op === \"grip\") {\n      if (acc.state !== \"open\" && acc.state !== \"closed\") throw new Error(\"invalid accepted grip state\");\n    } else {\n      throw new Error(\"unknown accepted op\");\n    }\n  } else {\n    throw new Error(\"accepted has unsupported type\");\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== \"boolean\") {\n    throw new Error(\"limited must be boolean\");\n  }\n  return { applied: acc, limited: reply.limited === true };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var tol = (state && state.tolerancePx) ? state.tolerancePx : 7;\n  if (!state || !state.tip || !state.target) return { action: \"stop\", reason: \"missing state\" };\n  var tip = state.tip, tgt = state.target;\n  var ex = tgt[0] - tip[0], ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!isFinite(err)) return { action: \"stop\", reason: \"non-finite error\" };\n  if (err <= tol) return { action: \"verify\" };\n\n  var hist = state.history || [];\n  var n = hist.length;\n  var start = n > 40 ? n - 40 : 0;\n  var M00 = 0, M01 = 0, M11 = 0, N00 = 0, N01 = 0, N10 = 0, N11 = 0, cnt = 0;\n  for (var i = start; i < n; i++) {\n    var h = hist[i];\n    if (!h || !h.applied || !h.delta) continue;\n    var a0 = Number(h.applied[0]), a1 = Number(h.applied[1]);\n    var d0 = Number(h.delta[0]), d1 = Number(h.delta[1]);\n    if (!isFinite(a0) || !isFinite(a1) || !isFinite(d0) || !isFinite(d1)) continue;\n    if (Math.abs(a0) + Math.abs(a1) < 1e-6) continue;\n    var w = Math.pow(0.5, (n - 1 - i) / 8);\n    M00 += w * a0 * a0; M01 += w * a0 * a1; M11 += w * a1 * a1;\n    N00 += w * d0 * a0; N01 += w * d0 * a1;\n    N10 += w * d1 * a0; N11 += w * d1 * a1;\n    cnt++;\n  }\n\n  var tr = M00 + M11;\n  var needProbe = false;\n  var J00 = 0, J01 = 0, J10 = 0, J11 = 0;\n  if (cnt < 2 || tr <= 1e-12) {\n    needProbe = true;\n  } else {\n    var lam = 1e-6 + 0.005 * tr;\n    var A = M00 + lam, B = M01, C = M11 + lam;\n    var det = A * C - B * B;\n    if (!isFinite(det) || Math.abs(det) < 1e-18) {\n      needProbe = true;\n    } else {\n      var iA = C / det, iB = -B / det, iC = A / det;\n      J00 = N00 * iA + N01 * iB;\n      J01 = N00 * iB + N01 * iC;\n      J10 = N10 * iA + N11 * iB;\n      J11 = N10 * iB + N11 * iC;\n      var Jdet = J00 * J11 - J01 * J10;\n      var frob2 = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n      if (!isFinite(Jdet) || !isFinite(frob2) || frob2 < 1e-12 || Math.abs(Jdet) < 0.02 * frob2) {\n        needProbe = true;\n      }\n    }\n  }\n\n  if (needProbe) {\n    // Pick the channel moved least recently; avoid pushing into a stalled limit.\n    var s0 = 0, s1 = 0, sg0 = 0, sg1 = 0, lastCmdSign = [0, 0], got = [false, false];\n    var k = n > 6 ? n - 6 : 0;\n    for (var j = k; j < n; j++) {\n      var hj = hist[j];\n      if (!hj || !hj.applied) continue;\n      var aj0 = Number(hj.applied[0]), aj1 = Number(hj.applied[1]);\n      if (!isFinite(aj0) || !isFinite(aj1)) continue;\n      s0 += Math.abs(aj0); s1 += Math.abs(aj1);\n      sg0 += aj0; sg1 += aj1;\n    }\n    for (var q = n - 1; q >= 0; q--) {\n      var hq = hist[q];\n      if (!hq || !hq.command) continue;\n      for (var ch = 0; ch < 2; ch++) {\n        if (!got[ch]) {\n          var cv = Number(hq.command[ch]);\n          if (isFinite(cv) && cv !== 0) {\n            lastCmdSign[ch] = cv > 0 ? 1 : -1;\n            got[ch] = true;\n          }\n        }\n      }\n      if (got[0] && got[1]) break;\n    }\n    var c = (s0 <= s1) ? 0 : 1;\n    var ssum = c === 0 ? sg0 : sg1;\n    var sign;\n    if (Math.abs(ssum) > 0.02) sign = ssum > 0 ? -1 : 1;\n    else if (lastCmdSign[c] !== 0) sign = -lastCmdSign[c];\n    else sign = 1;\n    var p = [0, 0];\n    p[c] = sign * 0.08;\n    return { action: \"move\", u: p };\n  }\n\n  var dt = J00 * J11 - J01 * J10;\n  var u0 = (J11 * ex - J01 * ey) / dt;\n  var u1 = (-J10 * ex + J00 * ey) / dt;\n  if (!isFinite(u0) || !isFinite(u1)) return { action: \"move\", u: [0.08, 0] };\n  var g = err > 4 * tol ? 1 : 0.5;\n  u0 *= g; u1 *= g;\n  var m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m > 0.1) { u0 = u0 * 0.1 / m; u1 = u1 * 0.1 / m; }\n  m = Math.max(Math.abs(u0), Math.abs(u1));\n  if (m < 0.02 && m > 0) { u0 = u0 * 0.02 / m; u1 = u1 * 0.02 / m; }\n  u0 = Math.max(-0.1, Math.min(0.1, u0));\n  u1 = Math.max(-0.1, Math.min(0.1, u1));\n  return { action: \"move\", u: [u0, u1] };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 164,
+     "trialActions": [
+      42,
+      28,
+      33,
+      27,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 160,
+     "trialActions": [
+      38,
+      33,
+      35,
+      26,
+      28
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 179,
+     "trialActions": [
+      33,
+      42,
+      31,
+      39,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-230556",
+   "label": "y-s8675-r2-claude",
+   "device": "VLAB-Y",
+   "seed": 8675,
+   "completedTrials": 0,
+   "allTruthPlaced": false,
+   "failure": "控制程式未通過隔離測試（9 項案例皆在 60 次動作內未到達目標），而目前 allowedTools 不含 write_controller，無法修正程式；重新執行 test_controller 不會改變結果。因此停止實驗，不進行 start_control 或取放動作。",
+   "modelCalls": 14,
+   "frontCalls": 14,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 0,
+   "actions": 0,
+   "xyActions": 0,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": null,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": null,
+   "twoLink": {
+    "required": true,
+    "reached": false,
+    "actions": 60,
+    "referenceActions": 69,
+    "ratio": null,
+    "maxRatio": 1.3,
+    "passed": false
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    false
+   ],
+   "controllerGateFailures": [
+    [
+     "二連桿肘關節極限繞行"
+    ],
+    [
+     "旋轉 0.3 rad、正向通道",
+     "通道交換且 A 反向",
+     "大角度旋轉與 B 反向",
+     "位置相依的非線性映射",
+     "到達後通道 A 反向的恢復",
+     "起點貼近行程邊界",
+     "接近目標時目標量測偏移",
+     "二連桿長距離多目標",
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 144684,
+    "output_tokens": 16745,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"step command requires exactly 2 channels\");\n    }\n    for (var i = 0; i < 2; i++) {\n      if (typeof command[i] !== \"number\" || !isFinite(command[i])) {\n        throw new Error(\"channel value must be a finite number\");\n      }\n      if (command[i] < -0.1 || command[i] > 0.1) {\n        throw new Error(\"channel value out of range [-0.1, 0.1]\");\n      }\n    }\n    return JSON.stringify({ op: \"step\", channels: [command[0], command[1]] }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"lift position must be up or down\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"grip state must be open or closed\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"unsupported command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"reply must be a string\");\n  }\n  if (!/\\n$/.test(rawReply)) {\n    throw new Error(\"malformed reply: missing LF terminator\");\n  }\n  var text = rawReply.replace(/\\r?\\n$/, \"\");\n  if (text.indexOf(\"\\n\") !== -1 || text.indexOf(\"\\r\") !== -1) {\n    throw new Error(\"malformed reply: multiple frames\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"malformed reply: invalid JSON\");\n  }\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"malformed reply: not an object\");\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"device error: \" + (reply.error !== undefined ? reply.error : \"ok false\"));\n  }\n  if (typeof reply.limited !== \"boolean\") {\n    throw new Error(\"malformed reply: limited must be boolean\");\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) {\n      throw new Error(\"malformed reply: accepted must have 2 channels\");\n    }\n    for (var j = 0; j < 2; j++) {\n      if (typeof acc[j] !== \"number\" || !isFinite(acc[j]) || acc[j] < -0.1 || acc[j] > 0.1) {\n        throw new Error(\"malformed reply: accepted channel invalid\");\n      }\n    }\n    return { applied: [acc[0], acc[1]], limited: reply.limited };\n  }\n  if (acc && typeof acc === \"object\") {\n    if (acc.op === \"lift\" && (acc.position === \"up\" || acc.position === \"down\")) {\n      return { applied: { op: \"lift\", position: acc.position }, limited: reply.limited };\n    }\n    if (acc.op === \"grip\" && (acc.state === \"open\" || acc.state === \"closed\")) {\n      return { applied: { op: \"grip\", state: acc.state }, limited: reply.limited };\n    }\n  }\n  throw new Error(\"malformed reply: accepted missing or invalid\");\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var lim = 0.1;\n  var tol = state.tolerancePx;\n  var tip = state.tip, target = state.target;\n  var ex = target[0] - tip[0], ey = target[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (!(err > tol)) { return { action: \"verify\" }; }\n  var h = state.history || [];\n  var n = h.length;\n  var last = n > 0 ? h[n - 1] : null;\n  var dirs = [[lim, 0], [0, lim], [-lim, 0], [0, -lim]];\n  function fin(x) { return typeof x === \"number\" && isFinite(x); }\n  function sgn(v) { return v < 0 ? -1 : 1; }\n  function clamp(v) { if (!fin(v)) { return 0; } if (v > lim) { return lim; } if (v < -lim) { return -lim; } return v; }\n  // 若某通道在上一步已接近行程邊界，且指令仍朝外推，則改為朝內退開\n  function retreat(u) {\n    var out = [u[0], u[1]];\n    if (last && last.applied && fin(last.applied[0]) && fin(last.applied[1])) {\n      for (var i = 0; i < 2; i++) {\n        var a = last.applied[i];\n        if (Math.abs(a) >= 0.09 && (out[i] === 0 || sgn(out[i]) === sgn(a))) {\n          out[i] = -sgn(a) * lim;\n        }\n      }\n    }\n    return [clamp(out[0]), clamp(out[1])];\n  }\n  function probe() {\n    var k = n % 4;\n    var u = [dirs[k][0], dirs[k][1]];\n    return { action: \"move\", u: retreat(u) };\n  }\n  // 卡住偵測：最近三步位移都很小\n  if (n >= 3) {\n    var stuck = true;\n    for (var q = n - 3; q < n; q++) {\n      var s0 = h[q];\n      if (!s0 || !s0.delta || !fin(s0.delta[0]) || !fin(s0.delta[1]) || Math.sqrt(s0.delta[0] * s0.delta[0] + s0.delta[1] * s0.delta[1]) >= 0.5) { stuck = false; break; }\n    }\n    if (stuck) { return probe(); }\n  }\n  // 近期樣本的區域線性擬合 delta ≈ J * applied\n  var start = Math.max(0, n - 12);\n  var M00 = 0, M01 = 0, M11 = 0, N00 = 0, N01 = 0, N10 = 0, N11 = 0, cnt = 0;\n  for (var i = start; i < n; i++) {\n    var s = h[i];\n    if (!s || !s.applied || !s.delta) { continue; }\n    var u0 = s.applied[0], u1 = s.applied[1], d0 = s.delta[0], d1 = s.delta[1];\n    if (!fin(u0) || !fin(u1) || !fin(d0) || !fin(d1)) { continue; }\n    if (Math.abs(u0) + Math.abs(u1) < 1e-6) { continue; }\n    cnt++;\n    M00 += u0 * u0; M01 += u0 * u1; M11 += u1 * u1;\n    N00 += d0 * u0; N01 += d0 * u1; N10 += d1 * u0; N11 += d1 * u1;\n  }\n  if (cnt < 2) { return probe(); }\n  var lam = 1e-7;\n  var a = M00 + lam, b = M01, c = M11 + lam;\n  var det = a * c - b * b;\n  if (!(det > 1e-12)) { return probe(); }\n  var J00 = (N00 * c - N01 * b) / det;\n  var J01 = (-N00 * b + N01 * a) / det;\n  var J10 = (N10 * c - N11 * b) / det;\n  var J11 = (-N10 * b + N11 * a) / det;\n  var detJ = J00 * J11 - J01 * J10;\n  var nrm = J00 * J00 + J01 * J01 + J10 * J10 + J11 * J11;\n  if (!fin(detJ) || !fin(nrm) || !(nrm > 0) || Math.abs(detJ) < 0.1 * nrm / 2) { return probe(); }\n  // 解 J u = e\n  var v0 = (J11 * ex - J01 * ey) / detJ;\n  var v1 = (-J10 * ex + J00 * ey) / detJ;\n  var m = Math.max(Math.abs(v0), Math.abs(v1));\n  if (!fin(m) || m === 0) { return probe(); }\n  var sc = Math.min(lim, Math.max(0.003, m)) / m;\n  v0 *= sc; v1 *= sc;\n  var uu = retreat([v0, v1]);\n  return { action: \"move\", u: [clamp(uu[0]), clamp(uu[1])] };\n}\n",
+   "analysis": {
+    "note": "Analysis only (--ignore-gate): both controller versions written in this run, replayed five trials per seed. Not a live result.",
+    "v1_rejectedByElbowCaseOnly": {
+     "2026": {
+      "completed": 5,
+      "actions": 157,
+      "trialActions": [
+       41,
+       28,
+       31,
+       25,
+       32
+      ],
+      "failure": null,
+      "gatePassed": false,
+      "gateIgnored": true
+     },
+     "3140": {
+      "completed": 5,
+      "actions": 154,
+      "trialActions": [
+       39,
+       32,
+       32,
+       25,
+       26
+      ],
+      "failure": null,
+      "gatePassed": false,
+      "gateIgnored": true
+     },
+     "8675": {
+      "completed": 5,
+      "actions": 169,
+      "trialActions": [
+       31,
+       39,
+       28,
+       36,
+       35
+      ],
+      "failure": null,
+      "gatePassed": false,
+      "gateIgnored": true
+     }
+    },
+    "v2_rejectedByAllCases": {
+     "2026": {
+      "completed": 0,
+      "actions": 180,
+      "trialActions": [
+       180
+      ],
+      "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+      "gatePassed": false,
+      "gateIgnored": true
+     },
+     "3140": {
+      "completed": 0,
+      "actions": 180,
+      "trialActions": [
+       180
+      ],
+      "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+      "gatePassed": false,
+      "gateIgnored": true
+     },
+     "8675": {
+      "completed": 0,
+      "actions": 180,
+      "trialActions": [
+       180
+      ],
+      "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+      "gatePassed": false,
+      "gateIgnored": true
+     }
+    }
+   }
+  },
+  {
+   "batch": "batch-20261015-230556",
+   "label": "y-s8675-r3-claude",
+   "device": "VLAB-Y",
+   "seed": 8675,
+   "completedTrials": 5,
+   "allTruthPlaced": true,
+   "failure": null,
+   "modelCalls": 95,
+   "frontCalls": 17,
+   "transientRetries": 0,
+   "rateLimitRetries": 0,
+   "decisionRejections": 1,
+   "actions": 180,
+   "xyActions": 140,
+   "unconfirmed": 0,
+   "limitedAcks": 0,
+   "ratioToBaseline": 1.01,
+   "controllerChannelKind": "rotary",
+   "controllerTestRatio": 1.03,
+   "twoLink": {
+    "required": true,
+    "reached": true,
+    "actions": 77,
+    "referenceActions": 69,
+    "ratio": 1.12,
+    "maxRatio": 1.3,
+    "passed": true
+   },
+   "driverGateAttempts": [
+    false,
+    true
+   ],
+   "controllerGateAttempts": [
+    false,
+    false,
+    true
+   ],
+   "controllerGateFailures": [
+    [
+     "起點貼近行程邊界"
+    ],
+    [
+     "二連桿肘關節極限繞行"
+    ]
+   ],
+   "driverGateFailures": [
+    [
+     "驅動程式拒絕失敗或毀損回覆"
+    ]
+   ],
+   "usage": {
+    "input_tokens": 490756,
+    "output_tokens": 53470,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0
+   },
+   "provenance": {
+    "driverSource": "claude-generated-no-template",
+    "controllerSource": "claude-generated"
+   },
+   "git": {
+    "commit": "c10bed1",
+    "dirtySourceOrTests": false
+   },
+   "generatedDriverSource": "function encode(command) {\n  var LIMIT = 0.1;\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"step requires exactly 2 channels\");\n    }\n    for (var i = 0; i < 2; i++) {\n      var v = command[i];\n      if (typeof v !== \"number\" || !isFinite(v)) {\n        throw new Error(\"channel value must be a finite number\");\n      }\n      if (v < -LIMIT || v > LIMIT) {\n        throw new Error(\"channel value out of range [-0.1, 0.1]\");\n      }\n    }\n    return JSON.stringify({ op: \"step\", channels: [command[0], command[1]] }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"lift position must be up or down\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"grip state must be open or closed\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"unsupported command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"reply must be a string\");\n  }\n  if (rawReply.indexOf(\"\\n\") !== rawReply.length - 1) {\n    throw new Error(\"reply must be exactly one LF-terminated line\");\n  }\n  var text = rawReply.slice(0, -1).trim();\n  if (text.length === 0) {\n    throw new Error(\"empty reply\");\n  }\n  var reply;\n  try {\n    reply = JSON.parse(text);\n  } catch (e) {\n    throw new Error(\"invalid JSON reply\");\n  }\n  if (!reply || typeof reply !== \"object\" || Array.isArray(reply)) {\n    throw new Error(\"reply is not an object\");\n  }\n  if (reply.ok === false) {\n    throw new Error(\"device rejected command: \" + (reply.error || \"unknown error\"));\n  }\n  if (reply.ok !== true) {\n    throw new Error(\"reply ok field must be true\");\n  }\n  if (reply.accepted === undefined) {\n    throw new Error(\"reply missing accepted field\");\n  }\n  if (reply.limited !== undefined && typeof reply.limited !== \"boolean\") {\n    throw new Error(\"limited field must be boolean\");\n  }\n  var acc = reply.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2) {\n      throw new Error(\"accepted step must have 2 channels\");\n    }\n    for (var j = 0; j < 2; j++) {\n      if (typeof acc[j] !== \"number\" || !isFinite(acc[j])) {\n        throw new Error(\"accepted channel must be a finite number\");\n      }\n      if (acc[j] < -0.1 || acc[j] > 0.1) {\n        throw new Error(\"accepted channel out of range\");\n      }\n    }\n  } else if (acc && typeof acc === \"object\") {\n    if (acc.op === \"lift\") {\n      if (acc.position !== \"up\" && acc.position !== \"down\") {\n        throw new Error(\"accepted lift position invalid\");\n      }\n    } else if (acc.op === \"grip\") {\n      if (acc.state !== \"open\" && acc.state !== \"closed\") {\n        throw new Error(\"accepted grip state invalid\");\n      }\n    } else {\n      throw new Error(\"accepted op invalid\");\n    }\n  } else {\n    throw new Error(\"accepted field has invalid type\");\n  }\n  return { applied: acc, limited: reply.limited === true };\n}\n",
+   "generatedControllerSource": "function control(state) {\n  var LIM = 0.1;\n  var tip = state.tip;\n  var tgt = state.target;\n  if (!tip || !tgt || !isFinite(tip[0]) || !isFinite(tip[1]) || !isFinite(tgt[0]) || !isFinite(tgt[1])) {\n    return { action: \"stop\", reason: \"invalid position\" };\n  }\n  var ex = tgt[0] - tip[0];\n  var ey = tgt[1] - tip[1];\n  var err = Math.sqrt(ex * ex + ey * ey);\n  if (err <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n  var h = state.history || [];\n  var n = h.length;\n\n  // Blocked channels: only the most recent two samples, so a channel that\n  // has just been freed by a retreat is not treated as blocked forever.\n  var blocked = [0, 0];\n  for (var k = Math.max(0, n - 2); k < n; k++) {\n    var e = h[k];\n    if (!e || !e.limited || !e.command || !e.applied) continue;\n    for (var i = 0; i < 2; i++) {\n      var c = e.command[i];\n      var a = e.applied[i];\n      if (typeof c !== \"number\" || typeof a !== \"number\" || !isFinite(c) || !isFinite(a)) continue;\n      if (c !== 0 && Math.abs(a) < 0.5 * Math.abs(c)) {\n        blocked[i] = c > 0 ? 1 : -1;\n      }\n    }\n  }\n\n  function pushesBlocked(u) {\n    for (var q = 0; q < 2; q++) {\n      if (u[q] !== 0 && blocked[q] !== 0 && ((u[q] > 0) ? 1 : -1) === blocked[q]) return true;\n    }\n    return false;\n  }\n\n  function retreatOnly() {\n    var r = [0, 0];\n    var any = false;\n    for (var q = 0; q < 2; q++) {\n      if (blocked[q] !== 0) {\n        r[q] = -blocked[q] * LIM;\n        any = true;\n      }\n    }\n    if (!any) return null;\n    return { action: \"move\", u: r };\n  }\n\n  function probe() {\n    var cands = [[LIM, 0], [0, LIM], [-LIM, 0], [0, -LIM]];\n    for (var t = 0; t < 4; t++) {\n      var c2 = cands[(n + t) % 4];\n      if (!pushesBlocked(c2)) return { action: \"move\", u: [c2[0], c2[1]] };\n    }\n    var r = retreatOnly();\n    if (r) return r;\n    return { action: \"stop\", reason: \"no admissible excitation\" };\n  }\n\n  // Regularized least squares: delta ~= J * applied over recent samples.\n  var start = Math.max(0, n - 16);\n  var S11 = 1e-6, S12 = 0, S22 = 1e-6;\n  var D11 = 0, D12 = 0, D21 = 0, D22 = 0;\n  var cnt = 0;\n  for (var s = start; s < n; s++) {\n    var uu = h[s].applied;\n    var dd = h[s].delta;\n    if (!uu || !dd || !isFinite(uu[0]) || !isFinite(uu[1]) || !isFinite(dd[0]) || !isFinite(dd[1])) continue;\n    if (Math.abs(uu[0]) + Math.abs(uu[1]) < 1e-9) continue;\n    cnt++;\n    S11 += uu[0] * uu[0];\n    S12 += uu[0] * uu[1];\n    S22 += uu[1] * uu[1];\n    D11 += dd[0] * uu[0];\n    D12 += dd[0] * uu[1];\n    D21 += dd[1] * uu[0];\n    D22 += dd[1] * uu[1];\n  }\n\n  var detS = S11 * S22 - S12 * S12;\n  if (cnt < 3 || detS < 1e-5) {\n    return probe();\n  }\n\n  var J11 = (D11 * S22 - D12 * S12) / detS;\n  var J12 = (-D11 * S12 + D12 * S11) / detS;\n  var J21 = (D21 * S22 - D22 * S12) / detS;\n  var J22 = (-D21 * S12 + D22 * S11) / detS;\n\n  if (n >= 1 && h[n - 1].applied && h[n - 1].delta) {\n    var ua = h[n - 1].applied;\n    var da = h[n - 1].delta;\n    var px = J11 * ua[0] + J12 * ua[1];\n    var py = J21 * ua[0] + J22 * ua[1];\n    var resid = Math.sqrt((px - da[0]) * (px - da[0]) + (py - da[1]) * (py - da[1]));\n    var dmag = Math.sqrt(da[0] * da[0] + da[1] * da[1]);\n    if (resid > 0.8 * dmag + 6) {\n      return probe();\n    }\n  }\n\n  var detJ = J11 * J22 - J12 * J21;\n  if (!isFinite(detJ) || Math.abs(detJ) < 1e-3) {\n    return probe();\n  }\n\n  var gain = err > 40 ? 1 : 0.5;\n  var ux = (J22 * ex - J12 * ey) / detJ * gain;\n  var uy = (-J21 * ex + J11 * ey) / detJ * gain;\n  if (!isFinite(ux) || !isFinite(uy)) {\n    return probe();\n  }\n  var u = [ux, uy];\n\n  // Blocked channel b: move it away from its limit (retreat), and let the\n  // other channel solve the remaining error using the fitted column.\n  var bad = [false, false];\n  for (var q2 = 0; q2 < 2; q2++) {\n    if (blocked[q2] !== 0 && u[q2] !== 0 && ((u[q2] > 0) ? 1 : -1) === blocked[q2]) bad[q2] = true;\n  }\n  if (bad[0] && bad[1]) {\n    var rr = retreatOnly();\n    return rr ? rr : probe();\n  }\n  if (bad[0] || bad[1]) {\n    var b = bad[0] ? 0 : 1;\n    var o = 1 - b;\n    var retB = -blocked[b] * LIM;\n    // residual after retreating channel b\n    var colB = (b === 0) ? [J11, J21] : [J12, J22];\n    var rex = ex - colB[0] * retB;\n    var rey = ey - colB[1] * retB;\n    var col = (o === 0) ? [J11, J21] : [J12, J22];\n    var cc = col[0] * col[0] + col[1] * col[1];\n    if (cc < 1e-6) {\n      var rr2 = retreatOnly();\n      return rr2 ? rr2 : probe();\n    }\n    var po = (col[0] * rex + col[1] * rey) / cc * gain;\n    u[b] = retB;\n    u[o] = po;\n  }\n\n  var m = Math.max(Math.abs(u[0]), Math.abs(u[1]));\n  if (m > LIM) {\n    u[0] = u[0] * LIM / m;\n    u[1] = u[1] * LIM / m;\n  }\n  u[0] = Math.max(-LIM, Math.min(LIM, u[0]));\n  u[1] = Math.max(-LIM, Math.min(LIM, u[1]));\n  if (!isFinite(u[0]) || !isFinite(u[1])) {\n    return probe();\n  }\n  if (pushesBlocked(u)) {\n    var rr3 = retreatOnly();\n    return rr3 ? rr3 : probe();\n  }\n  return { action: \"move\", u: u };\n}\n",
+   "crossSeedReplay": {
+    "2026": {
+     "completed": 5,
+     "actions": 168,
+     "trialActions": [
+      44,
+      29,
+      35,
+      28,
+      32
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "3140": {
+     "completed": 5,
+     "actions": 169,
+     "trialActions": [
+      44,
+      32,
+      35,
+      28,
+      30
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    },
+    "8675": {
+     "completed": 5,
+     "actions": 180,
+     "trialActions": [
+      35,
+      43,
+      31,
+      37,
+      34
+     ],
+     "failure": null,
+     "gatePassed": true,
+     "gateIgnored": false
+    }
+   }
+  }
+ ]
+}

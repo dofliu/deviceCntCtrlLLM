@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### VLAB-Y 保留評估（2026-10-15，使用者本機，E 版凍結後）
+
+紀錄：`validation/live-cli-holdout-Y-2026-10-15.json`（commit c10bed1）。8/9 組、40/45 回合，模擬器真值確認；無未確認動作、無重試。完成的 8 支控制程式跨三個 seed 重播 24/24，同 seed 動作數與真實相同；動作數對參考模組 0.95–1.05×。失敗的一組（8675 r2）在啟用前停止，原因是閘門拒絕後模型改寫出錯並誤判工具不可用。離線 `--ignore-gate` 分析：11 個被擋版本中 10 個可完成。命令列結果；結果未用於修改系統。
+
 ### 第二台保留設備 VLAB-Y（2026-10-15，離線 Node）
 
 紀錄：`validation/v7y-holdout-device.json`、`validation/v7y-offline-baseline.json`，新測試 `test_v7y_holdout_fivebar`。沒有呼叫真實模型，也沒有修改代理、閘門、提示或參考模組。
