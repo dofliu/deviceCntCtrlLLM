@@ -22,7 +22,8 @@
 //   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra  --out-dir dir  --label name
 //   --offline  --no-full
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
-//   --holdout  allow the held-out VLAB-X (--device X); adds it to the manual library
+//   --holdout  allow a held-out device: VLAB-X (--device X) or VLAB-Y (--device Y);
+//              adds VLAB-X (and VLAB-Y in its own runs) to the manual library
 //   --gate C|D|E (E)  E: D plus the elbow-limit two-link case on rotary manuals;
 //                   D: two-link case within 1.3x reference actions; C: reach-only
 //   --no-transient-retry  do not resend a model request after a timeout or HTTP 500/502/504/529
@@ -39,9 +40,9 @@ const arg = (name, fallback) => { const i = argv.indexOf(name); return i >= 0 &&
 const flag = name => argv.includes(name);
 const fail = message => { console.error(message); console.log('RESULT ' + JSON.stringify({ ok: false, error: message })); process.exit(2); };
 
-const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', X: 'VLAB-X', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3', 'VLAB-X': 'VLAB-X' };
-const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2, G3 or X.');
-if (device === 'VLAB-X' && !flag('--holdout')) fail('VLAB-X is the held-out evaluation device; add --holdout to run it.');
+const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', X: 'VLAB-X', Y: 'VLAB-Y', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3', 'VLAB-X': 'VLAB-X', 'VLAB-Y': 'VLAB-Y' };
+const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2, G3, X or Y.');
+if (['VLAB-X', 'VLAB-Y'].includes(device) && !flag('--holdout')) fail(device + ' is a held-out evaluation device; add --holdout to run it.');
 const seed = Number(arg('--seed', 2026));
 if (!Number.isInteger(seed) || seed < 1 || seed > 999999) fail('--seed must be an integer from 1 to 999999.');
 const manualTemplate = { on: true, off: false }[arg('--manual-template', 'off')];

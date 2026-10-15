@@ -20,8 +20,10 @@
   // the agent must still pick the matching document from the camera nameplate.
   // The held-out VLAB-X joins the library only when an experiment enables it
   // (includeHoldout); default runs keep the two-document library unchanged.
-  const DOCUMENTS=['VLAB-P2','VLAB-G3'],HOLDOUT_DOCUMENTS=['VLAB-X'];
-  const DEVICE_PRESETS={'VLAB-P2':{kinematics:'2r',deviceClass:'平面雙連桿手臂'},'VLAB-G3':{kinematics:'gantry',deviceClass:'雙軸直角座標龍門'},'VLAB-X':{kinematics:'corexy',deviceClass:'CoreXY 平面滑座',holdout:true}};
+  // The later held-out VLAB-Y joins only in its own runs, so VLAB-X runs keep
+  // the library they were evaluated with.
+  const DOCUMENTS=['VLAB-P2','VLAB-G3'],HOLDOUT_DOCUMENTS=['VLAB-X'],OWN_RUN_HOLDOUTS=['VLAB-Y'];
+  const DEVICE_PRESETS={'VLAB-P2':{kinematics:'2r',deviceClass:'平面雙連桿手臂'},'VLAB-G3':{kinematics:'gantry',deviceClass:'雙軸直角座標龍門'},'VLAB-X':{kinematics:'corexy',deviceClass:'CoreXY 平面滑座',holdout:true},'VLAB-Y':{kinematics:'fivebar',deviceClass:'五連桿平行手臂',holdout:true}};
   const CONTROLLER_MODES=['builtin','generated'];
   const USAGE=['input_tokens','output_tokens','cache_creation_input_tokens','cache_read_input_tokens','promptTokenCount','candidatesTokenCount','totalTokenCount','thoughtsTokenCount','cachedContentTokenCount'];
   function validateFrontDecision(value,allowed,library=DOCUMENTS){
@@ -52,7 +54,7 @@
     }
     _setExperimentOptions({device=this.device,manualTemplate=this.manualTemplate,controllerMode=this.controllerMode}={}){
       if(!DEVICE_PRESETS[device])throw new Error('未知的模擬設備型號。');
-      if(DEVICE_PRESETS[device].holdout&&!this.includeHoldout)throw new Error('VLAB-X 是保留的評估設備，須明確啟用（includeHoldout）才能使用。');
+      if(DEVICE_PRESETS[device].holdout&&!this.includeHoldout)throw new Error(device+' 是保留的評估設備，須明確啟用（includeHoldout）才能使用。');
       if(!CONTROLLER_MODES.includes(controllerMode))throw new Error('XY 控制模式必須是 builtin 或 generated。');
       this.device=device;this.manualTemplate=manualTemplate!==false;this.controllerMode=controllerMode;
     }
@@ -80,7 +82,7 @@
       this._configureInitialScenario?.();
       return this._emit({kind:'intro',title:'先認識設備、建立連線，再讓它動',explanation:'目前沒有通訊連線，也沒有已通過測試的控制程式。先區分影像假設、手冊規格與握手確認；所有步驟都會留下實際工具結果。這裡使用模擬設備與模擬主機介面。',nextLabel:'下一步：選擇第一個工具'});
     }
-    get documentLibrary(){return this.includeHoldout?[...DOCUMENTS,...HOLDOUT_DOCUMENTS]:DOCUMENTS.slice();}
+    get documentLibrary(){return this.includeHoldout?[...DOCUMENTS,...HOLDOUT_DOCUMENTS,...OWN_RUN_HOLDOUTS.filter(id=>id===this.device)]:DOCUMENTS.slice();}
     _traffic(){return typeof this._link?.traffic==='function'?this._link.traffic():[];}
     _frontState(){return {...copy(this._onboarding),traffic:copy(this._traffic()),completed:[...this._completed]};}
     _allowed(){

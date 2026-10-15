@@ -17,13 +17,16 @@
     #scenario = null; #destinationHeight = 0; #liftHeight = 1;
     #platformRadius = 24; #kinematics = '2r'; #travel = null;
     #backlash = 0; #motor = [0, 0]; #belt = [0, 0];
+    #five = null; #lastPoint = [0, 0];
 
     // kinematics '2r' is the original two-link arm; 'gantry' is a Cartesian
     // two-axis carriage with travel limits; 'corexy' (held-out VLAB-X) moves the
     // same kind of carriage with two coupled belt motors that have reversal
-    // backlash. All hide mapping, signs and gains.
+    // backlash; 'fivebar' (held-out VLAB-Y) is a closed-chain parallel arm whose
+    // two base motors meet at the tip through two passive distal links. All hide
+    // mapping, signs and gains.
     constructor({ seed = 42, width = 640, height = 480, kinematics = '2r' } = {}) {
-      if (!['2r', 'gantry', 'corexy'].includes(kinematics)) throw new Error('PLANT: unknown kinematics.');
+      if (!['2r', 'gantry', 'corexy', 'fivebar'].includes(kinematics)) throw new Error('PLANT: unknown kinematics.');
       this.#kinematics = kinematics;
       this.#width = Math.max(160, Math.round(width));
       this.#height = Math.max(120, Math.round(height));
@@ -61,6 +64,24 @@
         this.#gains = [0, 1].map(() => between(150, 190) * (this.#random() < 0.5 ? -1 : 1));
         this.#backlash = between(0.012, 0.02);
         this.#motor = [0, 0]; this.#belt = [0, 0];
+      } else if (this.#kinematics === 'fivebar') {
+        // Left and right motors sit on a base bar; each drives a proximal link,
+        // and two passive distal links join at the tip (elbows outward, tip
+        // above the elbow line). Slightly unequal sides; the whole mechanism
+        // is rotated by a hidden base angle about the work-area centre.
+        // Proportions (distal/proximal about 1.2, narrow motor spacing) and a
+        // task circle near the singularity margin make the local channel
+        // mapping turn and rescale along every transfer.
+        const proximal = [between(128, 138), between(128, 138)];
+        this.#five = {proximal, distal: proximal.map(v => v * between(1.15, 1.25)),
+          spacing: (proximal[0] + proximal[1]) / 2 * between(0.27, 0.33), baseAngle: between(-Math.PI, Math.PI), centre: 0, radius: 0};
+        this.#lengths = [this.#five.proximal[0], this.#five.distal[0]];
+        this.#mapping = this.#random() < 0.5 ? [0, 1] : [1, 0];
+        this.#gains = [0, 1].map(() => between(1.05, 1.4) * (this.#random() < 0.5 ? -1 : 1));
+        this.#fiveBarWorkspace();
+        const start = between(-Math.PI, Math.PI);
+        this.#q = this.#fiveBarIK([Math.cos(start) * this.#five.radius * .5, Math.sin(start) * this.#five.radius * .5]);
+        this.#lastPoint = this.#point();
       } else {
         this.#lengths = [between(82, 104), between(66, 82)];
         this.#q = [between(-2.1, -0.3), between(1.0, 1.9)];
@@ -101,7 +122,7 @@
       if (this.#attached) throw new Error('TRIAL: release the held object before changing the scene.');
       const pairs = [[-135,-25],[30,-90],[-145,-15],[35,155],[100,-30]];
       const heights = [0,.35,.65,.35,0];
-      const radius = this.#cartesian() ? Math.min(...this.#travel) * .84 : (this.#lengths[0] + this.#lengths[1]) * .77;
+      const radius = this.#cartesian() ? Math.min(...this.#travel) * .84 : this.#kinematics === 'fivebar' ? this.#five.radius * .92 : (this.#lengths[0] + this.#lengths[1]) * .77;
       const jitter = Math.sin(this.#seed * .173 + index * 2.1) * 3;
       const pointAt = degrees => {
         const angle = (degrees + jitter) * Math.PI / 180 - this.#camera.angle;
@@ -109,6 +130,9 @@
       };
       if (initialPose && this.#cartesian()) {
         this.#q = pointAt(135);
+        this.#lift = 'up'; this.#liftHeight = 1; this.#grip = 'open';
+      } else if (initialPose && this.#kinematics === 'fivebar') {
+        this.#q = this.#fiveBarIK(pointAt(135)); this.#lastPoint = this.#point();
         this.#lift = 'up'; this.#liftHeight = 1; this.#grip = 'open';
       } else if (initialPose) {
         const start = pointAt(135), [l1,l2] = this.#lengths;
@@ -139,6 +163,105 @@
 
     #cartesian() { return this.#kinematics === 'gantry' || this.#kinematics === 'corexy'; }
 
+    // Five-bar geometry in the mechanism frame: motors at (-s/2, 0) and
+    // (s/2, 0); q = absolute proximal angles. Returns null when the distal
+    // circles do not meet. The tip is the intersection left of e1 -> e2.
+    #fiveBarSolve(q) {
+      const f = this.#five, [la, lb] = f.proximal, [da, db] = f.distal, h0 = f.spacing / 2;
+      const e1 = [-h0 + la * Math.cos(q[0]), la * Math.sin(q[0])], e2 = [h0 + lb * Math.cos(q[1]), lb * Math.sin(q[1])];
+      const vx = e2[0] - e1[0], vy = e2[1] - e1[1], s = Math.hypot(vx, vy);
+      if (!(s > 1e-9) || s >= da + db || s <= Math.abs(da - db)) return null;
+      const a = (da * da - db * db + s * s) / (2 * s), h = Math.sqrt(Math.max(0, da * da - a * a));
+      const m = [e1[0] + a * vx / s, e1[1] + a * vy / s];
+      return {tip: [m[0] - h * vy / s, m[1] + h * vx / s], e1, e2, a1: [-h0, 0], a2: [h0, 0]};
+    }
+
+    // Signed link angles in degrees: elbow angles (proximal vs distal, per
+    // side) and the tip angle between the distal links. Near 0 or 180 the arm
+    // is at a serial or parallel singularity.
+    #fiveBarAngles(solution) {
+      const angle = (u, v) => Math.atan2(u[0] * v[1] - u[1] * v[0], u[0] * v[0] + u[1] * v[1]) * 180 / Math.PI;
+      const {tip, e1, e2, a1, a2} = solution, sub = (p, o) => [p[0] - o[0], p[1] - o[1]];
+      return {left: angle(sub(a1, e1), sub(tip, e1)), right: angle(sub(a2, e2), sub(tip, e2)), tip: angle(sub(e1, tip), sub(e2, tip))};
+    }
+
+    // Motion stops at 8 degrees from a serial (elbow) and 18 degrees from a
+    // parallel (tip) singularity; the task area keeps 14 and 24 degrees.
+    #fiveBarOK(q, elbow = 8, tip = 18) {
+      const solution = this.#fiveBarSolve(q);
+      if (!solution) return false;
+      const angles = this.#fiveBarAngles(solution);
+      return angles.left >= elbow && angles.left <= 180 - elbow && -angles.right >= elbow && -angles.right <= 180 - elbow && angles.tip >= tip && angles.tip <= 180 - tip;
+    }
+
+    // Mechanism frame <-> device frame (work-area centre at the origin).
+    #fiveBarToDevice(p) {
+      const f = this.#five, x = p[0], y = p[1] - f.centre, c = Math.cos(f.baseAngle), s = Math.sin(f.baseAngle);
+      return [c * x - s * y, s * x + c * y];
+    }
+    #fiveBarToMechanism(p) {
+      const f = this.#five, c = Math.cos(f.baseAngle), s = Math.sin(f.baseAngle);
+      return [c * p[0] + s * p[1], -s * p[0] + c * p[1] + f.centre];
+    }
+
+    // Elbows-outward inverse kinematics; point in the device frame.
+    #fiveBarIK(point, mechanism = false) {
+      const f = this.#five, p = mechanism ? point : this.#fiveBarToMechanism(point), q = [];
+      for (let side = 0; side < 2; side++) {
+        const ax = side ? f.spacing / 2 : -f.spacing / 2, dx = p[0] - ax, dy = p[1], r = Math.hypot(dx, dy);
+        const l1 = f.proximal[side], l2 = f.distal[side], cosine = (l1 * l1 + r * r - l2 * l2) / (2 * l1 * r);
+        if (!(r > 1e-9) || Math.abs(cosine) > 1) return null;
+        const phi = Math.atan2(dy, dx), alpha = Math.acos(cosine);
+        q.push(side ? phi - alpha : phi + alpha);
+      }
+      return q;
+    }
+
+    // Largest disk (centre on the symmetry axis) whose poses all keep a wider
+    // design margin than the motion stop; the task uses 92% of its radius.
+    #fiveBarWorkspace() {
+      const f = this.#five, rings = [1, .5], angles = 36;
+      const inside = (centre, radius) => {
+        for (let k = 0; k < angles; k++) for (const ring of rings) {
+          const a = 2 * Math.PI * k / angles, p = [Math.cos(a) * radius * ring, centre + Math.sin(a) * radius * ring];
+          const q = this.#fiveBarIK(p, true), solution = q && this.#fiveBarSolve(q);
+          if (!solution || Math.hypot(solution.tip[0] - p[0], solution.tip[1] - p[1]) > 1e-6 || !this.#fiveBarOK(q, 14, 24)) return false;
+        }
+        return true;
+      };
+      let best = {centre: 0, radius: 0};
+      for (let centre = 100; centre <= 300; centre += 4) {
+        if (!inside(centre, 10)) continue;
+        let low = 10, high = 260;
+        for (let i = 0; i < 14; i++) { const mid = (low + high) / 2; if (inside(centre, mid)) low = mid; else high = mid; }
+        if (low > best.radius) best = {centre, radius: low};
+      }
+      f.centre = best.centre; f.radius = best.radius;
+    }
+
+    #fiveBarSegment(from, to) {
+      for (let k = 1; k <= 8; k++) if (!this.#fiveBarOK(from.map((v, j) => v + (to[j] - v) * k / 8))) return false;
+      return true;
+    }
+
+    // Both motors stop together before a singular or unreachable pose; the
+    // ACK reports the accepted fraction and limited:true.
+    #actFiveBar(action) {
+      const amount = [0, 1].map(c => { const r = Number(action && action[c]); return clamp(Number.isFinite(r) ? r : 0, -0.10, 0.10); });
+      let limited = [0, 1].some(c => !Number.isFinite(Number(action && action[c])) || amount[c] !== Number(action[c]));
+      const after = scale => { const q = this.#q.slice(); for (let c = 0; c < 2; c++) q[this.#mapping[c]] += amount[c] * scale * this.#gains[c]; return q; };
+      let scale = 1, nextQ = after(1);
+      if (!this.#fiveBarSegment(this.#q, nextQ)) {
+        let low = 0, high = 1;
+        for (let i = 0; i < 30; i++) { const mid = (low + high) / 2; if (this.#fiveBarSegment(this.#q, after(mid))) low = mid; else high = mid; }
+        scale = low; nextQ = after(low); limited = true;
+      }
+      if (this.#scenario && this.#liftHeight < this.#destinationHeight - 1e-9) this.#checkSweep(nextQ);
+      this.#q = nextQ; this.#lastPoint = this.#point();
+      if (this.#attached) this.#object = this.#point();
+      return { applied: amount.map(v => v * scale), limited };
+    }
+
     // CoreXY with per-motor backlash: the belt follows the motor only after the
     // motor has taken up the slack w. The ACK reports the motor command the
     // controller accepted; the carriage moves by the belt displacement.
@@ -159,6 +282,7 @@
     act(action) {
       if (action && !Array.isArray(action)) return this.#manipulate(action);
       if (this.#kinematics === 'corexy') return this.#actCoreXY(action);
+      if (this.#kinematics === 'fivebar') return this.#actFiveBar(action);
       const applied = [0, 0];
       const nextQ = this.#q.slice();
       let limited = false;
@@ -258,6 +382,7 @@
 
     #point(q = this.#q) {
       if (this.#cartesian()) return [q[0], q[1]];
+      if (this.#kinematics === 'fivebar') { const solution = this.#fiveBarSolve(q); return solution ? this.#fiveBarToDevice(solution.tip) : this.#lastPoint.slice(); }
       return [
         this.#lengths[0] * Math.cos(q[0]) + this.#lengths[1] * Math.cos(q[0] + q[1]),
         this.#lengths[0] * Math.sin(q[0]) + this.#lengths[1] * Math.sin(q[0] + q[1])
@@ -287,10 +412,15 @@
       // to the controller. Goals are useful local-to-medium reaches, not a
       // fixed animation trajectory, and exclude poorly conditioned extremes.
       for (let attempt = 0; attempt < 40; attempt++) {
-        const q = this.#cartesian()
-          ? [(this.#random() * 2 - 1) * this.#travel[0] * .85, (this.#random() * 2 - 1) * this.#travel[1] * .85]
-          : [this.#q[0] + (this.#random() * 2 - 1) * 0.95, 0.65 + this.#random() * 1.6];
-        candidate = this.#point(q);
+        if (this.#kinematics === 'fivebar') {
+          const a = this.#random() * 2 * Math.PI, r = Math.sqrt(this.#random()) * this.#five.radius * .9;
+          candidate = [Math.cos(a) * r, Math.sin(a) * r];
+        } else {
+          const q = this.#cartesian()
+            ? [(this.#random() * 2 - 1) * this.#travel[0] * .85, (this.#random() * 2 - 1) * this.#travel[1] * .85]
+            : [this.#q[0] + (this.#random() * 2 - 1) * 0.95, 0.65 + this.#random() * 1.6];
+          candidate = this.#point(q);
+        }
         const distance = Math.hypot(candidate[0] - tip[0], candidate[1] - tip[1]);
         if (distance > 45 && distance < 175) break;
       }
@@ -367,6 +497,19 @@
         line(this.#project([point[0], -ty]), this.#project([point[0], ty]), 14 * fit, '#314758');
         line(this.#project([point[0], -ty]), this.#project([point[0], ty]), 7 * fit, '#8294a4');
         disk(tip, 11 * fit, '#263a4b');
+        disk(tip, 9 * fit, '#152838');
+      } else if (this.#kinematics === 'fivebar') {
+        // Base bar, two driven proximal links and two passive distal links.
+        const s = this.#fiveBarSolve(this.#q), to = p => this.#project(this.#fiveBarToDevice(p));
+        const a1 = to([-this.#five.spacing / 2, 0]), a2 = to([this.#five.spacing / 2, 0]);
+        line(a1, a2, 18 * fit, '#233c4b');
+        if (s) {
+          const e1 = to(s.e1), e2 = to(s.e2);
+          for (const [a, e] of [[a1, e1], [a2, e2]]) { line(a, e, 16 * fit, '#314758'); line(a, e, 10 * fit, '#a0afbb'); }
+          for (const e of [e1, e2]) { line(e, tip, 14 * fit, '#314758'); line(e, tip, 8 * fit, '#8294a4'); }
+          for (const e of [e1, e2]) { disk(e, 10 * fit, '#263a4b'); disk(e, 6 * fit, '#c1cad1'); }
+        }
+        for (const a of [a1, a2]) { disk(a, 9 * fit, '#d0d6dc'); disk(a, 3 * fit, '#263a4b'); }
         disk(tip, 9 * fit, '#152838');
       } else {
         disk(base, 23 * fit, '#233c4b');
@@ -463,10 +606,10 @@
           placed:!this.#attached && Math.abs(this.#objectHeight-this.#destinationHeight) < 1e-9 &&
             Math.hypot(this.#object[0]-this.#destination[0],this.#object[1]-this.#destination[1]) <= 12
         },
-        description: `裝置 #${this.#seed} · ${{gantry:'直角座標龍門機構',corexy:'CoreXY 皮帶機構'}[this.#kinematics] || '二連桿平面機構'} · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
+        description: `裝置 #${this.#seed} · ${{gantry:'直角座標龍門機構',corexy:'CoreXY 皮帶機構',fivebar:'五連桿平行機構'}[this.#kinematics] || '二連桿平面機構'} · 相機變更 ${this.#cameraVersion} · 馬達反轉 ${this.#motorFlips}${this.#scenario ? ` · 第 ${this.#scenario.trialNumber}/5 回合 · B 相對高度 ${this.#destinationHeight}` : ''}`,
         // Debug/evaluation only. Never include this object in worker messages.
         geometry: { kinematics: this.#kinematics, lengths: this.#lengths.slice(), jointAngles: this.#q.slice(),
-          channelToJoint: this.#mapping.slice(), channelGains: this.#gains.slice(), ...(this.#kinematics === 'corexy' ? {backlash: this.#backlash, motor: this.#motor.slice(), belt: this.#belt.slice()} : {}),
+          channelToJoint: this.#mapping.slice(), channelGains: this.#gains.slice(), ...(this.#kinematics === 'corexy' ? {backlash: this.#backlash, motor: this.#motor.slice(), belt: this.#belt.slice()} : {}), ...(this.#kinematics === 'fivebar' ? {fiveBar: {...this.#five, proximal: this.#five.proximal.slice(), distal: this.#five.distal.slice()}} : {}),
           camera: { ...this.#camera }, object:this.#object.slice(), destination:this.#destination.slice(),destinationHeight:this.#destinationHeight,platformRadius:this.#platformRadius }
       };
     }
