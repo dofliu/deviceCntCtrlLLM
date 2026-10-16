@@ -3,7 +3,7 @@
 ## 先讀
 
 `README.md` → `docs/CODEX_HANDOFF.md` → `docs/VALIDATION_STATUS.md` → `_research/STATE.md`。
-目前是 V7.0（報告版本 0.7.0）的開發版本；V7 新功能只有離線與無頭瀏覽器證據，不能宣稱真實模型已完成無範本驅動或控制程式產生。
+目前是 V7.0（報告版本 0.7.0）的開發版本。真實模型結果只有單一模型、每條件 3 seed × 3 次的先導層級證據；可用的宣稱與措辭以 `_research/CLAIMS.md`（作者已驗收的部分）為準，不得超過。
 
 ## 開發原則
 
