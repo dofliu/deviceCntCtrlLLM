@@ -124,3 +124,5 @@
 2026-10-15（作者決定）：閘門維持 E 版不改，VLAB-Y 上閘門案例未轉移的觀察寫進限制（LIVE_EXPERIMENTS_V7.md §7、§8；README 能力界線；DECISIONS.md）。沒有修改程式。
 
 2026-10-15（作者驗收）：CLAIMS.md「2026-10-15 追加」的宣稱措辭由作者定稿（本人驗收）；決策記入 DECISIONS.md。沒有修改程式或結果。
+
+2026-10-16（作者決定）：AGENTS.md「先讀」段的宣稱說明改為與 CLAIMS.md 定稿一致（先導層級、措辭以 CLAIMS.md 為準）；決策記入 DECISIONS.md。沒有修改程式。
