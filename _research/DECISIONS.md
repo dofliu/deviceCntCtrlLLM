@@ -39,3 +39,9 @@
 - 決策（作者）：第二個模型用 gemini-3.5-flash-lite（原指定的 gemini-3.8-flash-lite 在官方清單中只有語音合成版本），Gemini 實驗整體預算上限 US$20。
 - 理由：與 Haiku 同為各廠商的低成本層級；Claude 的團隊月額度不涵蓋 Gemini，需另計費用。
 - AI 依此在命令列執行器加入 Gemini 路徑（commit 2758d18），請求設定比照 Haiku 那次執行，並草擬 PROTOCOL.md 修正案 2。保留設備的 Gemini 實驗須待作者確認修正案、且 P2 先導確認流程後才執行。
+
+## 2026-10-17 Gemini 思考層級與修正案 2 確認
+- 決策（作者）：保留設備的 Gemini 實驗設定 `thinkingLevel: medium`（選項 B），並確認 PROTOCOL.md 修正案 2。
+- 理由：P2 先導 1 用模型預設時，Gemini 沒有產生思考 token；Haiku 5.5 以預設 adaptive thinking（effort medium）執行。設成 medium 讓推理條件對應。決定依原則，不依先導成敗。
+- 後續：先在 P2 跑先導 2，只檢查介接缺陷、截斷與費用；之後依序跑 VLAB-X、VLAB-Y 各 9 組。結果與 Haiku 分開報告，不用於修改系統。
+

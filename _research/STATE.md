@@ -134,3 +134,5 @@
 2026-10-17（第二個模型）：作者決定第二個模型用 gemini-3.5-flash-lite、預算上限 US$20。AI 在命令列執行器加入 Gemini 路徑（commit 2758d18）：`--provider gemini` 啟動 gemini_bridge.py，只認 gemini_api_key；請求設定比照 Haiku（輸出上限 8192／1400、思考用預設、逾時與伺服器錯誤重送一次並計入預算）；批次執行器加 `--max-usd` 估算費用上限。閘門、提示、參考模組、門檻與 Claude 請求內容未變；瀏覽器版 Gemini 預設不變。離線測試通過（新增 test_v7g_gemini_cli、test_v7g_batch_cost）；無頭 Chromium 的 test_gemini_workflow 在未修改的 HEAD 上同樣失敗，屬既有問題。未送出任何模型請求。草擬 PROTOCOL.md 修正案 2，待作者確認；保留設備的 Gemini 實驗須等確認後執行，P2 seed 2026 先導 1 組可先跑，用來確認流程與量測 token。
 
 2026-10-17（Gemini P2 先導）：作者本機以 gemini-3.5-flash-lite 跑 P2 seed 2026 一組（commit 474a1be）。流程正常（40 次呼叫、0 拒絕、0 重試，估算 US$0.098），結果 0/5：驅動閘門「拒絕失敗或毀損回覆」16 次測試都沒過，前段 40 次上限用完。離線檢查每一版驅動：會拒絕非 JSON 與 ok:false，但一直接受 accepted 內容無效的回覆。Haiku 收到相同回饋時第二版即通過。判讀為開發設備上的模型失敗，非介接缺陷；Gemini 思考 token 為 0（模型預設），與 Haiku 的 adaptive 預設不對等，是否設定思考層級待作者決定（修正案 2）。AI 新增 Gemini `--thinking-level` 選項（預設不送）並修正批次總表把未執行的測試記為「第一次通過」。沒有修改閘門、提示、手冊、參考模組或門檻。紀錄：validation/live-cli-pilot-gemini-P2-2026-10-17.json、LIVE_EXPERIMENTS §4.21。
+
+2026-10-17（作者決定）：Gemini 思考層級選 medium，PROTOCOL.md 修正案 2 確認（DECISIONS.md）。下一步由作者本機跑 P2 先導 2（`--thinking-level medium`），AI 檢查介接缺陷、截斷與費用後，再跑 VLAB-X、VLAB-Y 各 9 組。沒有修改程式。
