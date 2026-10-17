@@ -136,3 +136,5 @@
 2026-10-17（Gemini P2 先導）：作者本機以 gemini-3.5-flash-lite 跑 P2 seed 2026 一組（commit 474a1be）。流程正常（40 次呼叫、0 拒絕、0 重試，估算 US$0.098），結果 0/5：驅動閘門「拒絕失敗或毀損回覆」16 次測試都沒過，前段 40 次上限用完。離線檢查每一版驅動：會拒絕非 JSON 與 ok:false，但一直接受 accepted 內容無效的回覆。Haiku 收到相同回饋時第二版即通過。判讀為開發設備上的模型失敗，非介接缺陷；Gemini 思考 token 為 0（模型預設），與 Haiku 的 adaptive 預設不對等，是否設定思考層級待作者決定（修正案 2）。AI 新增 Gemini `--thinking-level` 選項（預設不送）並修正批次總表把未執行的測試記為「第一次通過」。沒有修改閘門、提示、手冊、參考模組或門檻。紀錄：validation/live-cli-pilot-gemini-P2-2026-10-17.json、LIVE_EXPERIMENTS §4.21。
 
 2026-10-17（作者決定）：Gemini 思考層級選 medium，PROTOCOL.md 修正案 2 確認（DECISIONS.md）。下一步由作者本機跑 P2 先導 2（`--thinking-level medium`），AI 檢查介接缺陷、截斷與費用後，再跑 VLAB-X、VLAB-Y 各 9 組。沒有修改程式。
+
+2026-10-17（Gemini P2 先導 2）：作者本機以 thinkingLevel medium 跑 P2 seed 2026（commit 13ba565）。修正案 2 的檢查都通過（無介接缺陷、截斷 0、每次呼叫約 US$0.0034，18 組最多約 US$9.1），結果 2/5：驅動與控制程式閘門都通過，第 3 回合控制程式在通道 B 的行程極限擺盪到 180 次上限。離線重播 seed 2026 2/5、3140 與 8675 各 5/5。這支控制程式通過 E 閘門（含肘關節案例）卻在 P2 失敗，是 CLAIMS「P2 上 E 版案例與完整重播一致」（依 Haiku 控制程式）的反例，待作者決定措辭；閘門不改。下一步：VLAB-X、VLAB-Y 各 9 組。紀錄：validation/live-cli-pilot2-gemini-P2-2026-10-17.json、LIVE_EXPERIMENTS §4.21。
