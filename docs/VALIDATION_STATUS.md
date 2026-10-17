@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### Gemini 先導 2：P2 seed 2026、thinkingLevel medium（2026-10-17，使用者本機，開發設備）
+
+紀錄：`validation/live-cli-pilot2-gemini-P2-2026-10-17.json`（commit 13ba565）。2/5，真值確認前兩回合；第 3 回合控制程式在行程極限擺盪到 180 次動作上限。無介接缺陷、截斷 0、1 次重送成功；每次呼叫約 US$0.0034，估算 US$0.245。離線重播：seed 2026 2/5（與真實逐一相同）、3140 與 8675 各 5/5。這是開發資料。
+
 ### Gemini 先導 P2 seed 2026（2026-10-17，使用者本機，開發設備）
 
 紀錄：`validation/live-cli-pilot-gemini-P2-2026-10-17.json`（commit 474a1be）。gemini-3.5-flash-lite，0/5：驅動閘門 16 次測試都在「拒絕失敗或毀損回覆」失敗，前段 40 次上限用完；沒有設備動作。流程正常：0 拒絕、0 重試；每次呼叫約 6,560 輸入、188 輸出、0 思考 token，估算 US$0.098。這是開發資料，不是保留設備結果。
