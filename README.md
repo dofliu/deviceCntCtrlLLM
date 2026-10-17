@@ -20,6 +20,8 @@
 - 真實模型結果（主要為 claude-haiku-5-5，每設備 × seed 最多 3 次）見下方「驗證與歷史」；仍不足以做統計上的成功率比較。第二個模型 gemini-3.5-flash-lite 在同樣的保留設備上只完成 VLAB-X 15/45、VLAB-Y 5/45（Haiku 為 45/45、40/45），多數卡在驅動閘門；完成率高度依賴模型（`_research/LIVE_EXPERIMENTS_V7.md` §4.22）。
 - 控制程式閘門的必要案例是依開發設備（P2／G3）的失敗設計。在保留設備 VLAB-Y（五連桿）上，11 次拒絕中有 10 次擋下的是實際可完成的程式，其中一組因此改寫出錯而失敗。作者決定閘門維持不改，列為限制；VLAB-Y 的結果是「閘門＋模型」整體的表現。
 
+論文英文初稿（草擬，未經作者驗收）：`paper/manuscript.md`，Word 版 `paper/manuscript.docx`。稿件中的總數、區間與圖由 `python paper/derive_numbers.py` 從 `validation/` 的紀錄重算（需 matplotlib、scipy）；匯出 Word：在 `paper/` 執行 `pandoc manuscript.md -o manuscript.docx --resource-path=.`。
+
 ## V6.3 模型等待與限流恢復
 
 - Claude／Gemini 的相鄰決策請求，開始時間預設至少相隔 6 秒，約每分鐘 10 次。設定頁可調整為 0–120 秒，0 表示停用固定間隔。這不是帳號配額保證；每分鐘詞元量、每日額度或其他共用金鑰的程式仍可能觸發限制。
