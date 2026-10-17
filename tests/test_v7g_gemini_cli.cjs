@@ -135,6 +135,17 @@ function runner(args, env) {
   assert.throws(() => harness('gemini', [], { maxOutputTokens: { onboarding: 0, other: 1400 } }), error => error.code === 'INVALID_OUTPUT_LIMIT');
   checks.push('Gemini can use the Claude output limits (8192 onboarding, 1400 afterwards); neither request sets thinking; the browser default stays 8192');
 
+  h = harness('gemini', [ok('gemini')], { thinkingLevel: 'medium', maxOutputTokens: { onboarding: 8192, other: 1400 } });
+  await h.run(control);
+  assert.deepEqual(h.requests[0].body.generationConfig, { candidateCount: 1, maxOutputTokens: 1400, thinkingConfig: { thinkingLevel: 'medium' } });
+  assert.throws(() => harness('gemini', [], { thinkingLevel: 'max' }), error => error.code === 'INVALID_THINKING_LEVEL');
+  // The bridge must accept the body the provider sends (fixture image swapped for a real 1x1 PNG).
+  h.requests[0].body.contents[0].parts[0].inlineData.data = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aVEcAAAAASUVORK5CYII=';
+  const bridgeCheck = spawnSync('python3', ['-c', 'import json,sys,importlib.util as u;s=u.spec_from_file_location("b",sys.argv[1]);m=u.module_from_spec(s);s.loader.exec_module(m);print(m.validate_message(json.loads(sys.stdin.read())))', path.join(root, 'gemini_bridge.py')],
+    { input: JSON.stringify({ model: 'gemini-3.5-flash-lite', ...h.requests[0].body }), encoding: 'utf8' });
+  assert.equal(bridgeCheck.stdout.trim(), 'True', bridgeCheck.stderr);
+  checks.push('an optional thinkingLevel is sent as generationConfig.thinkingConfig and accepted by gemini_bridge.validate_message; invalid levels are refused');
+
   // 3. Engine plumbing with the Gemini provider behind a stubbed bridge.
   const rt = createRuntime({ extraSources: ['gemini-provider.js'] }), g = rt.global, sent = [];
   const script = [
@@ -174,14 +185,16 @@ function runner(args, env) {
     assert.equal(r.status, 2); assert.match(r.result.error, /--key-env for gemini must be gemini_api_key/);
     r = runner(['--provider', 'openai', '--device', 'P2'], env);
     assert.equal(r.status, 2); assert.match(r.result.error, /--provider must be claude or gemini/);
-    r = runner(['--provider', 'gemini', '--model', 'gemini-3.5-flash-lite', '--device', 'P2', '--seed', '2026', '--trials', '1', '--out-dir', tmp, '--label', 'nokey', '--port', '8796'], env);
+    r = runner(['--thinking-level', 'medium', '--device', 'P2'], env);
+    assert.equal(r.status, 2); assert.match(r.result.error, /--thinking-level is for --provider gemini/);
+    r = runner(['--provider', 'gemini', '--model', 'gemini-3.5-flash-lite', '--thinking-level', 'medium', '--device', 'P2', '--seed', '2026', '--trials', '1', '--out-dir', tmp, '--label', 'nokey', '--port', '8796'], env);
     assert.equal(r.status, 1, r.stdout.slice(-600)); assert.equal(r.result.modelCalls, 0);
     assert.match(r.result.error, /gemini_api_key \/ GEMINI_API_KEY \/ Gemini_API_Key is not set in this environment; no request was sent/);
     const summary = JSON.parse(fs.readFileSync(path.join(tmp, 'nokey.summary.json'), 'utf8'));
     assert.equal(summary.kind, 'live-model-run'); assert.equal(summary.provider, 'gemini'); assert.equal(summary.model, 'gemini-3.5-flash-lite');
     assert.deepEqual(summary.condition.modelSettings.maxOutputTokens, { onboarding: 8192, other: 1400 });
-    assert.equal(summary.condition.maxTransientRetries, 1);
-    checks.push('runner --provider gemini: model required, only gemini_api_key accepted, unknown provider rejected; without the key it stops before the bridge with 0 calls and a summary naming provider, model and request limits');
+    assert.equal(summary.condition.maxTransientRetries, 1); assert.equal(summary.condition.modelSettings.thinking, 'thinkingLevel medium');
+    checks.push('runner --provider gemini: model required, only gemini_api_key accepted, unknown provider rejected, --thinking-level only for gemini; without the key it stops before the bridge with 0 calls and a summary naming provider, model, request limits and thinking level');
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 
   const result = { version: '0.7.0', kind: 'offline-node', date: new Date().toISOString().slice(0, 10), node: process.version,

@@ -104,18 +104,21 @@
     return out;
   }
   class GeminiAgentProvider {
-    #key;#model;#bridge;#maxCalls;#timeoutMs;#calls=0;#active=null;#disposed=false;#scheduler;#outputLimits;
+    #key;#model;#bridge;#maxCalls;#timeoutMs;#calls=0;#active=null;#disposed=false;#scheduler;#outputLimits;#thinkingLevel;
     // maxTransientRetries (default 0) resends a request once after a timeout or a
     // transient server failure, counted in the budget like every attempt.
     // maxOutputTokens is one limit for every phase (default 8192) or
-    // {onboarding,other}; it includes thinking tokens.
-    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,maxOutputTokens=8192,onRequestStatus}={}){
+    // {onboarding,other}; it includes thinking tokens. thinkingLevel is sent only
+    // when given; otherwise the model default applies.
+    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,maxOutputTokens=8192,thinkingLevel,onRequestStatus}={}){
       this.#bridge=bridgeOf(bridgeUrl);this.#key=this.#bridge?'':keyOf(apiKey);this.#model=modelOf(model);
       if(!Number.isInteger(maxCalls)||maxCalls<1||maxCalls>500)fail('INVALID_BUDGET','Gemini 呼叫上限必須介於 1 與 500。');
       checkTimeout(timeoutMs);this.#maxCalls=maxCalls;this.#timeoutMs=timeoutMs;
       const limits=typeof maxOutputTokens==='number'?{onboarding:maxOutputTokens,other:maxOutputTokens}:maxOutputTokens;
       if(!record(limits)||![limits.onboarding,limits.other].every(v=>Number.isInteger(v)&&v>=1&&v<=16384))fail('INVALID_OUTPUT_LIMIT','Gemini 輸出 token 上限必須介於 1 與 16384。');
       this.#outputLimits={onboarding:limits.onboarding,other:limits.other};
+      if(thinkingLevel!==undefined&&!['minimal','low','medium','high'].includes(thinkingLevel))fail('INVALID_THINKING_LEVEL','Gemini 思考層級必須是 minimal、low、medium 或 high。');
+      this.#thinkingLevel=thinkingLevel;
       if(!requests?.ModelRequestScheduler)fail('MISSING_CONTRACT','尚未載入 AI 請求排程器，請重新建置並開啟完整介面。');
       this.#scheduler=new requests.ModelRequestScheduler({minIntervalMs,maxRateLimitRetries,maxTransientRetries,isTransient:error=>error?.transient===true,onRequestStatus,makeError:(code,meta)=>requests.schedulingError(ProviderError,'Gemini',code,meta)});
     }
@@ -138,7 +141,7 @@
         contents:[{role:'user',parts:[{inlineData:{mimeType:'image/png',data:shared('cameraPNG',frame)}},{text:'目前可檢查的狀態（每次請求是獨立決策，以此狀態為準）：\n'+evidence+'\n選擇一個工具並提供完整 args 與 reason；expected 為選填。'}]}],
         tools:[{functionDeclarations:safe.allowedTools.map(name=>toolDefinition(name,safe.documentLibrary))}],
         toolConfig:{functionCallingConfig:{mode:'ANY',allowedFunctionNames:safe.allowedTools.slice()}},
-        generationConfig:{candidateCount:1,maxOutputTokens:safe.phase==='onboarding'?this.#outputLimits.onboarding:this.#outputLimits.other}
+        generationConfig:{candidateCount:1,maxOutputTokens:safe.phase==='onboarding'?this.#outputLimits.onboarding:this.#outputLimits.other,...(this.#thinkingLevel?{thinkingConfig:{thinkingLevel:this.#thinkingLevel}}:{})}
       };
       const connection=transport(this.#bridge,this.#key);
       const url=this.#bridge?connection.base+'/generateContent':connection.base+'/models/'+encodeURIComponent(this.#model)+':generateContent';

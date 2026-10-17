@@ -60,6 +60,8 @@ def parse_args():
                    help="Key variable name (default ANTHROPIC_API_KEY for claude, gemini_api_key for gemini).")
     p.add_argument("--port", type=int, default=None,
                    help="Bridge port (default 8766 claude, 8767 gemini). Run batches one at a time, or give each concurrent batch its own port.")
+    p.add_argument("--thinking-level", choices=("minimal", "low", "medium", "high"), default=None,
+                   help="Gemini only: set thinkingConfig.thinkingLevel (default: not set, the model default).")
     p.add_argument("--max-usd", type=float, default=None,
                    help="Stop starting runs when the estimated token cost would pass this cap (needs both price options).")
     p.add_argument("--usd-per-mtok-in", type=float, default=None, help="Input price per 1M tokens used for the estimate.")
@@ -97,6 +99,8 @@ def run_one(args, device, seed, rep, max_calls, out_dir):
         cmd.append("--holdout")
     if args.no_transient_retry and not args.offline:
         cmd.append("--no-transient-retry")
+    if args.thinking_level and not args.offline:
+        cmd += ["--thinking-level", args.thinking_level]
     print(f"\n=== {label} (cap {0 if args.offline else max_calls} calls) ===", flush=True)
     result = None
     with subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, text=True, encoding="utf-8", errors="replace") as proc:
@@ -131,6 +135,12 @@ def estimated_usd(args, tokens_in, tokens_out):
     return round((tokens_in * args.usd_per_mtok_in + tokens_out * args.usd_per_mtok_out) / 1e6, 4)
 
 
+def first_try(steps, tool):
+    """True/False for the first result of a test tool; None when the tool never ran."""
+    results = [ok for t, ok in steps or [] if t == tool]
+    return None if not results else not any(not ok for ok in results)
+
+
 def row_for(args, label, device, seed, rep, code, result, summary):
     s = summary or {}
     tokens_in, tokens_out, thoughts = token_counts(s.get("usage"))
@@ -147,8 +157,8 @@ def row_for(args, label, device, seed, rep, code, result, summary):
         "rateLimitRetries": s.get("rateLimitRetries"), "transientRetries": s.get("transientRetries"), "actions": s.get("actionCount"), "xyActions": s.get("xyActionCount"),
         "unconfirmed": s.get("unconfirmedActuationCount"), "maxPlacementErrorPx": max(errs) if errs else None,
         "controllerTestRatio": (ct.get("efficiency") or {}).get("ratio"), "twoLinkRatio": ((ct.get("efficiency") or {}).get("nonlinearArm") or {}).get("ratio"), "medianStep": step.get("medianMaxAbsU"),
-        "driverFirstTry": None if not s.get("onboardingSteps") else not any(t == "test_driver" and not ok for t, ok in s["onboardingSteps"]),
-        "controllerFirstTry": None if not s.get("onboardingSteps") else not any(t == "test_controller" and not ok for t, ok in s["onboardingSteps"]),
+        "driverFirstTry": first_try(s.get("onboardingSteps"), "test_driver"),
+        "controllerFirstTry": first_try(s.get("onboardingSteps"), "test_controller"),
         "inputTokens": tokens_in, "outputTokens": tokens_out, "thoughtsTokens": thoughts,
         "estimatedUsd": None if args.offline or summary is None else estimated_usd(args, tokens_in, tokens_out),
         "summary": result.get("summary") if result else None, "runnerError": (result or {}).get("error"),
@@ -178,6 +188,8 @@ def main():
     args.port = args.port or spec["port"]
     if args.key_env not in spec["keys"]:
         sys.exit(f"--key-env for {args.provider} must be one of {', '.join(spec['keys'])}.")
+    if args.thinking_level and args.provider != "gemini":
+        sys.exit("--thinking-level applies to --provider gemini only.")
     if args.max_usd is not None and (args.max_usd <= 0 or args.usd_per_mtok_in is None or args.usd_per_mtok_out is None):
         sys.exit("--max-usd needs a positive cap plus --usd-per-mtok-in and --usd-per-mtok-out (official prices at run time).")
     per_run = max(1, min(500, args.max_calls_per_run))
@@ -246,6 +258,7 @@ def main():
         "createdAt": dt.datetime.now().isoformat(timespec="seconds"), "provider": None if args.offline else args.provider, "model": None if args.offline else args.model,
         "condition": {"manualTemplate": args.manual_template, "controllerMode": args.controller_mode, "trials": args.trials, "goalTarget": "legacy re-measured" if args.legacy_target else "fixed at select_goal", "gate": args.gate, "holdout": args.holdout,
                       "transientRetry": None if args.offline else not args.no_transient_retry,
+                      "thinkingLevel": None if args.offline else (args.thinking_level or "model default"),
                       "minIntervalMs": None if args.offline else args.min_interval_ms},
         "budget": None if args.offline else {"perRun": per_run, "total": args.total_max_calls, "remaining": remaining,
                                              "maxUsd": args.max_usd, "usdPerMTokIn": args.usd_per_mtok_in, "usdPerMTokOut": args.usd_per_mtok_out,

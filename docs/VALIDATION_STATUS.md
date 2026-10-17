@@ -31,6 +31,16 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### Gemini 先導 P2 seed 2026（2026-10-17，使用者本機，開發設備）
+
+紀錄：`validation/live-cli-pilot-gemini-P2-2026-10-17.json`（commit 474a1be）。gemini-3.5-flash-lite，0/5：驅動閘門 16 次測試都在「拒絕失敗或毀損回覆」失敗，前段 40 次上限用完；沒有設備動作。流程正常：0 拒絕、0 重試；每次呼叫約 6,560 輸入、188 輸出、0 思考 token，估算 US$0.098。這是開發資料，不是保留設備結果。
+
+### Gemini 思考層級選項與總表修正（2026-10-17，雲端 Linux，離線）
+
+- `--thinking-level minimal|low|medium|high`（只限 Gemini）：請求加上 `generationConfig.thinkingConfig.thinkingLevel`，橋接的 `validate_message` 接受；預設不送，行為不變。
+- `run_experiments.py` 的 driverFirstTry／controllerFirstTry 在該測試從未執行時改為空值（先導總表曾把未執行的控制程式測試記為 True）。
+- 測試：`test_v7g_gemini_cli.cjs`、`test_v7g_batch_cost.py` 擴充後通過。回歸：test_gemini_provider、test_claude_provider、test_v63_provider_pacing、test_v63_model_reporting、test_v70_cli_runner，以及 test_gemini_bridge、test_v70_bridge_tool_parity、test_v63_bridge_limits 通過；被改寫的舊驗證檔已還原。
+
 ### 命令列 Gemini 路徑（2026-10-17，雲端 Linux，離線）
 
 紀錄：`validation/v7g-gemini-cli.json`、`validation/v7g-batch-cost.json`，新測試 `test_v7g_gemini_cli.cjs`、`test_v7g_batch_cost.py`（commit 2758d18）。沒有金鑰、沒有網路請求、沒有模型呼叫。

@@ -11,7 +11,8 @@
     "no third attempt; no resend for a missing key, budget refusal or 4xx; an exhausted budget stops the resend; the default (browser) Gemini provider still never resends",
     "Claude keeps its own rule (529 resent, 503 not): the scheduler default is unchanged",
     "Gemini can use the Claude output limits (8192 onboarding, 1400 afterwards); neither request sets thinking; the browser default stays 8192",
+    "an optional thinkingLevel is sent as generationConfig.thinkingConfig and accepted by gemini_bridge.validate_message; invalid levels are refused",
     "headless engine with the Gemini provider: bridge route, model and limits in each request; report keeps strategy, model, call count and summed usage including thinking tokens",
-    "runner --provider gemini: model required, only gemini_api_key accepted, unknown provider rejected; without the key it stops before the bridge with 0 calls and a summary naming provider, model and request limits"
+    "runner --provider gemini: model required, only gemini_api_key accepted, unknown provider rejected, --thinking-level only for gemini; without the key it stops before the bridge with 0 calls and a summary naming provider, model, request limits and thinking level"
   ]
 }
