@@ -57,3 +57,7 @@
 - 未選：B（以驗證層的作用與界限為主；含三件事，易被讀成安全性宣稱）、C（改為評估協定類型；協定 v1.0 屬事後整理、設備只有四台）。
 - 閘門的兩個發現放在主要觀察與討論。英文稿「alone」一詞的範圍待作者確認（見 CONTRIBUTION.md 第 1 題）。
 
+## 2026-10-17 一句話貢獻措辭修正
+- 決策（作者）：照 AI 建議，把「只依手冊與相機證據／from manuals and camera evidence alone」改為「在不提供驅動範本的條件下，依手冊、相機影像與工具回饋／from manuals, camera images and tool feedback, without a driver template」。
+- 理由：模型實際還看到握手回覆、工具結果與測試回饋，原句範圍比證據窄。
+

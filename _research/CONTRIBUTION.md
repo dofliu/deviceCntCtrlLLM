@@ -2,11 +2,11 @@
 
 狀態：v2（2026-10-16 AI 依作者選定方向改寫）；第 1 題一句話貢獻由作者 2026-10-17 選定，其餘各題仍是草擬，期刊（第 8 題）待定。作者已選定：方向「規格生成＋閘門驗證」、期刊全文、英文撰寫（見 DECISIONS.md）。v1（2026-10-12）保留在文末。
 
-1. **一句話貢獻（作者 2026-10-17 選定）**：在系統凍結後才評估的兩台保留模擬設備上，語言模型只依手冊與相機證據寫出的通訊驅動與閉迴路控制程式，經主機端驗證後可完成取放（claude-haiku-5-5：85/90 回合），但完成率強烈依賴模型（gemini-3.5-flash-lite：20/90）。
-   - English: On two held-out simulated devices evaluated only after the system was frozen, drivers and closed-loop controllers that a language model wrote from manuals and camera evidence alone completed pick-and-place after host-side verification (claude-haiku-5-5: 85/90 trials), but completion depended strongly on the model (gemini-3.5-flash-lite: 20/90).
+1. **一句話貢獻（作者 2026-10-17 選定）**：在系統凍結後才評估的兩台保留模擬設備上，在不提供驅動範本的條件下，語言模型依手冊、相機影像與工具回饋寫出的通訊驅動與閉迴路控制程式，經主機端驗證後可完成取放（claude-haiku-5-5：85/90 回合），但完成率強烈依賴模型（gemini-3.5-flash-lite：20/90）。
+   - English: On two held-out simulated devices evaluated only after the system was frozen, drivers and closed-loop controllers that a language model wrote from manuals, camera images and tool feedback, without a driver template, completed pick-and-place after host-side verification (claude-haiku-5-5: 85/90 trials), but completion depended strongly on the model (gemini-3.5-flash-lite: 20/90).
    - 證據：live-cli-holdout-X/Y-2026-10-15.json（Haiku 45/45＋40/45）、live-cli-holdout-gemini-X/Y-2026-10-17.json（Gemini 15/45＋5/45）；CLAIMS 已驗收。
    - 閘門的兩個發現（未通過閘門的組都在設備動作前停止；閘門案例不轉移到五連桿）放在主要觀察與討論，不進一句話貢獻。
-   - 措辭待確認：「只依手冊與相機證據／alone」比實際窄。模型還看到握手回覆、工具結果與測試回饋，且有預寫的任務層與影像驗證器。
+   - 措辭（作者 2026-10-17 確認）：原句「只依手冊與相機證據／alone」比實際範圍窄，改為「不提供驅動範本、依手冊、相機影像與工具回饋」。任務層與影像驗證器為預寫，於 Methods 與限制說明。
 2. **誰的決策會改變**：建構「讓語言模型接手陌生設備」系統的研究者與整合者。(a) 模型產生的程式與設備之間要放哪些驗證層（驅動乾跑測試、以合成設備做隔離測試、執行中違約即停）；(b) 依開發設備失敗設計的閘門案例，在新機構上可能擋下可用程式，閘門應依機構類別設計或區分必要與只回報；(c) 評估做法：開發／保留設備分離、凍結後評估、離線重播核對。
 3. **現有最強做法**：見 REFERENCES.md（9 篇初步核實，非系統性回顧）。近鄰為 Code as Policies（模型寫機器人策略程式，但假設已知機器人 API）、NeSyRo（程式策略的神經符號驗證）、RACAS（單一代理控制多種機器人）、手冊驅動的 fieldbus 自動配置、Neural Jacobian Fields（非 LLM，從影像學運動映射）。
    - 弱點／未知：沒有同任務、同資訊條件下可比的公開數字；尚未確認是否已有「未知線路協定＋未知運動學＋凍結後保留設備」的同類評估。在完成文獻檢查前不得用「first」「novel」。
