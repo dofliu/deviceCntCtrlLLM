@@ -27,3 +27,18 @@
 - 驗證各公開實作能否在共同觀測、訓練與運算預算下比較。
 - 查期刊目前收稿範圍及近年同類研究，再由作者選定投稿目標。
 
+
+## 2026-10-17 追加（摘要層級核實；待精讀全文）
+
+核實方式：arXiv 摘要頁或會議頁面。下列「與本案的差異」是我們依摘要的推論，精讀全文前不得在稿件中當作對方的完整描述。
+
+| 文獻 | 出處與連結 | 已核對內容及與本案的差異 |
+|---|---|---|
+| Englhardt et al., Exploring and Characterizing Large Language Models For Embedded System Development and Debugging (2023) | [arXiv:2307.03817](https://arxiv.org/abs/2307.03817)（v2 2023-11-22；另有 CHI EA 2024 版本待核實） | 以硬體在環框架驗證 LLM 寫的嵌入式程式（GPT-3.5、GPT-4、PaLM 2，N=450）；GPT-4 在 50 次中 66% 寫出可用 I2C 介面。硬體與感測器已知，沒有未知運動映射或保留設備評估。 |
+| Fakih et al., LLM4PLC: Harnessing Large Language Models for Verifiable Programming of PLCs in Industrial Control Systems (2024) | [arXiv:2401.05443](https://arxiv.org/abs/2401.05443v1)；[ICSE-SEIP 2024](https://conf.researchr.org/details/icse-2024/icse-2024-software-engineering-in-practice/32/LLM4PLC-Harnessing-Large-Language-Models-for-Verifiable-Programming-of-PLCs-in-Indus) | 以文法檢查、編譯器、SMV 模型檢查器包住 LLM 產生 PLC 程式；生成成功率 47%→72%（arXiv v1 摘要）。「生成後經外部驗證」與我們的主機端閘門同類；但目標是已知控制規格，不是陌生設備。 |
+| Vemprala et al., ChatGPT for Robotics: Design Principles and Model Abilities (2023) | [arXiv:2306.17582](https://arxiv.org/abs/2306.17582v1)；Microsoft MSR-TR-2023-8 | 以提示原則與高階函式庫讓 ChatGPT 控制多種機器人與模擬器。假設已有函式庫（已知 API），不處理線路協定與未知映射。 |
+| Tripathi, Akbarian Bafghi & Raissi, Test-Driven Agentic Framework for Reliable Robot Controller (2026，預印本) | [arXiv:2603.00455](https://arxiv.org/abs/2603.00455) | 依結構化測試套件反覆修正 LLM 產生的導航控制程式（2D、Webots）。以測試驅動修正與我們的隔離閘門相近；摘要未提保留設備或未見本體。 |
+| Flerlage, Wittkopp, Acker & Kao, Adaptive Code Generation for Controlling Robots (2026，ISoLA 2026) | [arXiv:2610.09588](https://arxiv.org/abs/2610.09588v1) | LLM 產生限制於正式函式庫的程式，VLM 提供語意基準，含執行期監控與重新規劃。摘要未說明機器人是否未知、是否寫低階控制。 |
+| Shastri et al., LLM-Driven Auto Configuration for Transient IoT Device Collaboration (CollabIoT, 2025) | [arXiv:2507.03064](https://arxiv.org/abs/2507.03064)；[作者 PDF](https://lass.cs.umass.edu/papers/pdf/sec25-llm_autoconfig.pdf) | LLM 把使用者意圖轉為陌生環境中設備的存取控制政策。屬「陌生設備自動配置」，但處理的是權限政策，不是驅動或閉迴路控制。 |
+
+搜尋紀錄（2026-10-17，非系統性）：「LLM 依 datasheet 產生驅動並評估」「LLM 代理接手未知 Modbus 設備」「LLM 控制未知機器人並由相機學運動映射」三組搜尋都沒有找到同時涵蓋未知線路協定、未知運動學與保留設備評估的研究；這只代表本次搜尋沒找到，投稿前須做系統性檢索，不得據此寫「first」。
