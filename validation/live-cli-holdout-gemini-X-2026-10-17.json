@@ -1,0 +1,1110 @@
+{
+  "kind": "live-model-holdout-evaluation",
+  "version": "E (frozen; runs report commit b3a3b82, clean)",
+  "runner": "run_experiments.py --provider gemini --thinking-level medium --holdout -> tests/live_claude_v7.cjs (headless-node, command line)",
+  "source": "author local machine, batch-20261017-204635 (one batch, --repeat 3: r1 of the three seeds, then r2, then r3)",
+  "protocol": "PROTOCOL.md amendment 2 (author-confirmed 2026-10-17); pilots: validation/live-cli-pilot-gemini-P2-2026-10-17.json, live-cli-pilot2-gemini-P2-2026-10-17.json",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "device": "VLAB-X",
+  "condition": {
+    "manualTemplate": "off",
+    "controllerMode": "generated",
+    "trials": 5,
+    "goalTarget": "fixed at select_goal",
+    "gate": "E",
+    "holdout": true,
+    "transientRetry": true,
+    "thinkingLevel": "medium",
+    "minIntervalMs": 6000,
+    "maxOutputTokens": {
+      "onboarding": 8192,
+      "other": 1400
+    },
+    "toolChoice": "ANY",
+    "perRunCallCap": 150
+  },
+  "freeze": "System frozen at E. These results did not and must not change the gate, prompts, manuals, reference module, thresholds or Gemini settings.",
+  "baseline": {
+    "referenceModuleTemplateOff": {
+      "2026": 166,
+      "3140": 163,
+      "8675": 165
+    },
+    "note": "ratioToBaseline = live actions / offline reference module actions on the same seed (completed runs only)"
+  },
+  "summary": {
+    "runs": 9,
+    "completeRuns": 3,
+    "trials": "15/45",
+    "ratioMedian": 1.11,
+    "ratioRange": [
+      0.99,
+      1.18
+    ],
+    "stoppedAt": {
+      "driver gate": 6,
+      "controller gate": 0,
+      "mission/control": 0,
+      "done": 3
+    },
+    "driverGatePassedRuns": 3,
+    "driverFirstTry": 0,
+    "controllerFirstTry": 0,
+    "decisionRejectionsTotal": 12,
+    "truncationsTotal": 12,
+    "transientRetriesTotal": 0,
+    "rateLimitRetriesTotal": 0,
+    "unconfirmedTotal": 0,
+    "modelCalls": 508,
+    "estimatedUsd": 2.5704,
+    "driverVersionsChecked": 99,
+    "driverVersionsAcceptingInvalidReplies": {
+      "lift value 7": 94,
+      "short read reply": 2
+    },
+    "truncationNote": "Every decision rejection was a truncated response (stop-reason MAX_TOKENS during onboarding). The trace keeps a decision-rejected event for each except the third of x-s8675-r1, which ended the run (correction limit 2).",
+    "gateRejectedControllerVersions": {
+      "versions": 3,
+      "wouldCompleteAllThreeSeeds": 3,
+      "note": "analysis only (--ignore-gate); never a reported result"
+    },
+    "crossSeedReplaysComplete": "9/9",
+    "ownSeedReplayMatchesLive": true
+  },
+  "runs": [
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s2026-r1-gemini",
+      "device": "VLAB-X",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 16,
+      "driverDistinctVersions": 13,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 19
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 360231,
+        "candidatesTokenCount": 27843,
+        "totalTokenCount": 442787,
+        "thoughtsTokenCount": 54713,
+        "cachedContentTokenCount": 201244
+      },
+      "estimatedUsd": 0.3145,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buffer) {\n    let crc = 0xFFFF;\n    for (let i = 0; i < buffer.length; i++) {\n        crc ^= buffer[i];\n        for (let j = 0; j < 8; j++) {\n            if (crc & 1) {\n                crc = (crc >> 1) ^ 0xA001;\n            } else {\n                crc = crc >> 1;\n            }\n        }\n    }\n    return crc;\n}\n\nfunction hexToBytes(hex) {\n    if (typeof hex !== 'string' || hex.length === 0) throw new Error(\"Invalid hex\");\n    if (hex.length % 2 !== 0) throw new Error(\"Invalid hex length\");\n    const bytes = [];\n    for (let i = 0; i < hex.length; i += 2) {\n        const sub = hex.substr(i, 2);\n        if (!/^[0-9a-fA-F]{2}$/.test(sub)) {\n            throw new Error(\"Invalid hex chars\");\n        }\n        bytes.push(parseInt(sub, 16));\n    }\n    return bytes;\n}\n\nfunction bytesToHex(bytes) {\n    return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n    const unit = 0x11;\n    let bytes = [];\n    if (Array.isArray(command)) {\n        const a = Math.round(command[0] * 10000);\n        const b = Math.round(command[1] * 10000);\n        bytes = [\n            unit,\n            0x17,\n            (784 >> 8) & 0xFF, 784 & 0xFF,\n            (3 >> 8) & 0xFF, 3 & 0xFF,\n            (768 >> 8) & 0xFF, 768 & 0xFF,\n            (2 >> 8) & 0xFF, 2 & 0xFF,\n            4,\n            (a >> 8) & 0xFF, a & 0xFF,\n            (b >> 8) & 0xFF, b & 0xFF\n        ];\n    } else if (command && command.op === 'lift') {\n        const val = command.position === 'up' ? 1 : 0;\n        bytes = [\n            unit,\n            0x06,\n            (512 >> 8) & 0xFF, 512 & 0xFF,\n            (val >> 8) & 0xFF, val & 0xFF\n        ];\n    } else if (command && command.op === 'grip') {\n        const val = command.state === 'closed' ? 1 : 0;\n        bytes = [\n            unit,\n            0x06,\n            (513 >> 8) & 0xFF, 513 & 0xFF,\n            (val >> 8) & 0xFF, val & 0xFF\n        ];\n    } else {\n        throw new Error(\"Unknown command format\");\n    }\n    const crc = crc16(bytes);\n    bytes.push(crc & 0xFF);\n    bytes.push((crc >> 8) & 0xFF);\n    return bytesToHex(bytes);\n}\n\nfunction decode(rawReply) {\n    if (!rawReply || typeof rawReply !== 'string') {\n        throw new Error(\"Invalid or missing rawReply\");\n    }\n    if (rawReply.length === 0) {\n        throw new Error(\"Empty rawReply\");\n    }\n    let bytes;\n    try {\n        bytes = hexToBytes(rawReply);\n    } catch (e) {\n        throw new Error(\"Invalid hex string: \" + e.message);\n    }\n    if (bytes.length < 4) {\n        throw new Error(\"Reply too short\");\n    }\n    const unit = bytes[0];\n    if (unit !== 0x11) {\n        throw new Error(\"Invalid unit address\");\n    }\n\n    const func = bytes[1];\n\n    if (func & 0x80) {\n        if (bytes.length !== 5) {\n            throw new Error(\"Invalid exception reply length\");\n        }\n        const dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n        const expectedCrc = crc16(dataWithoutCrc);\n        const actualCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n        if (expectedCrc !== actualCrc) {\n            throw new Error(\"CRC mismatch\");\n        }\n        const errCode = bytes[2];\n        throw new Error(\"Modbus exception code: \" + errCode);\n    }\n\n    const dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n    const expectedCrc = crc16(dataWithoutCrc);\n    const actualCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n    if (expectedCrc !== actualCrc) {\n        throw new Error(\"CRC mismatch\");\n    }\n\n    if (func === 0x17) {\n        if (bytes.length !== 11) {\n            throw new Error(\"Invalid 0x17 reply length\");\n        }\n        const byteCount = bytes[2];\n        if (byteCount !== 6) {\n            throw new Error(\"Invalid 0x17 byte count\");\n        }\n        let a = (bytes[3] << 8) | bytes[4];\n        if (a & 0x8000) a -= 0x10000;\n        let b = (bytes[5] << 8) | bytes[6];\n        if (b & 0x8000) b -= 0x10000;\n        const flags = (bytes[7] << 8) | bytes[8];\n        const limited = (flags & 0x0001) !== 0;\n        return {\n            applied: [a / 10000, b / 10000],\n            limited: limited\n        };\n    } else if (func === 0x06) {\n        if (bytes.length !== 8) {\n            throw new Error(\"Invalid 0x06 reply length\");\n        }\n        const reg = (bytes[2] << 8) | bytes[3];\n        const val = (bytes[4] << 8) | bytes[5];\n        if (reg === 512) {\n            return {\n                applied: { op: \"lift\", position: val === 1 ? \"up\" : \"down\" },\n                limited: false\n            };\n        } else if (reg === 513) {\n            return {\n                applied: { op: \"grip\", state: val === 1 ? \"closed\" : \"open\" },\n                limited: false\n            };\n        } else {\n            throw new Error(\"Unknown register in 0x06 echo\");\n        }\n    } else {\n        throw new Error(\"Unexpected function code: \" + func);\n    }\n}\n",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s2026-r2-gemini",
+      "device": "VLAB-X",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 41,
+      "frontCalls": 41,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 1,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7860
+        }
+      ],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 17,
+      "driverDistinctVersions": 16,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 18
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 374001,
+        "candidatesTokenCount": 31455,
+        "totalTokenCount": 463967,
+        "thoughtsTokenCount": 58511,
+        "cachedContentTokenCount": 201252
+      },
+      "estimatedUsd": 0.3371,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  function crc16(buf) {\n    let crc = 0xFFFF;\n    for (let i = 0; i < buf.length; i++) {\n      crc ^= buf[i];\n      for (let j = 0; j < 8; j++) {\n        if ((crc & 1) !== 0) {\n          crc = (crc >> 1) ^ 0xA001;\n        } else {\n          crc = crc >> 1;\n        }\n      }\n    }\n    return [crc & 0xFF, (crc >> 8) & 0xFF];\n  }\n\n  function toHex(bytes) {\n    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');\n  }\n\n  if (Array.isArray(command)) {\n    let val0 = Math.round(command[0] * 10000);\n    let val1 = Math.round(command[1] * 10000);\n    if (val0 < -32768) val0 = -32768; if (val0 > 32767) val0 = 32767;\n    if (val1 < -32768) val1 = -32768; if (val1 > 32767) val1 = 32767;\n\n    let buf = [\n      0x11, 0x17,\n      0x03, 0x10, 0x00, 0x03,\n      0x03, 0x00, 0x00, 0x02,\n      0x04,\n      (val0 >> 8) & 0xFF, val0 & 0xFF,\n      (val1 >> 8) & 0xFF, val1 & 0xFF\n    ];\n    let crc = crc16(buf);\n    return toHex(buf.concat(crc));\n  } else if (command && command.op === 'lift') {\n    let posVal = (command.position === 'up') ? 1 : 0;\n    let buf = [\n      0x11, 0x06,\n      0x02, 0x00,\n      (posVal >> 8) & 0xFF, posVal & 0xFF\n    ];\n    let crc = crc16(buf);\n    return toHex(buf.concat(crc));\n  } else if (command && command.op === 'grip') {\n    let stateVal = (command.state === 'closed') ? 1 : 0;\n    let buf = [\n      0x11, 0x06,\n      0x02, 0x01,\n      (stateVal >> 8) & 0xFF, stateVal & 0xFF\n    ];\n    let crc = crc16(buf);\n    return toHex(buf.concat(crc));\n  }\n  throw new Error(\"Unknown command format\");\n}\n\nfunction decode(rawReply) {\n  if (rawReply === null || rawReply === undefined || typeof rawReply !== 'string') {\n    throw new Error(\"Invalid reply\");\n  }\n  let clean = rawReply.trim();\n  if (clean === \"\" || clean.length % 2 !== 0) {\n    throw new Error(\"Invalid reply format\");\n  }\n  let bytes = [];\n  for (let i = 0; i < clean.length; i += 2) {\n    let hex = clean.substr(i, 2);\n    if (!/^[0-9a-fA-F]{2}$/.test(hex)) {\n      throw new Error(\"Invalid hex\");\n    }\n    bytes.push(parseInt(hex, 16));\n  }\n  \n  if (bytes.length < 3) {\n    throw new Error(\"Reply too short\");\n  }\n\n  if (bytes[0] !== 0x11) {\n    throw new Error(\"Address mismatch\");\n  }\n\n  let func = bytes[1];\n  if ((func & 0x80) !== 0) {\n    let errCode = bytes[2];\n    throw new Error(\"Device exception code: \" + errCode);\n  }\n\n  if (bytes.length < 5) {\n    throw new Error(\"Reply too short\");\n  }\n\n  let data = bytes.slice(0, bytes.length - 2);\n  let givenLo = bytes[bytes.length - 2];\n  let givenHi = bytes[bytes.length - 1];\n  let calc = crc16(data);\n\n  if (calc[0] !== givenLo || calc[1] !== givenHi) {\n    throw new Error(\"CRC mismatch\");\n  }\n\n  if (func === 0x17) {\n    if (bytes.length !== 11) {\n      throw new Error(\"Invalid 0x17 length\");\n    }\n    let byteCount = bytes[2];\n    if (byteCount !== 6) {\n      throw new Error(\"Invalid 0x17 byteCount\");\n    }\n    let aRaw = (bytes[3] << 8) | bytes[4];\n    if (aRaw & 0x8000) aRaw -= 0x10000;\n    let bRaw = (bytes[5] << 8) | bytes[6];\n    if (bRaw & 0x8000) bRaw -= 0x10000;\n    let flags = (bytes[7] << 8) | bytes[8];\n\n    return {\n      applied: [aRaw / 10000.0, bRaw / 10000.0],\n      limited: (flags & 0x01) !== 0\n    };\n  } else if (func === 0x06) {\n    if (bytes.length !== 8) {\n      throw new Error(\"Invalid 0x06 length\");\n    }\n    let reg = (bytes[2] << 8) | bytes[3];\n    let val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      return { applied: { op: 'lift', position: val === 1 ? 'up' : 'down' }, limited: false };\n    } else if (reg === 0x0201) {\n      return { applied: { op: 'grip', state: val === 1 ? 'closed' : 'open' }, limited: false };\n    } else {\n      throw new Error(\"Unknown register in 0x06 reply\");\n    }\n  }\n\n  throw new Error(\"Unsupported function code\");\n}\n\nfunction crc16(buf) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buf.length; i++) {\n    crc ^= buf[i];\n    for (let j = 0; j < 8; j++) {\n      if ((crc & 1) !== 0) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = crc >> 1;\n      }\n    }\n  }\n  return [crc & 0xFF, (crc >> 8) & 0xFF];\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s2026-r3-gemini",
+      "device": "VLAB-X",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 44,
+      "frontCalls": 44,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 4,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7267
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7864
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 6751
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7862
+        }
+      ],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 16,
+      "driverDistinctVersions": 14,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 19
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "compile-error",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 402881,
+        "candidatesTokenCount": 29661,
+        "totalTokenCount": 515642,
+        "thoughtsTokenCount": 83100,
+        "cachedContentTokenCount": 219553
+      },
+      "estimatedUsd": 0.4028,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buf) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buf.length; i++) {\n    crc ^= buf[i];\n    for (let j = 0; j < 8; j++) {\n      if (crc & 1) crc = (crc >> 1) ^ 0xA001;\n      else crc >>= 1;\n    }\n  }\n  return crc;\n}\n\nfunction toHex(buf) {\n  return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction fromHex(str) {\n  if (typeof str !== 'string' || str.length % 2 !== 0) {\n    throw new Error('Invalid hex string');\n  }\n  if (!/^[0-9a-fA-F]*$/.test(str)) {\n    throw new Error('Non-hex characters in string');\n  }\n  const buf = new Uint8Array(str.length / 2);\n  for (let i = 0; i < str.length; i += 2) {\n    buf[i / 2] = parseInt(str.substr(i, 2), 16);\n  }\n  return buf;\n}\n\nfunction s16(val) {\n  let v = Math.round(val);\n  if (v < -32768) v = -32768;\n  if (v > 32767) v = 32767;\n  const buf = new Uint8Array(2);\n  const view = new DataView(buf.buffer);\n  view.setInt16(0, v, false);\n  return buf;\n}\n\nfunction u16(val) {\n  let v = Math.round(val);\n  if (v < 0) v = 0;\n  if (v > 65535) v = 65535;\n  const buf = new Uint8Array(2);\n  const view = new DataView(buf.buffer);\n  view.setUint16(0, v, false);\n  return buf;\n}\n\nfunction encode(command) {\n  if (Array.isArray(command)) {\n    const aVal = Math.max(-0.1, Math.min(0.1, command[0]));\n    const bVal = Math.max(-0.1, Math.min(0.1, command[1]));\n    const body = new Uint8Array([\n      0x11, 0x17,\n      0x03, 0x10, 0x00, 0x03,\n      0x03, 0x00, 0x00, 0x02,\n      0x04,\n      ...s16(aVal * 10000),\n      ...s16(bVal * 10000)\n    ]);\n    const crc = crc16(body);\n    const frame = new Uint8Array(body.length + 2);\n    frame.set(body);\n    frame[body.length] = crc & 0xFF;\n    frame[body.length + 1] = (crc >> 8) & 0xFF;\n    return toHex(frame);\n  } else if (command && command.op === 'lift') {\n    const val = command.position === 'up' ? 1 : 0;\n    const body = new Uint8Array([0x11, 0x06, 0x02, 0x00, ...u16(val)]);\n    const crc = crc16(body);\n    const frame = new Uint8Array(body.length + 2);\n    frame.set(body);\n    frame[body.length] = crc & 0xFF;\n    frame[body.length + 1] = (crc >> 8) & 0xFF;\n    return toHex(frame);\n  } else if (command && command.op === 'grip') {\n    const val = command.state === 'closed' ? 1 : 0;\n    const body = new Uint8Array([0x11, 0x06, 0x02, 0x01, ...u16(val)]);\n    const crc = crc16(body);\n    const frame = new Uint8Array(body.length + 2);\n    frame.set(body);\n    frame[body.length] = crc & 0xFF;\n    frame[body.length + 1] = (crc >> 8) & 0xFF;\n    return toHex(frame);\n  }\n  throw new Error('Unknown command');\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') {\n    throw new Error('Invalid reply type');\n  }\n  if (rawReply === '') {\n    throw new Error('Device did not reply');\n  }\n  if (rawReply.length % 2 !== 0) {\n    throw new Error('Invalid hex string length');\n  }\n  const buf = fromHex(rawReply);\n  if (buf.length < 5) {\n    throw new Error('Reply too short');\n  }\n  \n  const unit = buf[0];\n  if (unit !== 0x11) {\n    throw new Error('Invalid unit address: ' + unit);\n  }\n\n  const body = buf.subarray(0, buf.length - 2);\n  const recvCrc = buf[buf.length - 2] | (buf[buf.length - 1] << 8);\n  if (recvCrc !== crc16(body)) {\n    throw new Error('CRC mismatch');\n  }\n\n  const func = buf[1];\n\n  if ((func & 0x80) !== 0) {\n    if (buf.length !== 5) {\n      throw new Error('Invalid exception reply length');\n    }\n    const errCode = buf[2];\n    throw new Error('Modbus exception code: ' + errCode);\n  }\n\n  if (func === 0x17) {\n    if (buf.length !== 11) {\n      throw new Error('Invalid reply length for function 23');\n    }\n    if (buf[2] !== 6) {\n      throw new Error('Invalid byte count for function 23');\n    }\n    const view = new DataView(buf.buffer, buf.byteOffset + 3, 6);\n    const a = view.getInt16(0, false) / 10000;\n    const b = view.getInt16(2, false) / 10000;\n    const flags = view.getUint16(4, false);\n    const limited = (flags & 1) !== 0;\n    return { applied: [a, b], limited };\n  } else if (func === 0x06) {\n    if (buf.length !== 8) {\n      throw new Error('Invalid reply length for function 6');\n    }\n    const reg = (buf[2] << 8) | buf[3];\n    const valParsed = (buf[4] << 8) | buf[5];\n    if (reg === 512) {\n      return { applied: { op: 'lift', position: valParsed === 1 ? 'up' : 'down' }, limited: false };\n    } else if (reg === 513) {\n      return { applied: { op: 'grip', state: valParsed === 1 ? 'closed' : 'open' }, limited: false };\n    }\n    throw new Error('Unknown register in 0x06 reply');\n  }\n  throw new Error('Unsupported function code: ' + func);\n}\n",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s3140-r1-gemini",
+      "device": "VLAB-X",
+      "seed": 3140,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 9,
+      "driverDistinctVersions": 9,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 9
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 294121,
+        "candidatesTokenCount": 17110,
+        "totalTokenCount": 346863,
+        "thoughtsTokenCount": 35632,
+        "cachedContentTokenCount": 129985
+      },
+      "estimatedUsd": 0.2201,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buf) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buf.length; i++) {\n    crc ^= buf[i];\n    for (let j = 0; j < 8; j++) {\n      if (crc & 1) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc >>= 1;\n      }\n    }\n  }\n  return crc;\n}\n\nfunction hexToBytes(hex) {\n  if (typeof hex !== 'string' || hex.length % 2 !== 0) {\n    throw new Error('Invalid hex string');\n  }\n  const bytes = [];\n  for (let i = 0; i < hex.length; i += 2) {\n    const b = parseInt(hex.substr(i, 2), 16);\n    if (isNaN(b)) throw new Error('Invalid hex characters');\n    bytes.push(b);\n  }\n  return bytes;\n}\n\nfunction bytesToHex(bytes) {\n  return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n  const unit = 0x11;\n  let dataBytes = [];\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error('Command array must have 2 elements');\n    const c0 = Math.round(command[0] * 10000);\n    const c1 = Math.round(command[1] * 10000);\n    const s0 = c0 < 0 ? c0 + 0x10000 : c0;\n    const s1 = c1 < 0 ? c1 + 0x10000 : c1;\n    dataBytes = [\n      0x17,\n      0x03, 0x10, 0x00, 0x03,\n      0x03, 0x00, 0x00, 0x02,\n      0x04,\n      (s0 >> 8) & 0xFF, s0 & 0xFF,\n      (s1 >> 8) & 0xFF, s1 & 0xFF\n    ];\n  } else if (typeof command === 'object' && command !== null) {\n    if (command.op === 'lift') {\n      const val = command.position === 'up' ? 1 : (command.position === 'down' ? 0 : null);\n      if (val === null) throw new Error('Invalid lift position');\n      dataBytes = [0x06, 0x02, 0x00, (val >> 8) & 0xFF, val & 0xFF];\n    } else if (command.op === 'grip') {\n      const val = command.state === 'closed' ? 1 : (command.state === 'open' ? 0 : null);\n      if (val === null) throw new Error('Invalid grip state');\n      dataBytes = [0x06, 0x02, 0x01, (val >> 8) & 0xFF, val & 0xFF];\n    } else {\n      throw new Error('Unknown command object');\n    }\n  } else {\n    throw new Error('Invalid command format');\n  }\n\n  const frameWithoutCrc = [unit, ...dataBytes];\n  const crc = crc16(frameWithoutCrc);\n  const crcLo = crc & 0xFF;\n  const crcHi = (crc >> 8) & 0xFF;\n  const fullFrame = [...frameWithoutCrc, crcLo, crcHi];\n  return bytesToHex(fullFrame);\n}\n\nfunction decode(rawReply) {\n  if (!rawReply || typeof rawReply !== 'string') {\n    throw new Error('Empty or invalid reply');\n  }\n  let bytes;\n  try {\n    bytes = hexToBytes(rawReply);\n  } catch (e) {\n    throw new Error('Invalid hex string');\n  }\n  if (bytes.length < 5) {\n    throw new Error('Reply too short');\n  }\n  const unit = bytes[0];\n  if (unit !== 0x11) {\n    throw new Error('Invalid unit address');\n  }\n\n  const dataForCrc = bytes.slice(0, bytes.length - 2);\n  const recvCrc = (bytes[bytes.length - 1] << 8) | bytes[bytes.length - 2];\n  if (recvCrc !== crc16(dataForCrc)) {\n    throw new Error('CRC mismatch');\n  }\n\n  const func = bytes[1];\n\n  if (func & 0x80) {\n    if (bytes.length !== 5) {\n      throw new Error('Invalid exception reply length');\n    }\n    const errCode = bytes[2];\n    throw new Error('Device exception code: ' + errCode);\n  }\n\n  if (func === 0x06) {\n    if (bytes.length !== 8) {\n      throw new Error('Invalid 0x06 reply length');\n    }\n    const reg = (bytes[2] << 8) | bytes[3];\n    const val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      return { applied: { op: 'lift', position: val === 1 ? 'up' : 'down' }, limited: false };\n    } else if (reg === 0x0201) {\n      return { applied: { op: 'grip', state: val === 1 ? 'closed' : 'open' }, limited: false };\n    } else {\n      throw new Error('Unknown register in 0x06 echo');\n    }\n  } else if (func === 0x17) {\n    if (bytes.length !== 11) {\n      throw new Error('Invalid 0x17 reply length');\n    }\n    const byteCount = bytes[2];\n    if (byteCount !== 6) {\n      throw new Error('Unexpected byte count in 0x17 reply');\n    }\n    let rawA0 = (bytes[3] << 8) | bytes[4];\n    let rawA1 = (bytes[5] << 8) | bytes[6];\n    if (rawA0 & 0x8000) rawA0 -= 0x10000;\n    if (rawA1 & 0x8000) rawA1 -= 0x10000;\n    const applied0 = rawA0 / 10000;\n    const applied1 = rawA1 / 10000;\n    const flags = (bytes[7] << 8) | bytes[8];\n    const limited = (flags & 0x0001) !== 0;\n    return { applied: [applied0, applied1], limited };\n  } else {\n    throw new Error('Unsupported function code');\n  }\n}\n",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s3140-r2-gemini",
+      "device": "VLAB-X",
+      "seed": 3140,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "stoppedAt": "done",
+      "modelCalls": 97,
+      "frontCalls": 26,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 2,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 6941
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7862
+        }
+      ],
+      "actions": 162,
+      "unconfirmed": 0,
+      "ratioToBaseline": 0.99,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "driverWrites": 7,
+      "driverDistinctVersions": 7,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 6
+      },
+      "controllerGateFailureCounts": {
+        "起點貼近行程邊界": 1,
+        "二連桿肘關節極限繞行": 1
+      },
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "all-rejected"
+      ],
+      "controllerTests": {
+        "passed": true,
+        "channelKind": "linear",
+        "twoLinkMaxRatio": 1.3,
+        "elbowLimitCase": false,
+        "efficiency": {
+          "actions": 174,
+          "referenceActions": 195,
+          "ratio": 0.89,
+          "nonlinearArm": {
+            "required": false,
+            "reached": true,
+            "actions": 76,
+            "referenceActions": 69,
+            "ratio": 1.1,
+            "maxRatio": null,
+            "passed": true,
+            "failure": null
+          }
+        }
+      },
+      "usage": {
+        "promptTokenCount": 457807,
+        "candidatesTokenCount": 17765,
+        "totalTokenCount": 525622,
+        "thoughtsTokenCount": 50050,
+        "cachedContentTokenCount": 89448
+      },
+      "estimatedUsd": 0.3069,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buffer) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buffer.length; i++) {\n    crc ^= buffer[i];\n    for (let j = 0; j < 8; j++) {\n      if ((crc & 0x0001) !== 0) {\n        crc = (crc >>> 1) ^ 0xA001;\n      } else {\n        crc = (crc >>> 1);\n      }\n    }\n  }\n  return crc & 0xFFFF;\n}\n\nfunction hexToBytes(hex) {\n  if (typeof hex !== 'string' || hex.length % 2 !== 0) {\n    throw new Error(\"Invalid hex string\");\n  }\n  const bytes = [];\n  for (let i = 0; i < hex.length; i += 2) {\n    const b = parseInt(hex.substr(i, 2), 16);\n    if (isNaN(b)) {\n      throw new Error(\"Invalid hex characters\");\n    }\n    bytes.push(b);\n  }\n  return bytes;\n}\n\nfunction bytesToHex(bytes) {\n  return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n  let payload = [];\n  if (Array.isArray(command)) {\n    const a = Math.round(command[0] * 10000);\n    const b = Math.round(command[1] * 10000);\n    payload = [\n      0x11, 0x17,\n      (784 >> 8) & 0xFF, 784 & 0xFF,\n      (3 >> 8) & 0xFF, 3 & 0xFF,\n      (768 >> 8) & 0xFF, 768 & 0xFF,\n      (2 >> 8) & 0xFF, 2 & 0xFF,\n      4,\n      (a >> 8) & 0xFF, a & 0xFF,\n      (b >> 8) & 0xFF, b & 0xFF\n    ];\n  } else if (command && command.op === 'lift') {\n    const val = command.position === 'up' ? 1 : 0;\n    payload = [\n      0x11, 0x06,\n      (512 >> 8) & 0xFF, 512 & 0xFF,\n      (val >> 8) & 0xFF, val & 0xFF\n    ];\n  } else if (command && command.op === 'grip') {\n    const val = command.state === 'closed' ? 1 : 0;\n    payload = [\n      0x11, 0x06,\n      (513 >> 8) & 0xFF, 513 & 0xFF,\n      (val >> 8) & 0xFF, val & 0xFF\n    ];\n  } else {\n    throw new Error(\"Unknown command format\");\n  }\n\n  const crc = crc16(payload);\n  const lowByte = crc & 0xFF;\n  const highByte = (crc >> 8) & 0xFF;\n  payload.push(lowByte);\n  payload.push(highByte);\n  return bytesToHex(payload);\n}\n\nfunction decode(rawReply) {\n  if (!rawReply || typeof rawReply !== 'string' || rawReply.length % 2 !== 0) {\n    throw new Error(\"Invalid reply format\");\n  }\n  const bytes = hexToBytes(rawReply);\n  if (bytes.length < 5) {\n    throw new Error(\"Reply too short\");\n  }\n  const unit = bytes[0];\n  if (unit !== 0x11) {\n    throw new Error(\"Invalid unit address\");\n  }\n\n  const dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n  const receivedCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n  const calculatedCrc = crc16(dataWithoutCrc);\n  if (receivedCrc !== calculatedCrc) {\n    throw new Error(\"CRC mismatch\");\n  }\n\n  const func = bytes[1];\n  if ((func & 0x80) !== 0) {\n    if (bytes.length !== 5) {\n      throw new Error(\"Invalid exception reply length\");\n    }\n    const errCode = bytes[2];\n    if (![1, 2, 3, 4, 6].includes(errCode)) {\n      throw new Error(\"Unknown exception code: \" + errCode);\n    }\n    throw new Error(\"Device exception code: \" + errCode);\n  }\n\n  if (func === 0x17) {\n    const byteCount = bytes[2];\n    if (byteCount !== 6 || bytes.length !== 11) {\n      throw new Error(\"Invalid 0x17 reply length\");\n    }\n    let aVal = (bytes[3] << 8) | bytes[4];\n    if (aVal & 0x8000) aVal -= 0x10000;\n    let bVal = (bytes[5] << 8) | bytes[6];\n    if (bVal & 0x8000) bVal -= 0x10000;\n    const flags = (bytes[7] << 8) | bytes[8];\n    const limited = (flags & 0x01) !== 0;\n    return {\n      applied: [aVal / 10000, bVal / 10000],\n      limited: limited\n    };\n  } else if (func === 0x06) {\n    if (bytes.length !== 8) {\n      throw new Error(\"Invalid 0x06 reply length\");\n    }\n    const reg = (bytes[2] << 8) | bytes[3];\n    const val = (bytes[4] << 8) | bytes[5];\n    if (reg === 512) {\n      if (val !== 0 && val !== 1) {\n        throw new Error(\"Invalid lift value\");\n      }\n      return {\n        applied: { op: \"lift\", position: val === 1 ? \"up\" : \"down\" },\n        limited: false\n      };\n    } else if (reg === 513) {\n      if (val !== 0 && val !== 1) {\n        throw new Error(\"Invalid grip value\");\n      }\n      return {\n        applied: { op: \"grip\", state: val === 1 ? \"closed\" : \"open\" },\n        limited: false\n      };\n    } else {\n      throw new Error(\"Unknown register in 0x06 echo\");\n    }\n  } else {\n    throw new Error(\"Unsupported function code in reply: \" + func);\n  }\n}\n",
+      "generatedControllerSource": "function control(state) {\n  if (state.errorPx <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n  \n  const history = state.history || [];\n  let J = null;\n  \n  // Use recent history, but handle limited commands gracefully\n  const validHistory = history.filter(h => h.delta && h.command);\n  \n  if (validHistory.length >= 2) {\n    const samples = validHistory.slice(-12);\n    let sumUuT = [[0, 0], [0, 0]];\n    let sumDU = [[0, 0], [0, 0]];\n    \n    for (const h of samples) {\n      // Use applied if available, else command\n      const u = h.applied || h.command;\n      const d = h.delta;\n      sumUuT[0][0] += u[0] * u[0];\n      sumUuT[0][1] += u[0] * u[1];\n      sumUuT[1][0] += u[1] * u[0];\n      sumUuT[1][1] += u[1] * u[1];\n      \n      sumDU[0][0] += d[0] * u[0];\n      sumDU[0][1] += d[0] * u[1];\n      sumDU[1][0] += d[1] * u[0];\n      sumDU[1][1] += d[1] * u[1];\n    }\n    \n    sumUuT[0][0] += 1e-3;\n    sumUuT[1][1] += 1e-3;\n    \n    const det = sumUuT[0][0] * sumUuT[1][1] - sumUuT[0][1] * sumUuT[1][0];\n    if (Math.abs(det) > 1e-7) {\n      const inv00 = sumUuT[1][1] / det;\n      const inv01 = -sumUuT[0][1] / det;\n      const inv10 = -sumUuT[1][0] / det;\n      const inv11 = sumUuT[0][0] / det;\n      \n      const J00 = sumDU[0][0] * inv00 + sumDU[0][1] * inv10;\n      const J01 = sumDU[0][0] * inv01 + sumDU[0][1] * inv11;\n      const J10 = sumDU[1][0] * inv00 + sumDU[1][1] * inv10;\n      const J11 = sumDU[1][0] * inv01 + sumDU[1][1] * inv11;\n      \n      J = [[J00, J01], [J10, J11]];\n    }\n  }\n  \n  const targetVec = [state.target[0] - state.tip[0], state.target[1] - state.tip[1]];\n  let u = [0.1, 0.1];\n  \n  // Check if recent history has consecutive limited flags (stuck at boundary)\n  const recentLimited = history.slice(-3).filter(h => h.limited).length >= 2;\n  \n  if (recentLimited) {\n    // If stuck at boundary, reverse or step orthogonally\n    const lastCmd = history.length > 0 ? history[history.length - 1].command : [0.1, 0.1];\n    u = [-lastCmd[0] * 0.8, -lastCmd[1] * 0.8];\n  } else if (J) {\n    const detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n    if (Math.abs(detJ) > 1e-7) {\n      const invJ00 = J[1][1] / detJ;\n      const invJ01 = -J[0][1] / detJ;\n      const invJ10 = -J[1][0] / detJ;\n      const invJ11 = J[0][0] / detJ;\n      \n      let u1 = invJ00 * targetVec[0] + invJ01 * targetVec[1];\n      let u2 = invJ10 * targetVec[0] + invJ11 * targetVec[1];\n      \n      const maxVal = Math.max(Math.abs(u1), Math.abs(u2));\n      if (maxVal > 0) {\n        // When far, push near 0.1\n        const scale = state.errorPx > 30 ? 0.1 : Math.min(0.1, Math.max(0.01, (state.errorPx / 30) * 0.1));\n        u1 = (u1 / maxVal) * scale;\n        u2 = (u2 / maxVal) * scale;\n      }\n      u = [u1, u2];\n    } else {\n      const stepIdx = state.step % 2;\n      u = stepIdx === 0 ? [0.1, 0.0] : [0.0, 0.1];\n    }\n  } else {\n    const stepIdx = state.step % 2;\n    u = stepIdx === 0 ? [0.1, 0.0] : [0.0, 0.1];\n  }\n  \n  u[0] = Math.max(-0.1, Math.min(0.1, u[0]));\n  u[1] = Math.max(-0.1, Math.min(0.1, u[1]));\n  \n  return { action: \"move\", u: u };\n}\n",
+      "crossSeedReplay": {
+        "2026": {
+          "completed": 5,
+          "actions": 167,
+          "trialActions": [
+            39,
+            30,
+            35,
+            32,
+            31
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 162,
+          "trialActions": [
+            36,
+            29,
+            33,
+            32,
+            32
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 162,
+          "trialActions": [
+            36,
+            30,
+            32,
+            30,
+            34
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        }
+      }
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s3140-r3-gemini",
+      "device": "VLAB-X",
+      "seed": 3140,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "stoppedAt": "done",
+      "modelCalls": 102,
+      "frontCalls": 27,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 181,
+      "unconfirmed": 0,
+      "ratioToBaseline": 1.11,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "driverWrites": 9,
+      "driverDistinctVersions": 9,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 7
+      },
+      "controllerGateFailureCounts": {
+        "大角度旋轉與 B 反向": 1,
+        "到達後通道 A 反向的恢復": 1,
+        "起點貼近行程邊界": 1
+      },
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "compile-error",
+        "short read reply+lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "all-rejected"
+      ],
+      "controllerTests": {
+        "passed": true,
+        "channelKind": "linear",
+        "twoLinkMaxRatio": 1.3,
+        "elbowLimitCase": false,
+        "efficiency": {
+          "actions": 195,
+          "referenceActions": 195,
+          "ratio": 1,
+          "nonlinearArm": {
+            "required": false,
+            "reached": true,
+            "actions": 83,
+            "referenceActions": 69,
+            "ratio": 1.2,
+            "maxRatio": null,
+            "passed": true,
+            "failure": null
+          }
+        }
+      },
+      "usage": {
+        "promptTokenCount": 475086,
+        "candidatesTokenCount": 18966,
+        "totalTokenCount": 531620,
+        "thoughtsTokenCount": 37568,
+        "cachedContentTokenCount": 105695
+      },
+      "estimatedUsd": 0.2839,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buffer) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buffer.length; i++) {\n    crc ^= buffer[i];\n    for (let j = 0; j < 8; j++) {\n      if ((crc & 0x0001) !== 0) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = crc >> 1;\n      }\n    }\n  }\n  return crc;\n}\n\nfunction hexToBytes(hex) {\n  if (typeof hex !== 'string' || hex.length % 2 !== 0) {\n    throw new Error('Invalid hex string');\n  }\n  const bytes = [];\n  for (let i = 0; i < hex.length; i += 2) {\n    const b = parseInt(hex.substr(i, 2), 16);\n    if (isNaN(b)) throw new Error('Invalid hex');\n    bytes.push(b);\n  }\n  return bytes;\n}\n\nfunction bytesToHex(bytes) {\n  return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n  let buf = [];\n  if (Array.isArray(command)) {\n    const val0 = Math.round(command[0] * 10000);\n    const val1 = Math.round(command[1] * 10000);\n    buf = [\n      0x11, 0x17,\n      0x03, 0x10,\n      0x00, 0x03,\n      0x03, 0x00,\n      0x00, 0x02,\n      0x04,\n      (val0 >> 8) & 0xFF, val0 & 0xFF,\n      (val1 >> 8) & 0xFF, val1 & 0xFF\n    ];\n  } else if (command && command.op === 'lift') {\n    const val = command.position === 'up' ? 1 : 0;\n    buf = [\n      0x11, 0x06,\n      0x02, 0x00,\n      (val >> 8) & 0xFF, val & 0xFF\n    ];\n  } else if (command && command.op === 'grip') {\n    const val = command.state === 'closed' ? 1 : 0;\n    buf = [\n      0x11, 0x06,\n      0x02, 0x01,\n      (val >> 8) & 0xFF, val & 0xFF\n    ];\n  } else {\n    throw new Error('Unknown command type');\n  }\n\n  const crc = crc16(buf);\n  buf.push(crc & 0xFF);\n  buf.push((crc >> 8) & 0xFF);\n  return bytesToHex(buf);\n}\n\nfunction decode(rawReply) {\n  if (!rawReply || typeof rawReply !== 'string' || rawReply.length < 8) {\n    throw new Error('Empty or invalid raw reply');\n  }\n  const bytes = hexToBytes(rawReply);\n  if (bytes.length < 4) {\n    throw new Error('Reply too short');\n  }\n  \n  const unit = bytes[0];\n  if (unit !== 0x11) {\n    throw new Error('Invalid unit address');\n  }\n\n  const dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n  const receivedCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n  const calculatedCrc = crc16(dataWithoutCrc);\n  if (receivedCrc !== calculatedCrc) {\n    throw new Error('CRC mismatch');\n  }\n\n  const func = bytes[1];\n  if ((func & 0x80) !== 0) {\n    const errCode = bytes[2];\n    throw new Error('Device exception code: ' + errCode);\n  }\n\n  if (func === 0x17) {\n    const byteCount = bytes[2];\n    if (byteCount !== 6 || bytes.length !== 3 + byteCount + 2) {\n      throw new Error('Invalid 0x17 reply length');\n    }\n    function parseS16(hi, lo) {\n      let val = (hi << 8) | lo;\n      if (val & 0x8000) val -= 0x10000;\n      return val / 10000;\n    }\n    function parseU16(hi, lo) {\n      return (hi << 8) | lo;\n    }\n    const applied0 = parseS16(bytes[3], bytes[4]);\n    const applied1 = parseS16(bytes[5], bytes[6]);\n    const flags = parseU16(bytes[7], bytes[8]);\n    const limited = (flags & 0x0001) !== 0;\n    return { applied: [applied0, applied1], limited };\n  } else if (func === 0x06) {\n    if (bytes.length !== 8) {\n      throw new Error('Invalid 0x06 reply length');\n    }\n    const reg = (bytes[2] << 8) | bytes[3];\n    const val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      const position = val === 1 ? 'up' : (val === 0 ? 'down' : null);\n      if (!position) throw new Error('Invalid lift position value');\n      return { applied: { op: 'lift', position }, limited: false };\n    } else if (reg === 0x0201) {\n      const state = val === 1 ? 'closed' : (val === 0 ? 'open' : null);\n      if (!state) throw new Error('Invalid grip state value');\n      return { applied: { op: 'grip', state }, limited: false };\n    } else {\n      throw new Error('Unknown register in 0x06 reply');\n    }\n  } else {\n    throw new Error('Unsupported function code: ' + func);\n  }\n}\n",
+      "generatedControllerSource": "function control(state) {\n  const { tip, target, errorPx, tolerancePx, inputLimit, history } = state;\n  if (errorPx <= tolerancePx) {\n    return { action: \"verify\" };\n  }\n  \n  const validHistory = history.filter(h => h.delta && h.delta.length === 2 && h.applied && h.applied.length === 2 && (Math.abs(h.applied[0]) > 0.0001 || Math.abs(h.applied[1]) > 0.0001));\n  const recent = validHistory.slice(-12);\n  \n  if (recent.length >= 3) {\n    let sum_a0a0 = 0, sum_a0a1 = 0, sum_a1a1 = 0;\n    let sum_a0dx = 0, sum_a1dx = 0;\n    let sum_a0dy = 0, sum_a1dy = 0;\n    \n    for (const h of recent) {\n      const a0 = h.applied[0];\n      const a1 = h.applied[1];\n      const dx = h.delta[0];\n      const dy = h.delta[1];\n      \n      sum_a0a0 += a0 * a0;\n      sum_a0a1 += a0 * a1;\n      sum_a1a1 += a1 * a1;\n      sum_a0dx += a0 * dx;\n      sum_a1dx += a1 * dx;\n      sum_a0dy += a0 * dy;\n      sum_a1dy += a1 * dy;\n    }\n    \n    const det = sum_a0a0 * sum_a1a1 - sum_a0a1 * sum_a0a1;\n    if (Math.abs(det) > 1e-9) {\n      const J00 = (sum_a1a1 * sum_a0dx - sum_a0a1 * sum_a1dx) / det;\n      const J01 = (sum_a0a0 * sum_a1dx - sum_a0a1 * sum_a0dx) / det;\n      const J10 = (sum_a1a1 * sum_a0dy - sum_a0a1 * sum_a1dy) / det;\n      const J11 = (sum_a0a0 * sum_a1dy - sum_a0a1 * sum_a0dy) / det;\n      \n      const ex = target[0] - tip[0];\n      const ey = target[1] - tip[1];\n      \n      const detJ = J00 * J11 - J01 * J10;\n      if (Math.abs(detJ) > 1e-9) {\n        const invJ00 = J11 / detJ;\n        const invJ01 = -J01 / detJ;\n        const invJ10 = -J10 / detJ;\n        const invJ11 = J00 / detJ;\n        \n        let u0 = invJ00 * ex + invJ01 * ey;\n        let u1 = invJ10 * ex + invJ11 * ey;\n        \n        const maxU = Math.max(Math.abs(u0), Math.abs(u1));\n        const desiredMax = Math.min(inputLimit, Math.max(0.02, errorPx / 40 * inputLimit));\n        if (maxU > 0) {\n          u0 = (u0 / maxU) * desiredMax;\n          u1 = (u1 / maxU) * desiredMax;\n        }\n        \n        u0 = Math.max(-inputLimit, Math.min(inputLimit, u0));\n        u1 = Math.max(-inputLimit, Math.min(inputLimit, u1));\n        \n        return { action: \"move\", u: [u0, u1] };\n      }\n    }\n  }\n  \n  const len = history.length;\n  if (len % 4 === 0) return { action: \"move\", u: [inputLimit, 0] };\n  if (len % 4 === 1) return { action: \"move\", u: [0, inputLimit] };\n  if (len % 4 === 2) return { action: \"move\", u: [-inputLimit, 0] };\n  return { action: \"move\", u: [0, -inputLimit] };\n}",
+      "crossSeedReplay": {
+        "2026": {
+          "completed": 5,
+          "actions": 181,
+          "trialActions": [
+            42,
+            35,
+            38,
+            33,
+            33
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 181,
+          "trialActions": [
+            41,
+            34,
+            37,
+            34,
+            35
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 180,
+          "trialActions": [
+            40,
+            35,
+            36,
+            33,
+            36
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        }
+      }
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s8675-r1-gemini",
+      "device": "VLAB-X",
+      "seed": 8675,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "Gemini 回覆未通過檢查（INVALID_TOOL_RESPONSE / stop-reason）：模型回覆未以完整工具決策結束，可能被截斷；這次未執行動作。 已用完 2 次修正機會，實驗停止；目前進度與拒絕原因已保留。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 13,
+      "frontCalls": 13,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 3,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7860
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7731
+        }
+      ],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 3,
+      "driverDistinctVersions": 3,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 3
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 103397,
+        "candidatesTokenCount": 4744,
+        "totalTokenCount": 140519,
+        "thoughtsTokenCount": 32378,
+        "cachedContentTokenCount": 30485
+      },
+      "estimatedUsd": 0.1238,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buffer) {\n    let crc = 0xFFFF;\n    for (let i = 0; i < buffer.length; i++) {\n        crc ^= buffer[i];\n        for (let j = 0; j < 8; j++) {\n            if ((crc & 0x0001) !== 0) {\n                crc = (crc >> 1) ^ 0xA001;\n            } else {\n                crc = crc >> 1;\n            }\n        }\n    }\n    return crc;\n}\n\nfunction hexToBytes(hex) {\n    if (typeof hex !== 'string' || hex.length % 2 !== 0) {\n        throw new Error('Invalid hex string');\n    }\n    const bytes = [];\n    for (let i = 0; i < hex.length; i += 2) {\n        const b = parseInt(hex.substr(i, 2), 16);\n        if (isNaN(b)) {\n            throw new Error('Invalid hex byte');\n        }\n        bytes.push(b);\n    }\n    return bytes;\n}\n\nfunction bytesToHex(bytes) {\n    return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n    let buf = [];\n    if (Array.isArray(command)) {\n        buf.push(0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04);\n        let v0 = Math.round(command[0] * 10000);\n        let v1 = Math.round(command[1] * 10000);\n        buf.push((v0 >> 8) & 0xFF, v0 & 0xFF);\n        buf.push((v1 >> 8) & 0xFF, v1 & 0xFF);\n    } else if (command && command.op === 'lift') {\n        buf.push(0x11, 0x06, 0x02, 0x00);\n        let val = (command.position === 'up') ? 1 : 0;\n        buf.push((val >> 8) & 0xFF, val & 0xFF);\n    } else if (command && command.op === 'grip') {\n        buf.push(0x11, 0x06, 0x02, 0x01);\n        let val = (command.state === 'closed') ? 1 : 0;\n        buf.push((val >> 8) & 0xFF, val & 0xFF);\n    } else {\n        throw new Error('Unknown command format');\n    }\n    let crc = crc16(buf);\n    let crcLo = crc & 0xFF;\n    let crcHi = (crc >> 8) & 0xFF;\n    buf.push(crcLo, crcHi);\n    return bytesToHex(buf);\n}\n\nfunction decode(rawReply) {\n    if (!rawReply || typeof rawReply !== 'string') {\n        throw new Error('Empty or invalid reply');\n    }\n    let bytes = hexToBytes(rawReply);\n    if (bytes.length < 5) {\n        throw new Error('Reply too short');\n    }\n    if (bytes[0] !== 0x11) {\n        throw new Error('Invalid unit address');\n    }\n    let dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n    let crcCalc = crc16(dataWithoutCrc);\n    let crcRecv = (bytes[bytes.length - 2] & 0xFF) | ((bytes[bytes.length - 1] & 0xFF) << 8);\n    if (crcCalc !== crcRecv) {\n        throw new Error('CRC mismatch');\n    }\n    let func = bytes[1];\n    if ((func & 0x80) !== 0) {\n        if (bytes.length !== 5) {\n            throw new Error('Invalid exception response length');\n        }\n        throw new Error('Exception response error code ' + bytes[2]);\n    }\n    if (func === 0x17) {\n        if (bytes.length !== 11 || bytes[2] !== 0x06) {\n            throw new Error('Invalid 0x17 length or byte count');\n        }\n        let a0 = (bytes[3] << 8) | bytes[4];\n        if (a0 & 0x8000) a0 -= 0x10000;\n        let a1 = (bytes[5] << 8) | bytes[6];\n        if (a1 & 0x8000) a1 -= 0x10000;\n        let flags = (bytes[7] << 8) | bytes[8];\n        return {\n            applied: [a0 / 10000, a1 / 10000],\n            limited: (flags & 0x0001) !== 0\n        };\n    } else if (func === 0x06) {\n        if (bytes.length !== 8) {\n            throw new Error('Invalid 0x06 length');\n        }\n        let reg = (bytes[2] << 8) | bytes[3];\n        let val = (bytes[4] << 8) | bytes[5];\n        if (reg === 0x0200) {\n            return {\n                applied: { op: 'lift', position: val === 1 ? 'up' : 'down' },\n                limited: false\n            };\n        } else if (reg === 0x0201) {\n            return {\n                applied: { op: 'grip', state: val === 1 ? 'closed' : 'open' },\n                limited: false\n            };\n        } else {\n            throw new Error('Unknown register for 0x06');\n        }\n    } else {\n        throw new Error('Unsupported function code ' + func);\n    }\n}\n",
+      "generatedControllerSource": null,
+      "truncationNote": "3 consecutive truncations; the third is the run failure and has no separate trace event."
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s8675-r2-gemini",
+      "device": "VLAB-X",
+      "seed": 8675,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 42,
+      "frontCalls": 42,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 2,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 6394
+        },
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 6964
+        }
+      ],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 16,
+      "driverGateFailureCounts": {
+        "升降與夾爪四種命令的實際編解碼": 2,
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "lift value 7"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 385871,
+        "candidatesTokenCount": 33207,
+        "totalTokenCount": 478490,
+        "thoughtsTokenCount": 59412,
+        "cachedContentTokenCount": 201252
+      },
+      "estimatedUsd": 0.3473,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  function crc16(buffer) {\n    let crc = 0xFFFF;\n    for (let i = 0; i < buffer.length; i++) {\n      crc ^= buffer[i];\n      for (let j = 0; j < 8; j++) {\n        if ((crc & 0x0001) !== 0) {\n          crc = (crc >> 1) ^ 0xA001;\n        } else {\n          crc = crc >> 1;\n        }\n      }\n    }\n    return crc;\n  }\n\n  function toHex(buf) {\n    let s = '';\n    for (let i = 0; i < buf.length; i++) {\n      let h = buf[i].toString(16);\n      if (h.length < 2) h = '0' + h;\n      s += h;\n    }\n    return s;\n  }\n\n  let payload = [];\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error('Command array must have 2 elements');\n    }\n    let a = Math.round(command[0] * 10000);\n    let b = Math.round(command[1] * 10000);\n    if (a < -32768) a = -32768; if (a > 32767) a = 32767;\n    if (b < -32768) b = -32768; if (b > 32767) b = 32767;\n    \n    payload = [\n      0x11, 0x17,\n      0x03, 0x10, 0x00, 0x03,\n      0x03, 0x00, 0x00, 0x02,\n      0x04,\n      (a >> 8) & 0xFF, a & 0xFF,\n      (b >> 8) & 0xFF, b & 0xFF\n    ];\n  } else if (command && typeof command === 'object') {\n    let reg = 0;\n    let val = 0;\n    if (command.op === 'lift') {\n      reg = 0x0200;\n      val = (command.position === 'up') ? 1 : 0;\n    } else if (command.op === 'grip') {\n      reg = 0x0201;\n      val = (command.state === 'closed') ? 1 : 0;\n    } else {\n      throw new Error('Unknown command object');\n    }\n    payload = [\n      0x11, 0x06,\n      (reg >> 8) & 0xFF, reg & 0xFF,\n      (val >> 8) & 0xFF, val & 0xFF\n    ];\n  } else {\n    throw new Error('Invalid command format');\n  }\n\n  let crc = crc16(payload);\n  let crcLo = crc & 0xFF;\n  let crcHi = (crc >> 8) & 0xFF;\n\n  let full = new Uint8Array(payload.length + 2);\n  for (let i = 0; i < payload.length; i++) full[i] = payload[i];\n  full[payload.length] = crcLo;\n  full[payload.length + 1] = crcHi;\n\n  return toHex(full);\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== 'string') {\n    throw new Error('Reply must be a string');\n  }\n  let trimmed = rawReply.trim();\n  if (trimmed === '') {\n    throw new Error('Empty reply');\n  }\n  if (trimmed.length % 2 !== 0) {\n    throw new Error('Invalid hex string length');\n  }\n  let bytes = [];\n  for (let i = 0; i < trimmed.length; i += 2) {\n    let b = parseInt(trimmed.substr(i, 2), 16);\n    if (isNaN(b)) {\n      throw new Error('Invalid hex characters');\n    }\n    bytes.push(b);\n  }\n  if (bytes.length < 5) {\n    throw new Error('Reply too short');\n  }\n  if (bytes[0] !== 0x11) {\n    throw new Error('Invalid unit address');\n  }\n\n  let func = bytes[1];\n  let expectedLength = 0;\n  if ((func & 0x80) !== 0) {\n    expectedLength = 5;\n  } else if (func === 0x17) {\n    if (bytes.length < 3) {\n      throw new Error('Reply too short for 0x17');\n    }\n    expectedLength = bytes[2] + 5;\n  } else if (func === 0x06) {\n    expectedLength = 8;\n  } else {\n    throw new Error('Unsupported function code');\n  }\n\n  if (bytes.length !== expectedLength) {\n    throw new Error('Invalid reply length for function ' + func.toString(16));\n  }\n\n  let data = bytes.slice(0, bytes.length - 2);\n  let rxCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n  let crc = 0xFFFF;\n  for (let i = 0; i < data.length; i++) {\n    crc ^= data[i];\n    for (let j = 0; j < 8; j++) {\n      if ((crc & 1) !== 0) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = (crc >> 1);\n      }\n    }\n  }\n  if (crc !== rxCrc) {\n    throw new Error('CRC mismatch');\n  }\n\n  if ((func & 0x80) !== 0) {\n    let exCode = bytes[2];\n    throw new Error('Device exception code ' + exCode);\n  }\n\n  if (func === 0x17) {\n    if (bytes[2] !== 6) {\n      throw new Error('Invalid 0x17 byte count');\n    }\n    let a = ((bytes[3] << 8) | bytes[4]);\n    if (a & 0x8000) a -= 0x10000;\n    let b = ((bytes[5] << 8) | bytes[6]);\n    if (b & 0x8000) b -= 0x10000;\n    let flags = (bytes[7] << 8) | bytes[8];\n    return {\n      applied: [a / 10000, b / 10000],\n      limited: (flags & 1) !== 0\n    };\n  } else if (func === 0x06) {\n    let reg = (bytes[2] << 8) | bytes[3];\n    let val = (bytes[4] << 8) | bytes[5];\n    let applied;\n    if (reg === 0x0200) {\n      applied = { op: 'lift', position: val === 1 ? 'up' : 'down' };\n    } else if (reg === 0x0201) {\n      applied = { op: 'grip', state: val === 1 ? 'closed' : 'open' };\n    } else {\n      throw new Error('Unknown register');\n    }\n    return {\n      applied: applied,\n      limited: false\n    };\n  }\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-204635",
+      "label": "x-s8675-r3-gemini",
+      "device": "VLAB-X",
+      "seed": 8675,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "stoppedAt": "done",
+      "modelCalls": 89,
+      "frontCalls": 19,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 194,
+      "unconfirmed": 0,
+      "ratioToBaseline": 1.18,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "controllerGateAttempts": [
+        false,
+        true
+      ],
+      "driverWrites": 4,
+      "driverDistinctVersions": 4,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 3
+      },
+      "controllerGateFailureCounts": {
+        "起點貼近行程邊界": 1,
+        "二連桿肘關節極限繞行": 1
+      },
+      "driverVersionsOfflineCheck": [
+        "short read reply+lift value 7",
+        "lift value 7",
+        "lift value 7",
+        "all-rejected"
+      ],
+      "controllerTests": {
+        "passed": true,
+        "channelKind": "linear",
+        "twoLinkMaxRatio": 1.3,
+        "elbowLimitCase": false,
+        "efficiency": {
+          "actions": 194,
+          "referenceActions": 195,
+          "ratio": 0.99,
+          "nonlinearArm": {
+            "required": false,
+            "reached": true,
+            "actions": 107,
+            "referenceActions": 69,
+            "ratio": 1.55,
+            "maxRatio": null,
+            "passed": true,
+            "failure": null
+          }
+        }
+      },
+      "usage": {
+        "promptTokenCount": 387264,
+        "candidatesTokenCount": 13698,
+        "totalTokenCount": 434396,
+        "thoughtsTokenCount": 33434,
+        "cachedContentTokenCount": 60994
+      },
+      "estimatedUsd": 0.234,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function crc16(buffer) {\n  let crc = 0xFFFF;\n  for (let i = 0; i < buffer.length; i++) {\n    crc ^= buffer[i];\n    for (let j = 0; j < 8; j++) {\n      if ((crc & 0x0001) !== 0) {\n        crc = (crc >> 1) ^ 0xA001;\n      } else {\n        crc = crc >> 1;\n      }\n    }\n  }\n  return crc;\n}\n\nfunction hexToBytes(hex) {\n  if (typeof hex !== 'string' || hex.length % 2 !== 0 || /[^0-9a-fA-F]/.test(hex)) {\n    throw new Error('Invalid hex string');\n  }\n  const bytes = [];\n  for (let i = 0; i < hex.length; i += 2) {\n    bytes.push(parseInt(hex.substr(i, 2), 16));\n  }\n  return bytes;\n}\n\nfunction bytesToHex(bytes) {\n  return bytes.map(b => b.toString(16).padStart(2, '0')).join('');\n}\n\nfunction encode(command) {\n  let bytes = [];\n  if (Array.isArray(command)) {\n    const a = Math.round(command[0] * 10000);\n    const b = Math.round(command[1] * 10000);\n    \n    bytes = [0x11, 0x17, 0x03, 0x10, 0x00, 0x03, 0x03, 0x00, 0x00, 0x02, 0x04];\n    \n    let bufA = a < 0 ? a + 0x10000 : a;\n    bytes.push((bufA >> 8) & 0xFF, bufA & 0xFF);\n    \n    let bufB = b < 0 ? b + 0x10000 : b;\n    bytes.push((bufB >> 8) & 0xFF, bufB & 0xFF);\n  } else if (command && command.op === 'lift') {\n    const val = command.position === 'up' ? 1 : 0;\n    bytes = [0x11, 0x06, 0x02, 0x00, 0x00, val];\n  } else if (command && command.op === 'grip') {\n    const val = command.state === 'closed' ? 1 : 0;\n    bytes = [0x11, 0x06, 0x02, 0x01, 0x00, val];\n  } else {\n    throw new Error('Unknown command type');\n  }\n\n  const crc = crc16(bytes);\n  bytes.push(crc & 0xFF, (crc >> 8) & 0xFF);\n  return bytesToHex(bytes);\n}\n\nfunction decode(rawReply) {\n  if (!rawReply || typeof rawReply !== 'string') {\n    throw new Error('Invalid reply: not a string');\n  }\n  const bytes = hexToBytes(rawReply);\n  if (bytes.length < 5) {\n    throw new Error('Reply too short');\n  }\n\n  const unit = bytes[0];\n  if (unit !== 0x11) {\n    throw new Error('Unit address mismatch');\n  }\n\n  // Check CRC first\n  const dataWithoutCrc = bytes.slice(0, bytes.length - 2);\n  const receivedCrc = bytes[bytes.length - 2] | (bytes[bytes.length - 1] << 8);\n  const calculatedCrc = crc16(dataWithoutCrc);\n  if (receivedCrc !== calculatedCrc) {\n    throw new Error('CRC mismatch');\n  }\n\n  const func = bytes[1];\n  if ((func & 0x80) !== 0) {\n    if (bytes.length !== 5) {\n      throw new Error('Invalid exception frame length');\n    }\n    const errCode = bytes[2];\n    throw new Error('Modbus exception code: ' + errCode);\n  }\n\n  if (func === 0x17) {\n    if (bytes.length !== 11) {\n      throw new Error('Invalid 0x17 reply length');\n    }\n    const byteCount = bytes[2];\n    if (byteCount !== 6) {\n      throw new Error('Invalid 0x17 byte count');\n    }\n    let rawA = (bytes[3] << 8) | bytes[4];\n    if (rawA & 0x8000) rawA -= 0x10000;\n    let rawB = (bytes[5] << 8) | bytes[6];\n    if (rawB & 0x8000) rawB -= 0x10000;\n    const flags = (bytes[7] << 8) | bytes[8];\n\n    const applied = [rawA / 10000, rawB / 10000];\n    const limited = (flags & 0x0001) !== 0;\n    return { applied, limited };\n  } else if (func === 0x06) {\n    if (bytes.length !== 8) {\n      throw new Error('Invalid 0x06 reply length');\n    }\n    const reg = (bytes[2] << 8) | bytes[3];\n    const val = (bytes[4] << 8) | bytes[5];\n    if (reg === 0x0200) {\n      if (val !== 0 && val !== 1) {\n        throw new Error('Invalid lift value in reply');\n      }\n      const position = val === 1 ? 'up' : 'down';\n      return { applied: { op: 'lift', position }, limited: false };\n    } else if (reg === 0x0201) {\n      if (val !== 0 && val !== 1) {\n        throw new Error('Invalid grip value in reply');\n      }\n      const state = val === 1 ? 'closed' : 'open';\n      return { applied: { op: 'grip', state }, limited: false };\n    } else {\n      throw new Error('Unsupported register in 0x06 reply');\n    }\n  } else {\n    throw new Error('Unsupported function code in reply: ' + func);\n  }\n}\n",
+      "generatedControllerSource": "function control(state) {\n  const { tip, target, errorPx, tolerancePx, inputLimit, history } = state;\n  const dx = target[0] - tip[0];\n  const dy = target[1] - tip[1];\n  \n  if (errorPx <= tolerancePx) {\n    return { action: \"verify\" };\n  }\n  \n  let recentLimitedCount = 0;\n  for (let i = Math.max(0, history.length - 3); i < history.length; i++) {\n    if (history[i] && history[i].limited) {\n      recentLimitedCount++;\n    }\n  }\n  \n  const X = [];\n  const Y = [];\n  \n  for (let i = 0; i < history.length; i++) {\n    const h = history[i];\n    if (h && h.applied && h.delta && !h.limited) {\n      const a = h.applied[0];\n      const b = h.applied[1];\n      if (Math.abs(a) > 1e-4 || Math.abs(b) > 1e-4) {\n        X.push([a, b]);\n        Y.push([h.delta[0], h.delta[1]]);\n      }\n    }\n  }\n  \n  if (X.length < 2 || recentLimitedCount >= 2) {\n    const stepCount = history.length;\n    let u = [0.03, -0.03];\n    if (stepCount % 4 === 0) u = [0.05, 0.0];\n    else if (stepCount % 4 === 1) u = [-0.05, 0.0];\n    else if (stepCount % 4 === 2) u = [0.0, 0.05];\n    else u = [0.0, -0.05];\n    if (recentLimitedCount >= 2) {\n      u = [-u[0]*0.5, -u[1]*0.5];\n    }\n    return { action: \"move\", u };\n  }\n  \n  function solve1D(X, target_vals) {\n    let sum_aa = 0, sum_ab = 0, sum_bb = 0;\n    let sum_ay = 0, sum_by = 0;\n    for (let i = 0; i < X.length; i++) {\n      const a = X[i][0];\n      const b = X[i][1];\n      const y = target_vals[i];\n      sum_aa += a * a;\n      sum_ab += a * b;\n      sum_bb += b * b;\n      sum_ay += a * y;\n      sum_by += b * y;\n    }\n    const det = sum_aa * sum_bb - sum_ab * sum_ab;\n    if (Math.abs(det) < 1e-9) return null;\n    const J0 = (sum_bb * sum_ay - sum_ab * sum_by) / det;\n    const J1 = (sum_aa * sum_by - sum_ab * sum_ay) / det;\n    return [J0, J1];\n  }\n  \n  const dx_vals = Y.map(y => y[0]);\n  const dy_vals = Y.map(y => y[1]);\n  \n  const row0 = solve1D(X, dx_vals);\n  const row1 = solve1D(X, dy_vals);\n  \n  if (!row0 || !row1) {\n    return { action: \"move\", u: [0.03, -0.03] };\n  }\n  \n  const J00 = row0[0], J01 = row0[1];\n  const J10 = row1[0], J11 = row1[1];\n  \n  const detJ = J00 * J11 - J01 * J10;\n  if (Math.abs(detJ) < 1e-9) {\n    return { action: \"move\", u: [0.03, 0.03] };\n  }\n  \n  const inv00 = J11 / detJ;\n  const inv01 = -J01 / detJ;\n  const inv10 = -J10 / detJ;\n  const inv11 = J00 / detJ;\n  \n  let ua = inv00 * dx + inv01 * dy;\n  let ub = inv10 * dx + inv11 * dy;\n  \n  const mag = Math.max(Math.abs(ua), Math.abs(ub));\n  if (mag > 0) {\n    const scale = Math.min(inputLimit, Math.max(0.01, inputLimit * (errorPx / 50)));\n    ua = (ua / mag) * scale;\n    ub = (ub / mag) * scale;\n  }\n  \n  ua = Math.max(-inputLimit, Math.min(inputLimit, ua));\n  ub = Math.max(-inputLimit, Math.min(inputLimit, ub));\n  \n  return { action: \"move\", u: [ua, ub] };\n}",
+      "crossSeedReplay": {
+        "2026": {
+          "completed": 5,
+          "actions": 194,
+          "trialActions": [
+            44,
+            36,
+            40,
+            37,
+            37
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 195,
+          "trialActions": [
+            45,
+            35,
+            39,
+            38,
+            38
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 194,
+          "trialActions": [
+            44,
+            37,
+            37,
+            35,
+            41
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        }
+      }
+    }
+  ],
+  "gateRejectedControllerVersions": [
+    {
+      "label": "x-s3140-r2-gemini",
+      "version": 1,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 5,
+          "actions": 152,
+          "trialActions": [
+            35,
+            28,
+            32,
+            29,
+            28
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 151,
+          "trialActions": [
+            35,
+            27,
+            31,
+            29,
+            29
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 153,
+          "trialActions": [
+            34,
+            29,
+            31,
+            28,
+            31
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    },
+    {
+      "label": "x-s3140-r3-gemini",
+      "version": 1,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 5,
+          "actions": 290,
+          "trialActions": [
+            67,
+            53,
+            60,
+            57,
+            53
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 534,
+          "trialActions": [
+            97,
+            95,
+            85,
+            106,
+            151
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 393,
+          "trialActions": [
+            78,
+            92,
+            64,
+            79,
+            80
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    },
+    {
+      "label": "x-s8675-r3-gemini",
+      "version": 1,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 5,
+          "actions": 194,
+          "trialActions": [
+            44,
+            36,
+            40,
+            37,
+            37
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 194,
+          "trialActions": [
+            44,
+            35,
+            39,
+            38,
+            38
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 192,
+          "trialActions": [
+            42,
+            37,
+            37,
+            35,
+            41
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    }
+  ],
+  "notes": [
+    "3/9 runs 5/5 with simulator truth (15/45 trials); 6 runs stopped at the driver gate before any actuation (5 by the 40-call front limit, x-s8675-r1 by three consecutive truncated responses). Zero unconfirmed actuations, no transient or rate-limit retries.",
+    "Driver gate: every run failed '驅動程式拒絕失敗或毀損回覆' first; 94 of 99 driver versions accepted the write reply carrying lift value 7, while structural faults (CRC, unit address, exception codes, empty, non-hex) were rejected. The VLAB-X contract states that corrupted replies must throw.",
+    "Truncations: 12, all during onboarding with 6,400-7,900 thinking tokens against the 8,192 output limit (unchanged by protocol).",
+    "Completed runs 0.99-1.18x the offline reference; their controllers replayed on all three seeds 9/9 complete, own-seed action counts equal the live runs. The 3 gate-rejected controller versions would each complete all three seeds (analysis only)."
+  ]
+}
