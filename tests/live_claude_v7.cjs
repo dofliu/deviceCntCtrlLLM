@@ -29,10 +29,13 @@
 //              adds VLAB-X (and VLAB-Y in its own runs) to the manual library
 //   --gate C|D|E (E)  E: D plus the elbow-limit two-link case on rotary manuals;
 //                   D: two-link case within 1.3x reference actions; C: reach-only
+//   --thinking-level minimal|low|medium|high  Gemini only: send thinkingConfig.thinkingLevel
+//              (default: not sent, so the model default applies)
 //   --no-transient-retry  do not resend a model request after a timeout or a server failure
 //              (Claude: HTTP 500/502/504/529; Gemini: HTTP 500/502/504 or 503 UNAVAILABLE)
 // Both providers get the same request limits: 8192 output tokens during onboarding,
-// 1400 afterwards (thinking included), thinking left at the provider default.
+// 1400 afterwards (thinking included), thinking left at the provider default unless
+// --thinking-level is given for Gemini.
 // The last stdout line is "RESULT <json>" with the summary path for wrappers.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -55,6 +58,8 @@ const PROVIDERS = {
 const providerName = String(arg('--provider', 'claude')).toLowerCase();
 const providerSpec = PROVIDERS[providerName] || fail('--provider must be claude or gemini.');
 const OUTPUT_LIMITS = { onboarding: 8192, other: 1400 };
+const thinkingLevel = arg('--thinking-level', undefined);
+if (thinkingLevel !== undefined && (providerName !== 'gemini' || !['minimal', 'low', 'medium', 'high'].includes(thinkingLevel))) fail('--thinking-level is for --provider gemini and must be minimal, low, medium or high.');
 const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2, G3, X or Y.');
 if (['VLAB-X', 'VLAB-Y'].includes(device) && !flag('--holdout')) fail(device + ' is a held-out evaluation device; add --holdout to run it.');
 const seed = Number(arg('--seed', 2026));
@@ -155,7 +160,7 @@ function summarize(report, { model, error }) {
     version: report?.version || '0.7.0', kind: offline ? 'offline-cli-run' : 'live-model-run', runner: 'headless-node (tests/live_claude_v7.cjs)',
     provider: offline ? null : providerName, model: offline ? null : (report?.model || model || null), git: gitInfo(), node: process.version,
     condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), gate, controllerGate: report?.suiteParameters?.controllerGate ?? null, maxTransientRetries: offline ? null : maxTransientRetries, maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs,
-      modelSettings: offline ? null : { maxOutputTokens: OUTPUT_LIMITS, thinking: 'provider default (not set in the request)', toolChoice: providerSpec.toolChoice } },
+      modelSettings: offline ? null : { maxOutputTokens: OUTPUT_LIMITS, thinking: thinkingLevel ? `thinkingLevel ${thinkingLevel}` : 'provider default (not set in the request)', toolChoice: providerSpec.toolChoice } },
     startedAt: started.toISOString(), finishedAt: new Date().toISOString(), runnerError: error,
     result: { done: report?.done ?? false, failure: report?.failure ?? null, failureCategory: report?.failureCategory ?? null, completedTrials: report?.suiteProgress?.totalCompleted ?? 0,
       allTruthPlaced: trialRows.length === trials && trialRows.every(t => t.evaluatorTruth?.placed === true) },
@@ -199,7 +204,7 @@ async function main() {
       }
       // Claude's request already uses 8192 / 1400 output tokens (claude-provider.js).
       provider = providerName === 'gemini'
-        ? new g.GeminiAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries, maxOutputTokens: OUTPUT_LIMITS })
+        ? new g.GeminiAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries, maxOutputTokens: OUTPUT_LIMITS, thinkingLevel })
         : new g.ClaudeAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries });
       strategy = providerName;
     }

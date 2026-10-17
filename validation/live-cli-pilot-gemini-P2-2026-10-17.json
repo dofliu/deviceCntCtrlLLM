@@ -1,0 +1,94 @@
+{
+  "kind": "live-model-pilot",
+  "version": "0.7.0",
+  "runner": "run_experiments.py -> tests/live_claude_v7.cjs (headless-node)",
+  "source": "Author's local run 2026-10-17 18:46-18:50 (UTC+8); files returned: p2-s2026-r1-gemini.summary.json, .full.json.gz, batch-summary.json/.csv. Analysis by AI in the cloud session.",
+  "purpose": "PROTOCOL.md amendment 2 pilot: check the Gemini pipeline and measure token use on the development device. Development data only; not a held-out result.",
+  "git": {
+    "commit": "474a1be",
+    "dirtySourceOrTests": false
+  },
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "condition": {
+    "device": "VLAB-P2",
+    "seed": 2026,
+    "manualTemplate": "off",
+    "controllerMode": "generated",
+    "trials": 5,
+    "gate": "E",
+    "maxCalls": 150,
+    "minIntervalMs": 6000,
+    "maxTransientRetries": 1,
+    "maxOutputTokens": {
+      "onboarding": 8192,
+      "other": 1400
+    },
+    "thinking": "model default (not set; Google docs list 3.5 Flash-Lite default as minimal)",
+    "toolChoice": "ANY"
+  },
+  "result": {
+    "completedTrials": 0,
+    "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+    "stoppedBy": "front-phase decision limit (40 calls), an existing system rule",
+    "actions": 0,
+    "unconfirmed": 0
+  },
+  "pipeline": {
+    "modelCalls": 40,
+    "decisionRejections": 0,
+    "rateLimitRetries": 0,
+    "transientRetries": 0,
+    "note": "Bridge, key check, function calling, usage recording and cost estimate all worked."
+  },
+  "usage": {
+    "promptTokenCount": 262405,
+    "candidatesTokenCount": 7532,
+    "thoughtsTokenCount": 0,
+    "cachedContentTokenCount": 129727,
+    "perCall": {
+      "input": 6560,
+      "output": 188
+    },
+    "estimatedUsd": 0.0976,
+    "price": "US$0.30 in / US$2.50 out per 1M (2026-10-17); cached tokens counted at full price, so the bill should not exceed the estimate"
+  },
+  "onboarding": {
+    "stepsBeforeDriver": "inspect_device, list_interfaces, inspect_device, read_manual, connect (TCP), handshake: all ok in 6 calls",
+    "writeDriver": 18,
+    "compileErrors": 1,
+    "testDriver": 16,
+    "testDriverPassed": 0,
+    "failingCheck": "驅動程式拒絕失敗或毀損回覆 (decode must reject malformed/error device replies.)",
+    "versions": {
+      "distinct": 8,
+      "mostRepeated": {
+        "hash": "bf1bffc4",
+        "submissions": 8
+      }
+    },
+    "offlineCheckOfEachVersion": {
+      "fixtures": [
+        "not-json",
+        "ok:false",
+        "accepted [\"bad\",0]",
+        "accepted lift position sideways"
+      ],
+      "result": "From version 2 on, decode threw for not-json and ok:false but accepted both replies with invalid accepted values in every later version; the last, untested version also accepted ok:false again.",
+      "rows": {
+        "add4dfdd": "threw, accepted, accepted, accepted",
+        "34f2cf7e": "threw, threw, accepted, accepted",
+        "0e05ab9d": "compile error",
+        "c9f98325": "threw, threw, accepted, accepted",
+        "2b4bee1c": "threw, threw, accepted, accepted",
+        "0332ef8a": "threw, threw, accepted, accepted",
+        "bf1bffc4": "threw, threw, accepted, accepted",
+        "4d2dd61e (not tested)": "threw, accepted, accepted, accepted"
+      }
+    }
+  },
+  "comparisonWithHaiku": "Same feedback text for both models. Haiku failed this check with its first JSON-protocol driver in every P2 and VLAB-Y run and passed on the second version (VLAB-Y 9/9; LIVE_EXPERIMENTS §4.20). The P2/VLAB-Y driver contract does not say that error replies must throw; the G3 and VLAB-X contracts do.",
+  "interpretation": "Model failure at the driver gate on the development device, not an adapter defect. Gemini wrote no thinking tokens (model default), while Haiku 5.5 ran with its default adaptive thinking; this difference is an open confound for the author to decide before the held-out runs.",
+  "reportingFix": "batch-summary showed controllerFirstTry=True although test_controller never ran; run_experiments.py now reports None when a test tool never ran.",
+  "notUsedFor": "No gate, prompt, manual, reference module or threshold was changed because of this pilot."
+}

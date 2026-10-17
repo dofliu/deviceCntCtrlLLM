@@ -85,7 +85,7 @@ python run_experiments.py --provider gemini --model gemini-3.5-flash-lite --devi
 - 預設條件與瀏覽器實驗相同：無範本、產生控制程式、5 回合、請求間隔 6 秒。可用 `--manual-template on`、`--controller-mode builtin`、`--repeat n`、`--max-calls-per-run n` 調整。
 - 預算：每組有單組上限（預設 150），整批另有總上限；每次真正送出的請求都計入，用量不明時以單組上限扣除；剩餘額度不足 `--min-calls-to-start`（預設 60）就不再開始新的一組。真實模式開始前會要求輸入 `yes` 確認（`--yes` 可略過）。
 - 金鑰：只由橋接讀取。Claude 用 `ANTHROPIC_API_KEY`（或 `--key-env ANTHROPIC_API_KEY_Extra`）；Gemini（`--provider gemini`）只用 `gemini_api_key`（也接受 `GEMINI_API_KEY` 寫法），建議用付費層，因為免費層資料可能被 Google 用於改進產品。找不到金鑰時整批停止，沒有送出任何請求。
-- Gemini 與 Claude 的請求設定相同：啟用階段輸出上限 8192、之後 1400 token（含思考），思考用模型預設，逾時或伺服器錯誤重送一次並計入預算。Gemini 以 ANY 模式強制呼叫工具（Claude 為 auto），這是既有介接差異。瀏覽器版 Gemini 的預設（8192、不重送）沒有改。
+- Gemini 與 Claude 的請求設定相同：啟用階段輸出上限 8192、之後 1400 token（含思考），思考用模型預設（Gemini 可用 `--thinking-level minimal|low|medium|high` 指定），逾時或伺服器錯誤重送一次並計入預算。Gemini 以 ANY 模式強制呼叫工具（Claude 為 auto），這是既有介接差異。瀏覽器版 Gemini 的預設（8192、不重送）沒有改。
 - 費用：`--max-usd` 依每組紀錄的 token 用量與命令列給的每 1M token 價格估算（Gemini 思考 token 以輸出價計），預估超過上限就不再開始新的一組。這只是估算，實際費用以供應商後台為準。
 - 輸出：`artifacts/live-runs/batch-<時間>/`（不進 repo）內有每組 `*.summary.json`（數十 KB，含自產程式、步長、效率倍率、模擬器真值核對、git commit）、`*.full.json.gz`（完整紀錄壓縮檔），以及 `batch-summary.json`／`batch-summary.csv` 總表。分享時壓縮 summary 與 batch 檔即可。
 - **離線重播控制程式**（不呼叫 API）：`node tests/replay_controller.cjs --summary <某組>.summary.json --seeds 2026,3140,8675 --compare-reference` 會把該組 Claude 寫的控制程式放回模擬器重跑（高階步驟用離線規則），輸出動作數與隔離測試倍率。已驗證與真實執行的動作數逐回合相同，可用來比較或分析控制程式而不花費。

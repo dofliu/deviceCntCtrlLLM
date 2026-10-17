@@ -71,9 +71,21 @@ class BatchCostTests(unittest.TestCase):
         self.assertEqual((summary["budget"]["usdPerMTokIn"], summary["budget"]["usdPerMTokOut"], summary["budget"]["maxUsd"]), (0.30, 2.50, 1.0))
         self.assertIn("est. US$0.61 so far", out)
 
+    def test_first_try_needs_the_test_to_run(self):
+        steps = [["write_driver", True], ["test_driver", False], ["write_driver", True], ["test_driver", True]]
+        self.assertIs(RUN.first_try(steps, "test_driver"), False)
+        self.assertIsNone(RUN.first_try(steps, "test_controller"))
+        self.assertIs(RUN.first_try([["test_controller", True]], "test_controller"), True)
+
+    def test_thinking_level_passthrough(self):
+        run_one = canned(90, GEMINI_USAGE)
+        summary, _ = batch(["--provider", "gemini", "--thinking-level", "medium", "--devices", "P2", "--seeds", "2026", "--total-max-calls", "150"], run_one)
+        self.assertEqual(summary["condition"]["thinkingLevel"], "medium")
+
     def test_bad_arguments(self):
         for argv, message in ((["--provider", "gemini", "--key-env", "ANTHROPIC_API_KEY"], "--key-env for gemini"),
-                              (["--provider", "gemini", "--max-usd", "20"], "--max-usd needs")):
+                              (["--provider", "gemini", "--max-usd", "20"], "--max-usd needs"),
+                              (["--thinking-level", "medium"], "--thinking-level applies to --provider gemini only")):
             with patch.object(sys, "argv", ["run_experiments.py", *argv, "--devices", "P2"]), self.assertRaises(SystemExit) as stop:
                 RUN.main()
             self.assertIn(message, str(stop.exception.code))
