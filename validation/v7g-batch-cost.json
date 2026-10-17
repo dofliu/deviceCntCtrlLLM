@@ -1,0 +1,9 @@
+{
+  "version": "0.7.0",
+  "date": "2026-10-17",
+  "scope": "run_experiments.py provider defaults and estimated-cost cap with canned run summaries; no Node run, bridge, key or model request.",
+  "testsRun": 4,
+  "failures": 0,
+  "errors": 0,
+  "passed": true
+}

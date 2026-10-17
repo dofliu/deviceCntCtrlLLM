@@ -282,15 +282,17 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
     return {status:response.status,quotaKind,retryable,...(retryAfterMs!==null?{retryAfterMs}:{})};
   }
   class ModelRequestScheduler {
-    #minIntervalMs;#maxRetries;#maxTransientRetries;#transientCooldownMs;#notify;#makeError;#lastStarted=null;#requests=0;#retries=0;#transientRetries=0;#waitMs=0;#recent=[];#lastError=null;
+    #minIntervalMs;#maxRetries;#maxTransientRetries;#transientCooldownMs;#isTransient;#notify;#makeError;#lastStarted=null;#requests=0;#retries=0;#transientRetries=0;#waitMs=0;#recent=[];#lastError=null;
     #status={phase:'idle',waitUntil:null,retryAttempt:0,maxRetries:2,startedAt:null};
     // maxTransientRetries: a model request that times out or gets HTTP 500/502/504/529
     // is sent again at most this many times (0 or 1) after transientCooldownMs (10 s). Each
     // attempt is a real request: it passes the budget check and is counted.
-    // Only model generation is retried; device commands are never resent here.
-    constructor({minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,transientCooldownMs=10000,onRequestStatus,makeError}) {
+    // isTransient lets a provider name its own server-side failures (default: the
+    // HTTP codes above). Only model generation is retried; device commands are never resent here.
+    constructor({minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,transientCooldownMs=10000,isTransient,onRequestStatus,makeError}) {
       this.#makeError=makeError;
-      if(!Number.isFinite(minIntervalMs)||minIntervalMs<0||minIntervalMs>120000||!Number.isInteger(maxRateLimitRetries)||maxRateLimitRetries<0||maxRateLimitRetries>2||!Number.isInteger(maxTransientRetries)||maxTransientRetries<0||maxTransientRetries>1||!Number.isFinite(transientCooldownMs)||transientCooldownMs<0||transientCooldownMs>60000)throw makeError('INVALID_PACING');
+      if(!Number.isFinite(minIntervalMs)||minIntervalMs<0||minIntervalMs>120000||!Number.isInteger(maxRateLimitRetries)||maxRateLimitRetries<0||maxRateLimitRetries>2||!Number.isInteger(maxTransientRetries)||maxTransientRetries<0||maxTransientRetries>1||!Number.isFinite(transientCooldownMs)||transientCooldownMs<0||transientCooldownMs>60000||(isTransient!==undefined&&typeof isTransient!=='function'))throw makeError('INVALID_PACING');
+      this.#isTransient=isTransient||(error=>/^HTTP_(500|502|504|529)$/.test(error?.code||''));
       this.#minIntervalMs=minIntervalMs;this.#maxRetries=maxRateLimitRetries;this.#maxTransientRetries=maxTransientRetries;this.#transientCooldownMs=transientCooldownMs;this.#notify=typeof onRequestStatus==='function'?onRequestStatus:null;this.#status.maxRetries=maxRateLimitRetries;
     }
     get status(){return {...this.#status};}
@@ -336,7 +338,7 @@ mission 階段中 observed.destination 是 B 的桌面 XY 定位標記，destina
             const result=await pending;this.#aborted(signal);this.#event('response',{requestNumber:this.#requests,retryAttempt});return result;
           }catch(error){
             this.#aborted(signal);
-            if((timedOut||/^HTTP_(500|502|504|529)$/.test(error?.code||''))&&transientAttempt<this.#maxTransientRetries){
+            if((timedOut||this.#isTransient(error))&&transientAttempt<this.#maxTransientRetries){
               if(hasBudget&&!hasBudget())throw this.#makeError('CALL_BUDGET',{retryAttempt,maxRetries:this.#maxRetries,requestNumber:this.#requests});
               this.#event('transient-retry',{code:timedOut?'TIMEOUT':error.code,requestNumber:this.#requests,transientAttempt:transientAttempt+1});
               clearTimeout(timer);signal.removeEventListener('abort',cancel);
