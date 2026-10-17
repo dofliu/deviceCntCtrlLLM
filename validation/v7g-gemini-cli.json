@@ -1,0 +1,17 @@
+{
+  "version": "0.7.0",
+  "kind": "offline-node",
+  "date": "2026-10-17",
+  "node": "v22.22.0",
+  "scope": "Gemini path of the CLI runner: provider retry and output limits with canned HTTP, headless engine plumbing with a stubbed bridge, runner setup refusals. No key, network, model call or full experiment.",
+  "passed": true,
+  "checks": [
+    "Gemini with maxTransientRetries 1 resends once after 10 s on HTTP 500/502/504 or 503 UNAVAILABLE (bridge or direct); both attempts count as calls",
+    "a Gemini request timeout (45 s) is resent once after the 10 s cooldown",
+    "no third attempt; no resend for a missing key, budget refusal or 4xx; an exhausted budget stops the resend; the default (browser) Gemini provider still never resends",
+    "Claude keeps its own rule (529 resent, 503 not): the scheduler default is unchanged",
+    "Gemini can use the Claude output limits (8192 onboarding, 1400 afterwards); neither request sets thinking; the browser default stays 8192",
+    "headless engine with the Gemini provider: bridge route, model and limits in each request; report keeps strategy, model, call count and summed usage including thinking tokens",
+    "runner --provider gemini: model required, only gemini_api_key accepted, unknown provider rejected; without the key it stops before the bridge with 0 calls and a summary naming provider, model and request limits"
+  ]
+}

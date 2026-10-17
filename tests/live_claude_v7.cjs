@@ -1,7 +1,8 @@
 'use strict';
 // Command-line five-trial runner (no browser page). One run per invocation.
 //
-// Live mode makes AUTHORIZED real Claude API calls through the local bridge.
+// Live mode makes AUTHORIZED real model API calls through the local bridge
+// (claude_bridge.py, or gemini_bridge.py with --provider gemini).
 // The API key stays inside the bridge process; this script only checks that
 // the named variable exists and never reads, prints or stores its value.
 // --offline runs the offline rule policy instead (no bridge, no API, no cost)
@@ -16,17 +17,22 @@
 // Usage:
 //   node tests/live_claude_v7.cjs --device G3 --seed 2026 --model claude-haiku-5-5 --max-calls 150
 //   node tests/live_claude_v7.cjs --device P2 --seed 3140 --offline
-// Options: --device P2|G3  --seed n  --model id  --max-calls n (<=500)
+//   node tests/live_claude_v7.cjs --provider gemini --model gemini-3.5-flash-lite --device P2 --seed 2026
+// Options: --provider claude|gemini (claude)  --device P2|G3  --seed n  --model id (required for gemini)  --max-calls n (<=500)
 //   --manual-template on|off (off)  --controller-mode generated|builtin (generated)
-//   --trials 5|1  --min-interval-ms n (6000)  --port n (8766)
-//   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra  --out-dir dir  --label name
+//   --trials 5|1  --min-interval-ms n (6000)  --port n (8766 claude, 8767 gemini)
+//   --key-env ANTHROPIC_API_KEY|ANTHROPIC_API_KEY_Extra (claude) or gemini_api_key (gemini; GEMINI_API_KEY also accepted)
+//   --out-dir dir  --label name
 //   --offline  --no-full
 //   --legacy-target  re-measure the goal marker every step (behaviour before 2026-10-13)
 //   --holdout  allow a held-out device: VLAB-X (--device X) or VLAB-Y (--device Y);
 //              adds VLAB-X (and VLAB-Y in its own runs) to the manual library
 //   --gate C|D|E (E)  E: D plus the elbow-limit two-link case on rotary manuals;
 //                   D: two-link case within 1.3x reference actions; C: reach-only
-//   --no-transient-retry  do not resend a model request after a timeout or HTTP 500/502/504/529
+//   --no-transient-retry  do not resend a model request after a timeout or a server failure
+//              (Claude: HTTP 500/502/504/529; Gemini: HTTP 500/502/504 or 503 UNAVAILABLE)
+// Both providers get the same request limits: 8192 output tokens during onboarding,
+// 1400 afterwards (thinking included), thinking left at the provider default.
 // The last stdout line is "RESULT <json>" with the summary path for wrappers.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -41,6 +47,14 @@ const flag = name => argv.includes(name);
 const fail = message => { console.error(message); console.log('RESULT ' + JSON.stringify({ ok: false, error: message })); process.exit(2); };
 
 const DEVICES = { P2: 'VLAB-P2', G3: 'VLAB-G3', X: 'VLAB-X', Y: 'VLAB-Y', 'VLAB-P2': 'VLAB-P2', 'VLAB-G3': 'VLAB-G3', 'VLAB-X': 'VLAB-X', 'VLAB-Y': 'VLAB-Y' };
+const PROVIDERS = {
+  claude: { bridge: 'claude_bridge.py', port: 8766, keyNames: ['ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY_Extra'], keyDefault: 'ANTHROPIC_API_KEY', toolChoice: 'auto (one tool, no parallel calls)' },
+  // gemini_bridge.py authorizes only gemini_api_key; it also reads the GEMINI_API_KEY spelling.
+  gemini: { bridge: 'gemini_bridge.py', port: 8767, keyNames: ['gemini_api_key'], keyDefault: 'gemini_api_key', keySpellings: ['gemini_api_key', 'GEMINI_API_KEY', 'Gemini_API_Key'], toolChoice: 'ANY (function call required, one call)' }
+};
+const providerName = String(arg('--provider', 'claude')).toLowerCase();
+const providerSpec = PROVIDERS[providerName] || fail('--provider must be claude or gemini.');
+const OUTPUT_LIMITS = { onboarding: 8192, other: 1400 };
 const device = DEVICES[String(arg('--device', 'G3')).toUpperCase()] || fail('--device must be P2, G3, X or Y.');
 if (['VLAB-X', 'VLAB-Y'].includes(device) && !flag('--holdout')) fail(device + ' is a held-out evaluation device; add --holdout to run it.');
 const seed = Number(arg('--seed', 2026));
@@ -59,13 +73,16 @@ if (!['C', 'D', 'E'].includes(gate)) fail('--gate must be C, D or E.');
 const twoLinkMaxRatio = gate === 'C' ? null : undefined;
 const elbowLimitCase = gate === 'E' ? undefined : false;
 const maxTransientRetries = flag('--no-transient-retry') ? 0 : 1;
-const keyEnv = arg('--key-env', 'ANTHROPIC_API_KEY');
+const keyEnv = arg('--key-env', providerSpec.keyDefault);
+if (!providerSpec.keyNames.includes(keyEnv)) fail(`--key-env for ${providerName} must be ${providerSpec.keyNames.join(' or ')}.`);
+const modelArg = arg('--model', null);
+if (!offline && providerName === 'gemini' && !modelArg) fail('--model is required with --provider gemini (for example gemini-3.5-flash-lite).');
 const maxCalls = Math.min(500, Math.max(1, Math.floor(Number(arg('--max-calls', 150)) || 150)));
 const minIntervalMs = Math.min(120000, Math.max(0, Number(arg('--min-interval-ms', 6000))));
-const port = Number(arg('--port', 8766));
+const port = Number(arg('--port', providerSpec.port));
 const started = new Date();
 const stamp = started.toISOString().replace(/[:.]/g, '-');
-const label = String(arg('--label', `${device.slice(5).toLowerCase()}-s${seed}-${offline ? 'offline' : 'claude'}-${stamp}`)).replace(/[^A-Za-z0-9._-]/g, '_');
+const label = String(arg('--label', `${device.slice(5).toLowerCase()}-s${seed}-${offline ? 'offline' : providerName}-${stamp}`)).replace(/[^A-Za-z0-9._-]/g, '_');
 const outDir = path.resolve(arg('--out-dir', path.join(root, 'artifacts', 'live-runs', stamp.slice(0, 10))));
 
 function gitInfo() {
@@ -94,20 +111,21 @@ function portBusy(p) {
 }
 async function startBridge() {
   if (await portBusy(port)) throw new Error(`Port ${port} is already in use (another run or bridge?). Wait for it to finish or pass a different --port; no request was sent.`);
-  if (!['ANTHROPIC_API_KEY', 'ANTHROPIC_API_KEY_Extra'].includes(keyEnv)) throw new Error('Unsupported key variable name.');
-  if (!process.env[keyEnv]) throw new Error(`${keyEnv} is not set in this environment; no request was sent.`);
+  if (!providerSpec.keyNames.includes(keyEnv)) throw new Error('Unsupported key variable name.');
+  const spellings = providerSpec.keySpellings || [keyEnv];
+  if (!spellings.some(name => process.env[name])) throw new Error(`${spellings.join(' / ')} is not set in this environment; no request was sent.`);
   const html = path.join(root, 'unknown-device-v7.0.html');
   if (!fs.existsSync(html)) throw new Error('Run python build.py first.');
   const python = process.platform === 'win32' ? 'python' : 'python3';
   // -u / PYTHONUNBUFFERED: stdout is a pipe here, and Python would otherwise
   // block-buffer the "available" startup line until the 15 s timeout fires.
-  bridge = spawn(python, ['-u', path.join(root, 'claude_bridge.py'), '--port', String(port), '--max-calls', String(maxCalls), '--key-env', keyEnv, '--html', html],
+  bridge = spawn(python, ['-u', path.join(root, providerSpec.bridge), '--port', String(port), '--max-calls', String(maxCalls), '--key-env', keyEnv, '--html', html],
     { stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, PYTHONUNBUFFERED: '1' } });
   return new Promise((resolve, reject) => {
     let out = '';
     const timer = setTimeout(() => reject(new Error('Bridge did not start.')), 15000);
     bridge.stdout.on('data', chunk => { out += chunk; if (/available/.test(out)) { clearTimeout(timer); resolve(); } else if (/not found/.test(out)) { clearTimeout(timer); stopBridge(); reject(new Error('Bridge could not find the key variable.')); } });
-    bridge.stderr.on('data', chunk => process.stderr.write(String(chunk).replace(/sk-ant-[A-Za-z0-9_-]+/g, '[redacted]')));
+    bridge.stderr.on('data', chunk => process.stderr.write(String(chunk).replace(/sk-ant-[A-Za-z0-9_-]+|AIza[0-9A-Za-z_-]{20,}/g, '[redacted]')));
     bridge.on('exit', code => { clearTimeout(timer); reject(new Error('Bridge exited: ' + code)); });
   });
 }
@@ -135,8 +153,9 @@ function summarize(report, { model, error }) {
   const ct = o.controllerTests;
   return {
     version: report?.version || '0.7.0', kind: offline ? 'offline-cli-run' : 'live-model-run', runner: 'headless-node (tests/live_claude_v7.cjs)',
-    provider: offline ? null : 'claude', model: offline ? null : (report?.model || model || null), git: gitInfo(), node: process.version,
-    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), gate, controllerGate: report?.suiteParameters?.controllerGate ?? null, maxTransientRetries: offline ? null : maxTransientRetries, maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs },
+    provider: offline ? null : providerName, model: offline ? null : (report?.model || model || null), git: gitInfo(), node: process.version,
+    condition: { device, protocol: report?.experiment?.protocol || null, manualTemplate, controllerMode, trials, seed, goalTarget: report?.suiteParameters?.goalTarget || (fixedGoalTarget ? 'fixed' : 'legacy'), gate, controllerGate: report?.suiteParameters?.controllerGate ?? null, maxTransientRetries: offline ? null : maxTransientRetries, maxCalls: offline ? 0 : maxCalls, minIntervalMs: offline ? null : minIntervalMs,
+      modelSettings: offline ? null : { maxOutputTokens: OUTPUT_LIMITS, thinking: 'provider default (not set in the request)', toolChoice: providerSpec.toolChoice } },
     startedAt: started.toISOString(), finishedAt: new Date().toISOString(), runnerError: error,
     result: { done: report?.done ?? false, failure: report?.failure ?? null, failureCategory: report?.failureCategory ?? null, completedTrials: report?.suiteProgress?.totalCompleted ?? 0,
       allTruthPlaced: trialRows.length === trials && trialRows.every(t => t.evaluatorTruth?.placed === true) },
@@ -157,7 +176,7 @@ function summarize(report, { model, error }) {
 }
 
 async function main() {
-  const rt = createRuntime(), g = rt.global;
+  const rt = createRuntime({ extraSources: providerName === 'gemini' ? ['gemini-provider.js'] : [] }), g = rt.global;
   // The provider needs a real URL parser; the headless navigation worker needs
   // the runtime's blob-URL shim. Keep both instead of replacing the shim.
   const blobURLs = g.URL;
@@ -169,19 +188,22 @@ async function main() {
   try {
     let strategy = 'adaptive';
     if (!offline) {
+      model = modelArg;
       await startBridge();
       const bridgeUrl = `http://127.0.0.1:${port}`;
-      model = arg('--model', null);
       if (!model) {
         const listed = plain(await g.ClaudeAgentProvider.listModels(undefined, { bridgeUrl }));
         const ids = (Array.isArray(listed) ? listed : listed?.models || listed?.data || []).map(item => typeof item === 'string' ? item : item.id).filter(Boolean);
         model = ids.find(id => /opus/.test(id)) || ids[0];
         if (!model) throw new Error('No Claude model listed for this key.');
       }
-      provider = new g.ClaudeAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries });
-      strategy = 'claude';
+      // Claude's request already uses 8192 / 1400 output tokens (claude-provider.js).
+      provider = providerName === 'gemini'
+        ? new g.GeminiAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries, maxOutputTokens: OUTPUT_LIMITS })
+        : new g.ClaudeAgentProvider({ bridgeUrl, model, maxCalls, timeoutMs: 45000, minIntervalMs, maxTransientRetries });
+      strategy = providerName;
     }
-    console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : 'claude'} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
+    console.log(`label=${label} device=${device} seed=${seed} manualTemplate=${manualTemplate} controllerMode=${controllerMode} trials=${trials} mode=${offline ? 'offline' : providerName} model=${model || '-'} maxCalls=${offline ? 0 : maxCalls}`);
     engine = new g.PickPlaceExperimentEngine({ seed, strategy, provider, recordFrames: false, trialCount: trials, device, manualTemplate, controllerMode, fixedGoalTarget, twoLinkMaxRatio, elbowLimitCase, includeHoldout });
     let state = await engine.initialize(), lastKind = '';
     for (let step = 0; !state.done && step < 6000; step++) {

@@ -65,15 +65,20 @@
     if(Array.isArray(error?.details)&&error.details.slice(0,40).some(detail=>detail?.reason==='API_KEY_INVALID'))code='INVALID_API_KEY';
     else if(typeof error?.code==='string'&&Object.hasOwn(errorMessages,error.code))code=error.code;
     else if(typeof error?.status==='string'&&Object.hasOwn(statusCodes,error.status))code=statusCodes[error.status];
-    if(code)return new ProviderError(code,errorMessages[code]);
-    return new ProviderError('HTTP_'+status,({
+    // Server-side failures a resend may clear: HTTP 500/502/504 (as for Claude)
+    // and 503 UNAVAILABLE (model overloaded, Gemini's counterpart of Claude 529).
+    // A bridge 503 without a key stays permanent.
+    const transient=[500,502,504].includes(status)||(status===503&&code==='UPSTREAM_UNAVAILABLE');
+    const mark=error=>{if(transient)error.transient=true;return error;};
+    if(code)return mark(new ProviderError(code,errorMessages[code]));
+    return mark(new ProviderError('HTTP_'+status,({
     400:'Gemini 拒絕請求格式，或所選模型不支援影像與工具設定。',
     401:'Gemini API 金鑰驗證失敗。',
     403:'Gemini API 或本機橋接拒絕存取；請檢查金鑰限制及橋接網址。',
     404:'找不到指定 Gemini 模型或本機橋接路徑。',
     429:'Gemini 配額、速率或本機橋接呼叫次數已達上限。',
     503:'尚未找到授權的 Gemini 金鑰，或服務暫時無法使用。'
-    })[status]||'Gemini API 回傳 HTTP '+status+'；這次未執行動作。');
+    })[status]||'Gemini API 回傳 HTTP '+status+'；這次未執行動作。'));
   }
   function toolDefinition(name,documentLibrary){
     const tool=shared('toolDefinition',name,documentLibrary);
@@ -99,13 +104,20 @@
     return out;
   }
   class GeminiAgentProvider {
-    #key;#model;#bridge;#maxCalls;#timeoutMs;#calls=0;#active=null;#disposed=false;#scheduler;
-    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,minIntervalMs=6000,maxRateLimitRetries=2,onRequestStatus}={}){
+    #key;#model;#bridge;#maxCalls;#timeoutMs;#calls=0;#active=null;#disposed=false;#scheduler;#outputLimits;
+    // maxTransientRetries (default 0) resends a request once after a timeout or a
+    // transient server failure, counted in the budget like every attempt.
+    // maxOutputTokens is one limit for every phase (default 8192) or
+    // {onboarding,other}; it includes thinking tokens.
+    constructor({apiKey,model,bridgeUrl,maxCalls=80,timeoutMs=45000,minIntervalMs=6000,maxRateLimitRetries=2,maxTransientRetries=0,maxOutputTokens=8192,onRequestStatus}={}){
       this.#bridge=bridgeOf(bridgeUrl);this.#key=this.#bridge?'':keyOf(apiKey);this.#model=modelOf(model);
       if(!Number.isInteger(maxCalls)||maxCalls<1||maxCalls>500)fail('INVALID_BUDGET','Gemini 呼叫上限必須介於 1 與 500。');
       checkTimeout(timeoutMs);this.#maxCalls=maxCalls;this.#timeoutMs=timeoutMs;
+      const limits=typeof maxOutputTokens==='number'?{onboarding:maxOutputTokens,other:maxOutputTokens}:maxOutputTokens;
+      if(!record(limits)||![limits.onboarding,limits.other].every(v=>Number.isInteger(v)&&v>=1&&v<=16384))fail('INVALID_OUTPUT_LIMIT','Gemini 輸出 token 上限必須介於 1 與 16384。');
+      this.#outputLimits={onboarding:limits.onboarding,other:limits.other};
       if(!requests?.ModelRequestScheduler)fail('MISSING_CONTRACT','尚未載入 AI 請求排程器，請重新建置並開啟完整介面。');
-      this.#scheduler=new requests.ModelRequestScheduler({minIntervalMs,maxRateLimitRetries,onRequestStatus,makeError:(code,meta)=>requests.schedulingError(ProviderError,'Gemini',code,meta)});
+      this.#scheduler=new requests.ModelRequestScheduler({minIntervalMs,maxRateLimitRetries,maxTransientRetries,isTransient:error=>error?.transient===true,onRequestStatus,makeError:(code,meta)=>requests.schedulingError(ProviderError,'Gemini',code,meta)});
     }
     get calls(){return this.#calls;}get model(){return this.#model;}get mode(){return this.#bridge?'bridge':'direct';}
     get requestStatus(){return this.#scheduler.status;}get requestDiagnostics(){return this.#scheduler.diagnostics;}
@@ -126,7 +138,7 @@
         contents:[{role:'user',parts:[{inlineData:{mimeType:'image/png',data:shared('cameraPNG',frame)}},{text:'目前可檢查的狀態（每次請求是獨立決策，以此狀態為準）：\n'+evidence+'\n選擇一個工具並提供完整 args 與 reason；expected 為選填。'}]}],
         tools:[{functionDeclarations:safe.allowedTools.map(name=>toolDefinition(name,safe.documentLibrary))}],
         toolConfig:{functionCallingConfig:{mode:'ANY',allowedFunctionNames:safe.allowedTools.slice()}},
-        generationConfig:{candidateCount:1,maxOutputTokens:8192}
+        generationConfig:{candidateCount:1,maxOutputTokens:safe.phase==='onboarding'?this.#outputLimits.onboarding:this.#outputLimits.other}
       };
       const connection=transport(this.#bridge,this.#key);
       const url=this.#bridge?connection.base+'/generateContent':connection.base+'/models/'+encodeURIComponent(this.#model)+':generateContent';
