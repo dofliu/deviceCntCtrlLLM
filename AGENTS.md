@@ -3,7 +3,7 @@
 ## 先讀
 
 `README.md` → `docs/CODEX_HANDOFF.md` → `docs/VALIDATION_STATUS.md` → `_research/STATE.md`。
-目前是 V7.0（報告版本 0.7.0）的開發版本。真實模型結果只有單一模型、每條件 3 seed × 3 次的先導層級證據；可用的宣稱與措辭以 `_research/CLAIMS.md`（作者已驗收的部分）為準，不得超過。
+目前是 V7.0（報告版本 0.7.0）的開發版本。真實模型結果是每條件 3 seed × 3 次的先導層級證據：主要結果來自 claude-haiku-5-5；第二個模型 gemini-3.5-flash-lite 只做了保留設備評估（PROTOCOL 修正案 2），完成率明顯較低。不得把 Haiku 的結果寫成系統在任意模型上的表現；可用的宣稱與措辭以 `_research/CLAIMS.md`（作者已驗收的部分）為準，不得超過。
 
 ## 開發原則
 

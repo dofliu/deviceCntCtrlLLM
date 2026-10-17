@@ -142,3 +142,5 @@
 2026-10-17（Gemini 保留評估）：依修正案 2，作者本機以 gemini-3.5-flash-lite（thinkingLevel medium）跑 VLAB-X、VLAB-Y 各 9 組（commit b3a3b82）。VLAB-X 3/9 組、15/45 回合；VLAB-Y 1/9 組、5/45 回合（Haiku 為 45/45、40/45）。14 組失敗都停在設備動作之前，其中 13 組卡在驅動閘門：Gemini 的驅動會拒絕結構錯誤，卻一直接受內容值不合法的回覆（X 94/99 版、Y 145/150 版）。截斷 13 次（啟用階段思考用完 8,192 上限）。完成組控制程式跨 seed 重播 12/12；閘門擋下的 6 個控制程式版本中 5 個其實可完成。估算 US$4.45（含先導 US$4.79）。結果沒有用來修改系統。AI 本段工作：解壓、逐組分析、驅動版本離線檢查、控制程式重播、紀錄撰寫；CLAIMS 新增「AI 草擬、待作者驗收」一節，含兩列既有宣稱的範圍建議。狀態：已執行、已核對（重播動作數一致）；未經作者驗收。紀錄：validation/live-cli-holdout-gemini-X-2026-10-17.json、live-cli-holdout-gemini-Y-2026-10-17.json、LIVE_EXPERIMENTS §4.22。
 
 2026-10-17（作者驗收）：CLAIMS.md「2026-10-17 追加」照草擬定稿；2026-10-15 表第一列加註 claude-haiku-5-5、第四列限縮為 Haiku 的 16 支 P2 控制程式並記錄 Gemini 反例。決策記入 DECISIONS.md。沒有修改程式或結果。待作者決定：一句話貢獻、PROTOCOL v1.0 凍結、目標期刊。
+
+2026-10-17（作者決定）：AGENTS.md「先讀」段改為兩個模型的說法，與 CLAIMS 定稿一致；決策記入 DECISIONS.md。沒有修改程式。
