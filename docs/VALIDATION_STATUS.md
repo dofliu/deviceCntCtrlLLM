@@ -31,6 +31,10 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### Gemini 保留評估 VLAB-X、VLAB-Y（2026-10-17，使用者本機，E 版凍結、修正案 2）
+
+紀錄：`validation/live-cli-holdout-gemini-X-2026-10-17.json`、`validation/live-cli-holdout-gemini-Y-2026-10-17.json`（commit b3a3b82）。gemini-3.5-flash-lite、thinkingLevel medium。VLAB-X 3/9 組、15/45 回合；VLAB-Y 1/9 組、5/45 回合，模擬器真值確認。14 組失敗都在設備動作前停止，未確認動作 0；截斷 13 次；無重送、無限流。完成組控制程式跨 seed 重播 12/12，同 seed 動作數與真實相同。估算 US$4.45。詳見 LIVE_EXPERIMENTS §4.22。
+
 ### Gemini 先導 2：P2 seed 2026、thinkingLevel medium（2026-10-17，使用者本機，開發設備）
 
 紀錄：`validation/live-cli-pilot2-gemini-P2-2026-10-17.json`（commit 13ba565）。2/5，真值確認前兩回合；第 3 回合控制程式在行程極限擺盪到 180 次動作上限。無介接缺陷、截斷 0、1 次重送成功；每次呼叫約 US$0.0034，估算 US$0.245。離線重播：seed 2026 2/5（與真實逐一相同）、3140 與 8675 各 5/5。這是開發資料。

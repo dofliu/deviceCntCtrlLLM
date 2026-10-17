@@ -1,0 +1,1026 @@
+{
+  "kind": "live-model-holdout-evaluation",
+  "version": "E (frozen; runs report commit b3a3b82, clean)",
+  "runner": "run_experiments.py --provider gemini --thinking-level medium --holdout -> tests/live_claude_v7.cjs (headless-node, command line)",
+  "source": "author local machine, batch-20261017-222230 (one batch, --repeat 3: r1 of the three seeds, then r2, then r3)",
+  "protocol": "PROTOCOL.md amendment 2 (author-confirmed 2026-10-17); pilots: validation/live-cli-pilot-gemini-P2-2026-10-17.json, live-cli-pilot2-gemini-P2-2026-10-17.json",
+  "provider": "gemini",
+  "model": "gemini-3.5-flash-lite",
+  "device": "VLAB-Y",
+  "condition": {
+    "manualTemplate": "off",
+    "controllerMode": "generated",
+    "trials": 5,
+    "goalTarget": "fixed at select_goal",
+    "gate": "E",
+    "holdout": true,
+    "transientRetry": true,
+    "thinkingLevel": "medium",
+    "minIntervalMs": 6000,
+    "maxOutputTokens": {
+      "onboarding": 8192,
+      "other": 1400
+    },
+    "toolChoice": "ANY",
+    "perRunCallCap": 150
+  },
+  "freeze": "System frozen at E. These results did not and must not change the gate, prompts, manuals, reference module, thresholds or Gemini settings.",
+  "baseline": {
+    "referenceModuleTemplateOff": {
+      "2026": 166,
+      "3140": 160,
+      "8675": 179
+    },
+    "note": "ratioToBaseline = live actions / offline reference module actions on the same seed (completed runs only)"
+  },
+  "summary": {
+    "runs": 9,
+    "completeRuns": 1,
+    "trials": "5/45",
+    "ratioMedian": 1.2,
+    "ratioRange": [
+      1.2,
+      1.2
+    ],
+    "stoppedAt": {
+      "driver gate": 7,
+      "controller gate": 1,
+      "mission/control": 0,
+      "done": 1
+    },
+    "driverGatePassedRuns": 2,
+    "driverFirstTry": 0,
+    "controllerFirstTry": 0,
+    "decisionRejectionsTotal": 1,
+    "truncationsTotal": 1,
+    "transientRetriesTotal": 0,
+    "rateLimitRetriesTotal": 0,
+    "unconfirmedTotal": 0,
+    "modelCalls": 423,
+    "estimatedUsd": 1.879,
+    "driverVersionsChecked": 150,
+    "driverVersionsAcceptingInvalidReplies": {
+      "accepted [\"bad\",0]": 145,
+      "lift sideways": 145,
+      "ok:false": 6,
+      "not-json": 1
+    },
+    "truncationNote": "Every decision rejection was a truncated response (stop-reason MAX_TOKENS during onboarding). The trace keeps a decision-rejected event for each except the third of x-s8675-r1, which ended the run (correction limit 2).",
+    "gateRejectedControllerVersions": {
+      "versions": 3,
+      "wouldCompleteAllThreeSeeds": 2,
+      "note": "analysis only (--ignore-gate); never a reported result"
+    },
+    "crossSeedReplaysComplete": "3/3",
+    "ownSeedReplayMatchesLive": true
+  },
+  "runs": [
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s2026-r1-gemini",
+      "device": "VLAB-Y",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 15,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 273153,
+        "candidatesTokenCount": 8657,
+        "totalTokenCount": 320603,
+        "thoughtsTokenCount": 38793,
+        "cachedContentTokenCount": 129767
+      },
+      "estimatedUsd": 0.2006,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== \"number\" || typeof command[1] !== \"number\" || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid channels\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  } else if (command && typeof command === \"object\" && typeof command.op === \"string\") {\n    return JSON.stringify(command) + \"\\n\";\n  }\n  throw new Error(\"Invalid command\");\n}\n\nfunction decode(rawReply) {\n  if (rawReply === null || rawReply === undefined) {\n    throw new Error(\"Empty reply\");\n  }\n  let obj;\n  if (typeof rawReply === \"string\") {\n    const trimmed = rawReply.trim();\n    if (!trimmed) throw new Error(\"Empty reply string\");\n    try {\n      obj = JSON.parse(trimmed);\n    } catch (e) {\n      throw new Error(\"Invalid JSON\");\n    }\n  } else if (typeof rawReply === \"object\") {\n    obj = rawReply;\n  } else {\n    throw new Error(\"Invalid reply type\");\n  }\n\n  if (!obj || typeof obj !== \"object\" || Array.isArray(obj)) {\n    throw new Error(\"Not an object reply\");\n  }\n\n  if (obj.ok !== true) {\n    throw new Error(obj.error || \"Device error\");\n  }\n\n  if (obj.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n\n  return {\n    applied: obj.accepted,\n    limited: Boolean(obj.limited)\n  };\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s2026-r2-gemini",
+      "device": "VLAB-Y",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 17,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 270170,
+        "candidatesTokenCount": 7418,
+        "totalTokenCount": 309305,
+        "thoughtsTokenCount": 31717,
+        "cachedContentTokenCount": 133803
+      },
+      "estimatedUsd": 0.1789,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) throw new Error(\"Step command requires 2 channels\");\n    for (let i = 0; i < 2; i++) {\n      if (typeof command[i] !== 'number' || !isFinite(command[i])) {\n        throw new Error(\"Channel values must be finite numbers\");\n      }\n      if (command[i] < -0.1 || command[i] > 0.1) {\n        throw new Error(\"Channel values out of bounds\");\n      }\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  } else if (command && typeof command === 'object' && command !== null) {\n    if (command.op === 'lift') {\n      if (command.position !== 'up' && command.position !== 'down') {\n        throw new Error(\"Invalid lift position\");\n      }\n    } else if (command.op === 'grip') {\n      if (command.state !== 'open' && command.state !== 'closed') {\n        throw new Error(\"Invalid grip state\");\n      }\n    } else {\n      throw new Error(\"Unknown operation\");\n    }\n    return JSON.stringify(command) + \"\\n\";\n  }\n  throw new Error(\"Invalid command format\");\n}\n\nfunction decode(rawReply) {\n  let res;\n  if (typeof rawReply === 'string') {\n    try {\n      res = JSON.parse(rawReply);\n    } catch (e) {\n      throw new Error(\"Malformed JSON\");\n    }\n  } else if (rawReply && typeof rawReply === 'object') {\n    res = rawReply;\n  } else {\n    throw new Error(\"Invalid reply type\");\n  }\n\n  if (!res || typeof res !== 'object' || Array.isArray(res)) {\n    throw new Error(\"Invalid reply structure\");\n  }\n\n  if (res.ok !== true) {\n    throw new Error(res.error || \"Device returned error\");\n  }\n\n  if (res.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n\n  return {\n    applied: res.accepted,\n    limited: Boolean(res.limited)\n  };\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s2026-r3-gemini",
+      "device": "VLAB-Y",
+      "seed": 2026,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 17,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "all-rejected"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 277710,
+        "candidatesTokenCount": 11323,
+        "totalTokenCount": 327873,
+        "thoughtsTokenCount": 38840,
+        "cachedContentTokenCount": 133842
+      },
+      "estimatedUsd": 0.2087,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"Step command requires exactly 2 channels\");\n    }\n    for (let i = 0; i < 2; i++) {\n      let v = command[i];\n      if (typeof v !== \"number\" || isNaN(v) || !isFinite(v)) {\n        throw new Error(\"Channel value must be a finite number\");\n      }\n      if (v < -0.1 || v > 0.1) {\n        throw new Error(\"Channel value out of range [-0.1, 0.1]\");\n      }\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  } else if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n    throw new Error(\"Unknown command operation\");\n  } else {\n    throw new Error(\"Invalid command format\");\n  }\n}\n\nfunction decode(rawReply) {\n  if (rawReply === null || rawReply === undefined) {\n    throw new Error(\"Null or undefined reply\");\n  }\n  let str = \"\";\n  if (typeof rawReply === \"string\") {\n    str = rawReply.trim();\n  } else if (typeof rawReply === \"object\") {\n    str = JSON.stringify(rawReply);\n  } else {\n    str = String(rawReply).trim();\n  }\n\n  if (!str) {\n    throw new Error(\"Empty reply string\");\n  }\n\n  let data;\n  try {\n    data = JSON.parse(str);\n  } catch (err) {\n    throw new Error(\"Invalid JSON: \" + err.message);\n  }\n\n  if (!data || typeof data !== \"object\" || Array.isArray(data)) {\n    throw new Error(\"Reply must be a JSON object\");\n  }\n\n  if (data.ok !== true) {\n    throw new Error(data.error || \"Device returned error\");\n  }\n\n  if (data.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n\n  let accepted = data.accepted;\n  if (Array.isArray(accepted)) {\n    if (accepted.length !== 2) {\n      throw new Error(\"Accepted array must have length 2\");\n    }\n    for (let i = 0; i < 2; i++) {\n      if (typeof accepted[i] !== \"number\" || isNaN(accepted[i]) || !isFinite(accepted[i])) {\n        throw new Error(\"Accepted array elements must be finite numbers\");\n      }\n    }\n  } else if (accepted && typeof accepted === \"object\") {\n    if (accepted.op === \"lift\") {\n      if (accepted.position !== \"up\" && accepted.position !== \"down\") {\n        throw new Error(\"Invalid accepted lift position\");\n      }\n    } else if (accepted.op === \"grip\") {\n      if (accepted.state !== \"open\" && accepted.state !== \"closed\") {\n        throw new Error(\"Invalid accepted grip state\");\n      }\n    } else {\n      throw new Error(\"Unknown accepted operation\");\n    }\n  } else {\n    throw new Error(\"Invalid accepted field format\");\n  }\n\n  return {\n    applied: accepted,\n    limited: Boolean(data.limited)\n  };\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s3140-r1-gemini",
+      "device": "VLAB-Y",
+      "seed": 3140,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "controller gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "controllerGateAttempts": [
+        false
+      ],
+      "driverWrites": 16,
+      "driverDistinctVersions": 13,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 14
+      },
+      "controllerGateFailureCounts": {
+        "位置相依的非線性映射": 1,
+        "起點貼近行程邊界": 1,
+        "二連桿長距離多目標": 1,
+        "二連桿肘關節極限繞行": 1
+      },
+      "driverVersionsOfflineCheck": [
+        "ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "compile-error",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "all-rejected"
+      ],
+      "controllerTests": {
+        "passed": false,
+        "channelKind": "rotary",
+        "twoLinkMaxRatio": 1.3,
+        "elbowLimitCase": true,
+        "efficiency": {
+          "actions": 185,
+          "referenceActions": 140,
+          "ratio": 1.32,
+          "nonlinearArm": {
+            "required": true,
+            "reached": false,
+            "actions": 116,
+            "referenceActions": 69,
+            "ratio": null,
+            "maxRatio": 1.3,
+            "passed": false,
+            "failure": "目標 4 未在 60 次動作內到達"
+          }
+        }
+      },
+      "usage": {
+        "promptTokenCount": 271020,
+        "candidatesTokenCount": 9293,
+        "totalTokenCount": 316630,
+        "thoughtsTokenCount": 36317,
+        "cachedContentTokenCount": 119626
+      },
+      "estimatedUsd": 0.1953,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid step command\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  } else if (command && typeof command === 'object' && command !== null) {\n    if (command.op === 'lift') {\n      if (command.position !== 'up' && command.position !== 'down') {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    } else if (command.op === 'grip') {\n      if (command.state !== 'open' && command.state !== 'closed') {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Invalid command\");\n}\n\nfunction decode(rawReply) {\n  let parsed;\n  if (typeof rawReply === 'string') {\n    const trimmed = rawReply.trim();\n    if (!trimmed) {\n      throw new Error(\"Empty reply string\");\n    }\n    try {\n      parsed = JSON.parse(trimmed);\n    } catch (e) {\n      throw new Error(\"JSON parse error: \" + e.message);\n    }\n  } else if (rawReply !== null && typeof rawReply === 'object') {\n    parsed = rawReply;\n  } else {\n    throw new Error(\"Invalid reply format\");\n  }\n\n  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {\n    throw new Error(\"Reply must be a JSON object\");\n  }\n\n  if (parsed.ok !== true) {\n    throw new Error(parsed.error || \"Device returned error response\");\n  }\n\n  if (!('accepted' in parsed)) {\n    throw new Error(\"Missing accepted field in reply\");\n  }\n\n  const acc = parsed.accepted;\n  let validAccepted = false;\n  if (Array.isArray(acc)) {\n    if (acc.length === 2 && typeof acc[0] === 'number' && typeof acc[1] === 'number' && Number.isFinite(acc[0]) && Number.isFinite(acc[1])) {\n      validAccepted = true;\n    }\n  } else if (acc && typeof acc === 'object') {\n    if (acc.op === 'lift' && (acc.position === 'up' || acc.position === 'down')) {\n      validAccepted = true;\n    } else if (acc.op === 'grip' && (acc.state === 'open' || acc.state === 'closed')) {\n      validAccepted = true;\n    }\n  }\n\n  if (!validAccepted) {\n    throw new Error(\"Invalid accepted field format or content\");\n  }\n\n  return {\n    applied: acc,\n    limited: Boolean(parsed.limited)\n  };\n}\n",
+      "generatedControllerSource": "function control(state) {\n  if (state.errorPx <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n  const dx = state.target[0] - state.tip[0];\n  const dy = state.target[1] - state.tip[1];\n\n  if (state.history && state.history.length >= 2) {\n    let sumU1Sq = 0, sumU2Sq = 0;\n    let sumDxU1 = 0, sumDyU2 = 0;\n    for (const h of state.history) {\n      if (h.applied && h.delta && !h.limited) {\n        sumU1Sq += h.applied[0] * h.applied[0];\n        sumU2Sq += h.applied[1] * h.applied[1];\n        sumDxU1 += h.delta[0] * h.applied[0];\n        sumDyU2 += h.delta[1] * h.applied[1];\n      }\n    }\n    const gainX = sumU1Sq > 1e-5 ? sumDxU1 / sumU1Sq : 0;\n    const gainY = sumU2Sq > 1e-5 ? sumDyU2 / sumU2Sq : 0;\n    if (Math.abs(gainX) > 1 && Math.abs(gainY) > 1) {\n      let du1 = dx / gainX;\n      let du2 = dy / gainY;\n      const m = Math.max(Math.abs(du1), Math.abs(du2));\n      if (m > 0) {\n        const targetMag = state.errorPx > 40 ? 0.1 : Math.max(0.01, 0.1 * (state.errorPx / 40));\n        du1 = (du1 / m) * targetMag;\n        du2 = (du2 / m) * targetMag;\n      }\n      return { action: \"move\", u: [Math.max(-0.1, Math.min(0.1, du1)), Math.max(-0.1, Math.min(0.1, du2))] };\n    }\n  }\n\n  const len = Math.sqrt(dx * dx + dy * dy);\n  let u1 = len > 0 ? (dx / len) * 0.1 : 0;\n  let u2 = len > 0 ? (dy / len) * 0.1 : 0;\n  return { action: \"move\", u: [u1, u2] };\n}\n"
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s3140-r2-gemini",
+      "device": "VLAB-Y",
+      "seed": 3140,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 18,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 274776,
+        "candidatesTokenCount": 9907,
+        "totalTokenCount": 323627,
+        "thoughtsTokenCount": 38944,
+        "cachedContentTokenCount": 133828
+      },
+      "estimatedUsd": 0.2046,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== \"number\" || typeof command[1] !== \"number\" || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid channels array\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Unknown command format\");\n}\n\nfunction decode(rawReply) {\n  let parsed;\n  if (typeof rawReply === \"string\") {\n    if (!rawReply.trim()) {\n      throw new Error(\"Empty reply string\");\n    }\n    try {\n      parsed = JSON.parse(rawReply.trim());\n    } catch (e) {\n      throw new Error(\"Malformed JSON\");\n    }\n  } else if (rawReply && typeof rawReply === \"object\") {\n    parsed = rawReply;\n  } else {\n    throw new Error(\"Invalid reply format\");\n  }\n\n  if (!parsed || typeof parsed !== \"object\" || Array.isArray(parsed)) {\n    throw new Error(\"Invalid reply object\");\n  }\n  if (parsed.ok !== true) {\n    throw new Error(parsed.error || \"Device error\");\n  }\n  if (parsed.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n  return {\n    applied: parsed.accepted,\n    limited: Boolean(parsed.limited)\n  };\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s3140-r3-gemini",
+      "device": "VLAB-Y",
+      "seed": 3140,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 17,
+      "driverDistinctVersions": 16,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 274107,
+        "candidatesTokenCount": 9943,
+        "totalTokenCount": 320190,
+        "thoughtsTokenCount": 36140,
+        "cachedContentTokenCount": 129783
+      },
+      "estimatedUsd": 0.1974,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid channels array\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  } else if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    } else if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    } else if (command.op === \"hello\") {\n      return JSON.stringify({ op: \"hello\" }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Unknown command format\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\" && (typeof rawReply !== \"object\" || rawReply === null)) {\n    throw new Error(\"Invalid reply type\");\n  }\n  let parsed;\n  if (typeof rawReply === \"string\") {\n    try {\n      parsed = JSON.parse(rawReply);\n    } catch (e) {\n      throw new Error(\"Malformed JSON reply\");\n    }\n  } else {\n    parsed = rawReply;\n  }\n  if (!parsed || typeof parsed !== \"object\" || Array.isArray(parsed)) {\n    throw new Error(\"Invalid reply format\");\n  }\n  if (parsed.ok === false) {\n    throw new Error(parsed.error || \"Device error\");\n  }\n  if (parsed.ok !== true) {\n    throw new Error(\"Invalid ok field\");\n  }\n  if (parsed.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n  return {\n    applied: parsed.accepted,\n    limited: Boolean(parsed.limited)\n  };\n}\n",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s8675-r1-gemini",
+      "device": "VLAB-Y",
+      "seed": 8675,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 41,
+      "frontCalls": 41,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 1,
+      "truncations": [
+        {
+          "issue": "stop-reason",
+          "stopReason": "MAX_TOKENS",
+          "thoughtsTokenCount": 7864
+        }
+      ],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 17,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17,
+        "雙通道、零值與上下限的編碼及回覆往返": 1,
+        "升降與夾爪四種命令的實際編解碼": 1
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "not-json+ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "all-rejected"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 281495,
+        "candidatesTokenCount": 9465,
+        "totalTokenCount": 337910,
+        "thoughtsTokenCount": 46950,
+        "cachedContentTokenCount": 133821
+      },
+      "estimatedUsd": 0.2255,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid command array\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Invalid command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"Invalid reply type\");\n  }\n  let trimmed = rawReply.trim();\n  let res;\n  try {\n    res = JSON.parse(trimmed);\n  } catch (e) {\n    throw new Error(\"Invalid JSON\");\n  }\n  if (!res || typeof res !== \"object\" || Array.isArray(res)) {\n    throw new Error(\"Invalid reply structure\");\n  }\n  if (res.ok === false) {\n    throw new Error(String(res.error || \"Device error\"));\n  }\n  if (res.ok !== true) {\n    throw new Error(\"Invalid or missing ok field\");\n  }\n  if (!(\"accepted\" in res) || res.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n\n  const acc = res.accepted;\n  const isArrayValid = Array.isArray(acc) && acc.length === 2 && typeof acc[0] === 'number' && typeof acc[1] === 'number' && Number.isFinite(acc[0]) && Number.isFinite(acc[1]);\n  const isLiftValid = acc && typeof acc === 'object' && !Array.isArray(acc) && acc.op === 'lift' && (acc.position === 'up' || acc.position === 'down');\n  const isGripValid = acc && typeof acc === 'object' && !Array.isArray(acc) && acc.op === 'grip' && (acc.state === 'open' || acc.state === 'closed');\n\n  if (!isArrayValid && !isLiftValid && !isGripValid) {\n    throw new Error(\"Invalid accepted field structure\");\n  }\n\n  return {\n    applied: res.accepted,\n    limited: !!res.limited\n  };\n}",
+      "generatedControllerSource": null
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s8675-r2-gemini",
+      "device": "VLAB-Y",
+      "seed": 8675,
+      "completedTrials": 5,
+      "allTruthPlaced": true,
+      "failure": null,
+      "stoppedAt": "done",
+      "modelCalls": 102,
+      "frontCalls": 30,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 214,
+      "unconfirmed": 0,
+      "ratioToBaseline": 1.2,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "controllerGateAttempts": [
+        false,
+        false,
+        true
+      ],
+      "driverWrites": 9,
+      "driverDistinctVersions": 9,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 8
+      },
+      "controllerGateFailureCounts": {
+        "起點貼近行程邊界": 1,
+        "二連桿肘關節極限繞行": 2,
+        "旋轉 0.3 rad、正向通道": 1,
+        "位置相依的非線性映射": 1,
+        "接近目標時目標量測偏移": 1
+      },
+      "driverVersionsOfflineCheck": [
+        "ok:false+accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "all-rejected"
+      ],
+      "controllerTests": {
+        "passed": true,
+        "channelKind": "rotary",
+        "twoLinkMaxRatio": 1.3,
+        "elbowLimitCase": true,
+        "efficiency": {
+          "actions": 413,
+          "referenceActions": 349,
+          "ratio": 1.18,
+          "nonlinearArm": {
+            "required": true,
+            "reached": true,
+            "actions": 84,
+            "referenceActions": 69,
+            "ratio": 1.22,
+            "maxRatio": 1.3,
+            "passed": true,
+            "failure": null
+          }
+        }
+      },
+      "usage": {
+        "promptTokenCount": 444499,
+        "candidatesTokenCount": 12171,
+        "totalTokenCount": 490991,
+        "thoughtsTokenCount": 34321,
+        "cachedContentTokenCount": 89259
+      },
+      "estimatedUsd": 0.2496,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2 || typeof command[0] !== 'number' || typeof command[1] !== 'number' || !Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Invalid channels array\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Invalid command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"Raw reply must be a string\");\n  }\n  let res;\n  try {\n    res = JSON.parse(rawReply.trim());\n  } catch (e) {\n    throw new Error(\"Invalid JSON\");\n  }\n  if (!res || typeof res !== \"object\" || Array.isArray(res)) {\n    throw new Error(\"Reply must be an object\");\n  }\n  if (res.ok !== true) {\n    throw new Error(res.error || \"Command failed\");\n  }\n  if (res.accepted === undefined) {\n    throw new Error(\"Missing accepted field\");\n  }\n  const acc = res.accepted;\n  if (Array.isArray(acc)) {\n    if (acc.length !== 2 || typeof acc[0] !== 'number' || typeof acc[1] !== 'number' || !Number.isFinite(acc[0]) || !Number.isFinite(acc[1])) {\n      throw new Error(\"Invalid accepted step array\");\n    }\n  } else if (acc && typeof acc === \"object\") {\n    if (acc.op === \"lift\") {\n      if (acc.position !== \"up\" && acc.position !== \"down\") {\n        throw new Error(\"Invalid accepted lift position\");\n      }\n    } else if (acc.op === \"grip\") {\n      if (acc.state !== \"open\" && acc.state !== \"closed\") {\n        throw new Error(\"Invalid accepted grip state\");\n      }\n    } else {\n      throw new Error(\"Invalid accepted object type\");\n    }\n  } else {\n    throw new Error(\"Invalid accepted field type\");\n  }\n  return {\n    applied: res.accepted,\n    limited: !!res.limited\n  };\n}",
+      "generatedControllerSource": "function control(state) {\n  const history = state.history || [];\n  if (state.errorPx <= state.tolerancePx) {\n    return { action: \"verify\" };\n  }\n\n  // 收集有效歷史以估計局部 Jacobian\n  const validHistory = history.filter(h => h.delta && (Math.abs(h.delta[0]) > 0.05 || Math.abs(h.delta[1]) > 0.05));\n  let J = null;\n  if (validHistory.length >= 3) {\n    const recent = validHistory.slice(-8);\n    let sumU00 = 0, sumU01 = 0, sumU10 = 0, sumU11 = 0;\n    let sumDXU0 = 0, sumDXU1 = 0, sumDYU0 = 0, sumDYU1 = 0;\n    \n    for (const h of recent) {\n      const u0 = h.applied[0];\n      const u1 = h.applied[1];\n      sumU00 += u0 * u0;\n      sumU01 += u0 * u1;\n      sumU10 += u1 * u0;\n      sumU11 += u1 * u1;\n      sumDXU0 += h.delta[0] * u0;\n      sumDXU1 += h.delta[0] * u1;\n      sumDYU0 += h.delta[1] * u0;\n      sumDYU1 += h.delta[1] * u1;\n    }\n    \n    const det = sumU00 * sumU11 - sumU01 * sumU10;\n    if (Math.abs(det) > 1e-6) {\n      const j00 = (sumDXU0 * sumU11 - sumDXU1 * sumU10) / det;\n      const j01 = (sumDXU1 * sumU00 - sumDXU0 * sumU01) / det;\n      const j10 = (sumDYU0 * sumU11 - sumDYU1 * sumU10) / det;\n      const j11 = (sumDYU1 * sumU00 - sumDYU0 * sumU01) / det;\n      J = [[j00, j01], [j10, j11]];\n    }\n  }\n\n  let u = [0.08, 0];\n  const stepCount = state.step || 0;\n  const lastLimited = history.length > 0 && history[history.length - 1].limited;\n\n  if (lastLimited && validHistory.length > 0) {\n    // 若受限，反向退開或隨機探索\n    const lastU = history[history.length - 1].applied;\n    const sign = (stepCount % 2 === 0) ? 1 : -1;\n    u = [-lastU[0] * sign, -lastU[1] * sign];\n  } else if (J) {\n    const detJ = J[0][0] * J[1][1] - J[0][1] * J[1][0];\n    if (Math.abs(detJ) > 1e-5) {\n      const invDet = 1.0 / detJ;\n      const invJ00 = J[1][1] * invDet;\n      const invJ01 = -J[0][1] * invDet;\n      const invJ10 = -J[1][0] * invDet;\n      const invJ11 = J[0][0] * invDet;\n\n      const dx = state.target[0] - state.tip[0];\n      const dy = state.target[1] - state.tip[1];\n\n      let rawU0 = invJ00 * dx + invJ01 * dy;\n      let rawU1 = invJ10 * dx + invJ11 * dy;\n\n      const maxVal = Math.max(Math.abs(rawU0), Math.abs(rawU1));\n      if (maxVal > 1e-5) {\n        // 接近目標時按比例減小步長，避免過衝與震盪\n        const scaleFactor = Math.min(1.0, state.errorPx / 50.0);\n        const scale = (0.1 * scaleFactor) / maxVal;\n        u = [rawU0 * scale, rawU1 * scale];\n      }\n    }\n  } else {\n    // 初始探索階段\n    const phase = stepCount % 4;\n    if (phase === 0) u = [0.1, 0];\n    else if (phase === 1) u = [-0.1, 0];\n    else if (phase === 2) u = [0, 0.1];\n    else u = [0, -0.1];\n  }\n\n  // 確保不超過 0.1 限制\n  if (Math.abs(u[0]) > 0.1) u[0] = 0.1 * Math.sign(u[0]);\n  if (Math.abs(u[1]) > 0.1) u[1] = 0.1 * Math.sign(u[1]);\n\n  return { action: \"move\", u: u };\n}\n",
+      "crossSeedReplay": {
+        "2026": {
+          "completed": 5,
+          "actions": 196,
+          "trialActions": [
+            52,
+            33,
+            39,
+            32,
+            40
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 181,
+          "trialActions": [
+            45,
+            39,
+            35,
+            28,
+            34
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 214,
+          "trialActions": [
+            41,
+            46,
+            33,
+            46,
+            48
+          ],
+          "failure": null,
+          "gatePassed": true,
+          "gateIgnored": false
+        }
+      }
+    },
+    {
+      "batch": "batch-20261017-222230",
+      "label": "y-s8675-r3-gemini",
+      "device": "VLAB-Y",
+      "seed": 8675,
+      "completedTrials": 0,
+      "allTruthPlaced": false,
+      "failure": "前置探索已達決策次數上限，尚未完成控制程式驗證。",
+      "stoppedAt": "driver gate",
+      "modelCalls": 40,
+      "frontCalls": 40,
+      "transientRetries": 0,
+      "rateLimitRetries": 0,
+      "decisionRejections": 0,
+      "truncations": [],
+      "actions": 0,
+      "unconfirmed": 0,
+      "ratioToBaseline": null,
+      "driverGateAttempts": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "controllerGateAttempts": [],
+      "driverWrites": 18,
+      "driverDistinctVersions": 18,
+      "driverGateFailureCounts": {
+        "驅動程式拒絕失敗或毀損回覆": 17
+      },
+      "controllerGateFailureCounts": {},
+      "driverVersionsOfflineCheck": [
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways",
+        "accepted [\"bad\",0]+lift sideways"
+      ],
+      "controllerTests": null,
+      "usage": {
+        "promptTokenCount": 275781,
+        "candidatesTokenCount": 10339,
+        "totalTokenCount": 330049,
+        "thoughtsTokenCount": 43929,
+        "cachedContentTokenCount": 133833
+      },
+      "estimatedUsd": 0.2184,
+      "git": {
+        "commit": "b3a3b82",
+        "dirtySourceOrTests": false
+      },
+      "generatedDriverSource": "function encode(command) {\n  if (Array.isArray(command)) {\n    if (command.length !== 2) {\n      throw new Error(\"Array must have length 2\");\n    }\n    if (!Number.isFinite(command[0]) || !Number.isFinite(command[1])) {\n      throw new Error(\"Channels must be finite numbers\");\n    }\n    return JSON.stringify({ op: \"step\", channels: command }) + \"\\n\";\n  }\n  if (command && typeof command === \"object\") {\n    if (command.op === \"step\") {\n      if (!Array.isArray(command.channels) || command.channels.length !== 2) {\n        throw new Error(\"Step channels must be array of length 2\");\n      }\n      if (!Number.isFinite(command.channels[0]) || !Number.isFinite(command.channels[1])) {\n        throw new Error(\"Step channel values must be finite numbers\");\n      }\n      return JSON.stringify({ op: \"step\", channels: command.channels }) + \"\\n\";\n    }\n    if (command.op === \"lift\") {\n      if (command.position !== \"up\" && command.position !== \"down\") {\n        throw new Error(\"Invalid lift position\");\n      }\n      return JSON.stringify({ op: \"lift\", position: command.position }) + \"\\n\";\n    }\n    if (command.op === \"grip\") {\n      if (command.state !== \"open\" && command.state !== \"closed\") {\n        throw new Error(\"Invalid grip state\");\n      }\n      return JSON.stringify({ op: \"grip\", state: command.state }) + \"\\n\";\n    }\n  }\n  throw new Error(\"Invalid command\");\n}\n\nfunction decode(rawReply) {\n  if (typeof rawReply !== \"string\") {\n    throw new Error(\"Raw reply must be a string\");\n  }\n  let parsed;\n  try {\n    parsed = JSON.parse(rawReply);\n  } catch (e) {\n    throw new Error(\"Invalid JSON: \" + e.message);\n  }\n  if (!parsed || typeof parsed !== \"object\" || Array.isArray(parsed)) {\n    throw new Error(\"Reply must be a non-null object\");\n  }\n  if (parsed.ok !== true) {\n    throw new Error(parsed.error || \"Device replied with ok: false\");\n  }\n  const applied = parsed.accepted !== undefined ? parsed.accepted : parsed.applied;\n  if (applied === undefined) {\n    throw new Error(\"Missing accepted or applied field\");\n  }\n  return {\n    applied: applied,\n    limited: Boolean(parsed.limited)\n  };\n}\n",
+      "generatedControllerSource": null
+    }
+  ],
+  "gateRejectedControllerVersions": [
+    {
+      "label": "y-s3140-r1-gemini",
+      "version": 1,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 0,
+          "actions": 180,
+          "trialActions": [
+            180
+          ],
+          "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 0,
+          "actions": 180,
+          "trialActions": [
+            180
+          ],
+          "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 0,
+          "actions": 180,
+          "trialActions": [
+            180
+          ],
+          "failure": "動作未送出：已達本回合取放動作上限；未送出額外命令。",
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    },
+    {
+      "label": "y-s8675-r2-gemini",
+      "version": 1,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 5,
+          "actions": 159,
+          "trialActions": [
+            45,
+            27,
+            31,
+            25,
+            31
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 151,
+          "trialActions": [
+            41,
+            31,
+            29,
+            24,
+            26
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 174,
+          "trialActions": [
+            34,
+            42,
+            29,
+            36,
+            33
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    },
+    {
+      "label": "y-s8675-r2-gemini",
+      "version": 2,
+      "replayIgnoringGate": {
+        "2026": {
+          "completed": 5,
+          "actions": 178,
+          "trialActions": [
+            44,
+            43,
+            31,
+            29,
+            31
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "3140": {
+          "completed": 5,
+          "actions": 157,
+          "trialActions": [
+            39,
+            33,
+            35,
+            24,
+            26
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        },
+        "8675": {
+          "completed": 5,
+          "actions": 187,
+          "trialActions": [
+            34,
+            41,
+            45,
+            34,
+            33
+          ],
+          "failure": null,
+          "gatePassed": false,
+          "gateIgnored": true
+        }
+      }
+    }
+  ],
+  "notes": [
+    "1/9 runs 5/5 with simulator truth (5/45 trials); 7 runs stopped at the driver gate and y-s3140-r1 at the controller gate, all by the 40-call front limit and before any actuation. Zero unconfirmed actuations, no transient or rate-limit retries.",
+    "Driver gate: 145 of 150 driver versions accepted replies whose accepted value was invalid (non-numeric channel, lift position 'sideways'); not-JSON and ok:false were almost always rejected. In two runs the last driver version rejected all four corrupted replies but was written after the last allowed call, so it was never tested.",
+    "Truncations: 1 (onboarding).",
+    "The completed run is 1.20x the offline reference; its controller replayed on all three seeds 3/3 complete (196/181/214), own seed equal to the live run. Gate-rejected controller versions: y-s3140-r1 v1 fails every seed (correct rejection); y-s8675-r2 v1 and v2 would complete all seeds (analysis only)."
+  ]
+}
