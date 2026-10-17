@@ -1,6 +1,6 @@
 # 研究狀態 — 陌生設備自主啟用與選擇性重校正
 
-最後更新：2026-10-15（Asia/Taipei；更新者：AI）
+最後更新：2026-10-17（Asia/Taipei；更新者：AI）
 狀態：草擬。文獻出處已初步核實，貢獻與實驗協定尚未由作者定稿。
 
 ## 基本資訊
@@ -130,3 +130,5 @@
 2026-10-16（論文準備）：作者選定方向「規格生成＋閘門驗證」、期刊全文、英文。AI 已改寫 CONTRIBUTION.md v2 與 PROTOCOL.md v1.0（事後整理，保留設備協定有事前 commit 證據；修正案 1 為凍結點 D→E），狀態皆為草擬、待作者定稿。下一步：作者定稿貢獻卡並確認協定凍結、選定目標期刊；之後先寫 Methods 與 Results。
 
 2026-10-17（文獻）：作者詢問無補實驗時的貢獻與可對照文獻。AI 做非系統性網路搜尋，新增 6 篇摘要層級核實的近鄰到 REFERENCES.md（硬體在環的嵌入式程式生成、LLM4PLC 驗證管線、ChatGPT for Robotics、測試驅動控制程式、自適應程式生成、陌生 IoT 設備配置）。沒有找到可做數字比較的同條件研究。四項待作者決定仍未回覆。
+
+2026-10-17（第二個模型）：作者決定第二個模型用 gemini-3.5-flash-lite、預算上限 US$20。AI 在命令列執行器加入 Gemini 路徑（commit 2758d18）：`--provider gemini` 啟動 gemini_bridge.py，只認 gemini_api_key；請求設定比照 Haiku（輸出上限 8192／1400、思考用預設、逾時與伺服器錯誤重送一次並計入預算）；批次執行器加 `--max-usd` 估算費用上限。閘門、提示、參考模組、門檻與 Claude 請求內容未變；瀏覽器版 Gemini 預設不變。離線測試通過（新增 test_v7g_gemini_cli、test_v7g_batch_cost）；無頭 Chromium 的 test_gemini_workflow 在未修改的 HEAD 上同樣失敗，屬既有問題。未送出任何模型請求。草擬 PROTOCOL.md 修正案 2，待作者確認；保留設備的 Gemini 實驗須等確認後執行，P2 seed 2026 先導 1 組可先跑，用來確認流程與量測 token。

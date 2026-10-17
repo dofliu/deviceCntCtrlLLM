@@ -31,6 +31,18 @@
 | 無頭 Chromium（真實 iframe 沙箱、CSP、Worker） | `validation/v7-browser-smoke.json` | 3 組單回合（G3 無範本＋控制程式、P2 無範本＋控制程式、G3 範本＋內建）完成，無主控台錯誤、無外部請求。此測試發現並修正一個重複 DOM id 問題。 |
 | Claude／Gemini 新工具與上下文 | 擴充後的 `test_claude_provider.cjs`、`test_gemini_provider.cjs` | 模擬 HTTP 通過；不是真實 API。 |
 
+### 命令列 Gemini 路徑（2026-10-17，雲端 Linux，離線）
+
+紀錄：`validation/v7g-gemini-cli.json`、`validation/v7g-batch-cost.json`，新測試 `test_v7g_gemini_cli.cjs`、`test_v7g_batch_cost.py`（commit 2758d18）。沒有金鑰、沒有網路請求、沒有模型呼叫。
+- Gemini 加上 `maxTransientRetries: 1` 時，HTTP 500／502／504 或 503 UNAVAILABLE（經橋接或直連）在 10 秒後重送一次；逾時也一樣。兩次請求都計入呼叫次數。缺金鑰、橋接預算、4xx 不重送；預算用完時不重送。瀏覽器版預設仍不重送。
+- Claude 規則不變：529 重送、503 不重送。
+- Gemini 可用與 Claude 相同的輸出上限（8192／1400）；兩邊請求都不設定思考。瀏覽器版預設仍為 8192。
+- 無頭引擎串接替身橋接：請求路徑、模型、上限正確，報告的策略、模型、呼叫數與 token 加總（含思考）正確。
+- 執行器：`--provider gemini` 必須給 `--model`、只接受 `gemini_api_key`；沒有金鑰時在啟動橋接前停止，0 次呼叫，摘要記錄 provider、model 與請求設定。
+- 批次執行器：provider 預設、token 加總（Gemini 思考計入輸出）、`--max-usd` 依平均每次費用預估下一組，超過上限即停止。
+- 回歸：test_gemini_provider、test_claude_provider、test_v63_provider_pacing、test_v61_budgets、test_v63_model_reporting、test_v70_cli_runner、test_expected_contract、test_recovery_policy、test_v7x_holdout_device、test_v7y_holdout_fivebar、test_v70_gate_e，以及 5 個橋接 Python 測試皆通過。被改寫的舊驗證檔已還原（只有日期或舊紀錄差異）。
+- 無頭 Chromium：`test_gemini_ui.py` 改用本機 Chromium 路徑執行（不提交）通過。`test_gemini_workflow.py` 失敗（「前置探索已達決策次數上限」）；在未修改的 HEAD 上以同樣方式執行也同樣失敗，是 V5 時期的模擬工作流程未跟上 V7 產生控制程式流程的既有問題，與本次修改無關，未修正。
+
 ### VLAB-Y 保留評估（2026-10-15，使用者本機，E 版凍結後）
 
 紀錄：`validation/live-cli-holdout-Y-2026-10-15.json`（commit c10bed1）。8/9 組、40/45 回合，模擬器真值確認；無未確認動作、無重試。完成的 8 支控制程式跨三個 seed 重播 24/24，同 seed 動作數與真實相同；動作數對參考模組 0.95–1.05×。失敗的一組（8675 r2）在啟用前停止，原因是閘門拒絕後模型改寫出錯並誤判工具不可用。離線 `--ignore-gate` 分析：11 個被擋版本中 10 個可完成。命令列結果；結果未用於修改系統。
