@@ -1,0 +1,917 @@
+{
+  "version": "0.7.0",
+  "date": "2026-10-17",
+  "kind": "manuscript-derived-numbers",
+  "modelCalls": 0,
+  "scope": "Totals, medians and post-hoc Clopper-Pearson intervals derived from the run records listed per group; analysis only, no new runs.",
+  "groups": {
+    "claude-haiku-5-5 VLAB-P2": {
+      "record": "validation/live-cli-batch-E-2026-10-15.json",
+      "runs": 9,
+      "completeRuns": 9,
+      "trialsCompleted": 45,
+      "trialsPlanned": 45,
+      "runCompletionCI95": [
+        0.664,
+        1.0
+      ],
+      "ratiosCompletedRuns": [
+        1.03,
+        1.06,
+        1.51,
+        1.12,
+        0.95,
+        1.04,
+        1.36,
+        1.01,
+        1.12
+      ],
+      "ratioMedian": 1.06,
+      "ratioRange": [
+        0.95,
+        1.51
+      ],
+      "modelCallsTotal": 797,
+      "modelCallsRange": [
+        83,
+        93
+      ],
+      "inputTokensTotal": null,
+      "outputTokensTotal": null,
+      "unconfirmedTotal": 0,
+      "failedRuns": [],
+      "runRows": [
+        {
+          "label": "p2-s2026-r1-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 290,
+          "ratio": 1.03,
+          "modelCalls": 83,
+          "frontCalls": 10,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s2026-r2-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 299,
+          "ratio": 1.06,
+          "modelCalls": 91,
+          "frontCalls": 16,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s2026-r3-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 424,
+          "ratio": 1.51,
+          "modelCalls": 87,
+          "frontCalls": 14,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s3140-r1-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 309,
+          "ratio": 1.12,
+          "modelCalls": 91,
+          "frontCalls": 14,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s3140-r2-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 262,
+          "ratio": 0.95,
+          "modelCalls": 89,
+          "frontCalls": 14,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s3140-r3-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 287,
+          "ratio": 1.04,
+          "modelCalls": 87,
+          "frontCalls": 13,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s8675-r1-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 384,
+          "ratio": 1.36,
+          "modelCalls": 88,
+          "frontCalls": 16,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s8675-r2-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 284,
+          "ratio": 1.01,
+          "modelCalls": 88,
+          "frontCalls": 16,
+          "stage": "done"
+        },
+        {
+          "label": "p2-s8675-r3-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 315,
+          "ratio": 1.12,
+          "modelCalls": 93,
+          "frontCalls": 18,
+          "stage": "done"
+        }
+      ],
+      "controllerGateTestsTotal": 17,
+      "controllerFirstTry": 2
+    },
+    "claude-haiku-5-5 VLAB-X": {
+      "record": "validation/live-cli-holdout-X-2026-10-15.json",
+      "runs": 9,
+      "completeRuns": 9,
+      "trialsCompleted": 45,
+      "trialsPlanned": 45,
+      "runCompletionCI95": [
+        0.664,
+        1.0
+      ],
+      "ratiosCompletedRuns": [
+        1.04,
+        0.91,
+        0.99,
+        0.93,
+        0.98,
+        0.98,
+        1.1,
+        1.08,
+        0.92
+      ],
+      "ratioMedian": 0.98,
+      "ratioRange": [
+        0.91,
+        1.1
+      ],
+      "modelCallsTotal": 769,
+      "modelCallsRange": [
+        80,
+        90
+      ],
+      "inputTokensTotal": 3851126,
+      "outputTokensTotal": 370375,
+      "unconfirmedTotal": 0,
+      "failedRuns": [],
+      "runRows": [
+        {
+          "label": "x-s2026-r1-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 172,
+          "ratio": 1.04,
+          "modelCalls": 88,
+          "frontCalls": 15,
+          "stage": "done"
+        },
+        {
+          "label": "x-s2026-r2-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 151,
+          "ratio": 0.91,
+          "modelCalls": 84,
+          "frontCalls": 12,
+          "stage": "done"
+        },
+        {
+          "label": "x-s2026-r3-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 165,
+          "ratio": 0.99,
+          "modelCalls": 90,
+          "frontCalls": 18,
+          "stage": "done"
+        },
+        {
+          "label": "x-s3140-r1-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 151,
+          "ratio": 0.93,
+          "modelCalls": 83,
+          "frontCalls": 11,
+          "stage": "done"
+        },
+        {
+          "label": "x-s3140-r2-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 160,
+          "ratio": 0.98,
+          "modelCalls": 85,
+          "frontCalls": 10,
+          "stage": "done"
+        },
+        {
+          "label": "x-s3140-r3-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 160,
+          "ratio": 0.98,
+          "modelCalls": 88,
+          "frontCalls": 17,
+          "stage": "done"
+        },
+        {
+          "label": "x-s8675-r1-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 182,
+          "ratio": 1.1,
+          "modelCalls": 80,
+          "frontCalls": 10,
+          "stage": "done"
+        },
+        {
+          "label": "x-s8675-r2-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 178,
+          "ratio": 1.08,
+          "modelCalls": 88,
+          "frontCalls": 12,
+          "stage": "done"
+        },
+        {
+          "label": "x-s8675-r3-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 151,
+          "ratio": 0.92,
+          "modelCalls": 83,
+          "frontCalls": 10,
+          "stage": "done"
+        }
+      ],
+      "perCallInputTokens": 5008,
+      "perCallOutputTokens": 482,
+      "controllerGateTestsTotal": 17,
+      "controllerFirstTry": 4,
+      "driverFirstTry": 8,
+      "driverGatePassedRuns": 9
+    },
+    "claude-haiku-5-5 VLAB-Y": {
+      "record": "validation/live-cli-holdout-Y-2026-10-15.json",
+      "runs": 9,
+      "completeRuns": 8,
+      "trialsCompleted": 40,
+      "trialsPlanned": 45,
+      "runCompletionCI95": [
+        0.518,
+        0.997
+      ],
+      "ratiosCompletedRuns": [
+        0.95,
+        0.97,
+        1.05,
+        1.04,
+        0.99,
+        1.0,
+        1.0,
+        1.01
+      ],
+      "ratioMedian": 1.0,
+      "ratioRange": [
+        0.95,
+        1.05
+      ],
+      "modelCallsTotal": 721,
+      "modelCallsRange": [
+        14,
+        95
+      ],
+      "inputTokensTotal": 3670881,
+      "outputTokensTotal": 367167,
+      "unconfirmedTotal": 0,
+      "failedRuns": [
+        {
+          "label": "y-s8675-r2-claude",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "controller gate",
+          "modelCalls": 14
+        }
+      ],
+      "runRows": [
+        {
+          "label": "y-s2026-r1-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 157,
+          "ratio": 0.95,
+          "modelCalls": 87,
+          "frontCalls": 15,
+          "stage": "done"
+        },
+        {
+          "label": "y-s2026-r2-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 161,
+          "ratio": 0.97,
+          "modelCalls": 88,
+          "frontCalls": 14,
+          "stage": "done"
+        },
+        {
+          "label": "y-s2026-r3-claude",
+          "seed": 2026,
+          "completedTrials": 5,
+          "actions": 174,
+          "ratio": 1.05,
+          "modelCalls": 93,
+          "frontCalls": 20,
+          "stage": "done"
+        },
+        {
+          "label": "y-s3140-r1-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 167,
+          "ratio": 1.04,
+          "modelCalls": 86,
+          "frontCalls": 14,
+          "stage": "done"
+        },
+        {
+          "label": "y-s3140-r2-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 158,
+          "ratio": 0.99,
+          "modelCalls": 84,
+          "frontCalls": 12,
+          "stage": "done"
+        },
+        {
+          "label": "y-s3140-r3-claude",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 160,
+          "ratio": 1.0,
+          "modelCalls": 85,
+          "frontCalls": 12,
+          "stage": "done"
+        },
+        {
+          "label": "y-s8675-r1-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 179,
+          "ratio": 1.0,
+          "modelCalls": 89,
+          "frontCalls": 16,
+          "stage": "done"
+        },
+        {
+          "label": "y-s8675-r2-claude",
+          "seed": 8675,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 14,
+          "frontCalls": 14,
+          "stage": "controller gate"
+        },
+        {
+          "label": "y-s8675-r3-claude",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 180,
+          "ratio": 1.01,
+          "modelCalls": 95,
+          "frontCalls": 17,
+          "stage": "done"
+        }
+      ],
+      "perCallInputTokens": 5091,
+      "perCallOutputTokens": 509,
+      "controllerGateTestsTotal": 19,
+      "controllerFirstTry": 2,
+      "driverFirstTry": 0,
+      "driverGatePassedRuns": 9
+    },
+    "gemini-3.5-flash-lite VLAB-X": {
+      "record": "validation/live-cli-holdout-gemini-X-2026-10-17.json",
+      "runs": 9,
+      "completeRuns": 3,
+      "trialsCompleted": 15,
+      "trialsPlanned": 45,
+      "runCompletionCI95": [
+        0.075,
+        0.701
+      ],
+      "ratiosCompletedRuns": [
+        0.99,
+        1.11,
+        1.18
+      ],
+      "ratioMedian": 1.11,
+      "ratioRange": [
+        0.99,
+        1.18
+      ],
+      "modelCallsTotal": 508,
+      "modelCallsRange": [
+        13,
+        102
+      ],
+      "inputTokensTotal": 3240659,
+      "outputTokensTotal": 639247,
+      "unconfirmedTotal": 0,
+      "failedRuns": [
+        {
+          "label": "x-s2026-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "x-s2026-r2-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 41
+        },
+        {
+          "label": "x-s2026-r3-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 44
+        },
+        {
+          "label": "x-s3140-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "x-s8675-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 13
+        },
+        {
+          "label": "x-s8675-r2-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 42
+        }
+      ],
+      "runRows": [
+        {
+          "label": "x-s2026-r1-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s2026-r2-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 41,
+          "frontCalls": 41,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s2026-r3-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 44,
+          "frontCalls": 44,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s3140-r1-gemini",
+          "seed": 3140,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s3140-r2-gemini",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 162,
+          "ratio": 0.99,
+          "modelCalls": 97,
+          "frontCalls": 26,
+          "stage": "done"
+        },
+        {
+          "label": "x-s3140-r3-gemini",
+          "seed": 3140,
+          "completedTrials": 5,
+          "actions": 181,
+          "ratio": 1.11,
+          "modelCalls": 102,
+          "frontCalls": 27,
+          "stage": "done"
+        },
+        {
+          "label": "x-s8675-r1-gemini",
+          "seed": 8675,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 13,
+          "frontCalls": 13,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s8675-r2-gemini",
+          "seed": 8675,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 42,
+          "frontCalls": 42,
+          "stage": "driver gate"
+        },
+        {
+          "label": "x-s8675-r3-gemini",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 194,
+          "ratio": 1.18,
+          "modelCalls": 89,
+          "frontCalls": 19,
+          "stage": "done"
+        }
+      ],
+      "perCallInputTokens": 6379,
+      "perCallOutputTokens": 1258,
+      "thinkingTokensTotal": 444798,
+      "estimatedUsd": 2.5704,
+      "truncationsTotal": 12,
+      "driverVersionsChecked": 99,
+      "driverVersionsAcceptingInvalidReplies": {
+        "lift value 7": 94,
+        "short read reply": 2
+      },
+      "controllerGateTestsTotal": 6,
+      "controllerFirstTry": 0,
+      "driverFirstTry": 0,
+      "driverGatePassedRuns": 3
+    },
+    "gemini-3.5-flash-lite VLAB-Y": {
+      "record": "validation/live-cli-holdout-gemini-Y-2026-10-17.json",
+      "runs": 9,
+      "completeRuns": 1,
+      "trialsCompleted": 5,
+      "trialsPlanned": 45,
+      "runCompletionCI95": [
+        0.003,
+        0.482
+      ],
+      "ratiosCompletedRuns": [
+        1.2
+      ],
+      "ratioMedian": 1.2,
+      "ratioRange": [
+        1.2,
+        1.2
+      ],
+      "modelCallsTotal": 423,
+      "modelCallsRange": [
+        40,
+        102
+      ],
+      "inputTokensTotal": 2642711,
+      "outputTokensTotal": 434467,
+      "unconfirmedTotal": 0,
+      "failedRuns": [
+        {
+          "label": "y-s2026-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s2026-r2-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s2026-r3-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s3140-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "controller gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s3140-r2-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s3140-r3-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        },
+        {
+          "label": "y-s8675-r1-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 41
+        },
+        {
+          "label": "y-s8675-r3-gemini",
+          "completedTrials": 0,
+          "actions": 0,
+          "stage": "driver gate",
+          "modelCalls": 40
+        }
+      ],
+      "runRows": [
+        {
+          "label": "y-s2026-r1-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s2026-r2-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s2026-r3-gemini",
+          "seed": 2026,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s3140-r1-gemini",
+          "seed": 3140,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "controller gate"
+        },
+        {
+          "label": "y-s3140-r2-gemini",
+          "seed": 3140,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s3140-r3-gemini",
+          "seed": 3140,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s8675-r1-gemini",
+          "seed": 8675,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 41,
+          "frontCalls": 41,
+          "stage": "driver gate"
+        },
+        {
+          "label": "y-s8675-r2-gemini",
+          "seed": 8675,
+          "completedTrials": 5,
+          "actions": 214,
+          "ratio": 1.2,
+          "modelCalls": 102,
+          "frontCalls": 30,
+          "stage": "done"
+        },
+        {
+          "label": "y-s8675-r3-gemini",
+          "seed": 8675,
+          "completedTrials": 0,
+          "actions": 0,
+          "ratio": null,
+          "modelCalls": 40,
+          "frontCalls": 40,
+          "stage": "driver gate"
+        }
+      ],
+      "perCallInputTokens": 6248,
+      "perCallOutputTokens": 1027,
+      "thinkingTokensTotal": 345951,
+      "estimatedUsd": 1.879,
+      "truncationsTotal": 1,
+      "driverVersionsChecked": 150,
+      "driverVersionsAcceptingInvalidReplies": {
+        "accepted [\"bad\",0]": 145,
+        "lift sideways": 145,
+        "ok:false": 6,
+        "not-json": 1
+      },
+      "controllerGateTestsTotal": 4,
+      "controllerFirstTry": 0,
+      "driverFirstTry": 0,
+      "driverGatePassedRuns": 2
+    }
+  },
+  "heldOut": {
+    "claude-haiku-5-5": {
+      "runs": 18,
+      "completeRuns": 17,
+      "runCompletionCI95": [
+        0.727,
+        0.999
+      ],
+      "trialsCompleted": 85,
+      "trialsPlanned": 90,
+      "modelCallsTotal": 1490
+    },
+    "gemini-3.5-flash-lite": {
+      "runs": 18,
+      "completeRuns": 4,
+      "runCompletionCI95": [
+        0.064,
+        0.476
+      ],
+      "trialsCompleted": 20,
+      "trialsPlanned": 90,
+      "modelCallsTotal": 931
+    }
+  },
+  "haikuThreeDevices": {
+    "trialsCompleted": 130,
+    "trialsPlanned": 135
+  },
+  "heldOutRunsTotal": 36,
+  "heldOutFailedRuns": 15,
+  "heldOutFailedRunsWithActuation": 0,
+  "heldOutFailedRunsByStage": {
+    "controller gate": 2,
+    "driver gate": 13
+  },
+  "heldOutUnconfirmedTotal": 0,
+  "geminiHeldOutUsd": 4.45,
+  "geminiPilotsUsd": 0.343,
+  "geminiAllUsd": 4.79,
+  "geminiTruncationsHeldOut": 13,
+  "geminiTruncationThinkingTokens": {
+    "withTraceRecord": 12,
+    "min": 6394,
+    "max": 7864
+  },
+  "geminiDriverTests": {
+    "tests": 247,
+    "failedRejectCheck": 242
+  },
+  "gateRejectedControllerVersions": {
+    "claude-haiku-5-5 VLAB-Y": {
+      "rejectedVersions": 11,
+      "wouldCompleteAllThreeSeeds": 10,
+      "elbowCaseOnly": 5
+    },
+    "gemini-3.5-flash-lite VLAB-X": {
+      "rejectedVersions": 3,
+      "wouldCompleteAllThreeSeeds": 3,
+      "elbowCaseOnly": 0
+    },
+    "gemini-3.5-flash-lite VLAB-Y": {
+      "rejectedVersions": 3,
+      "wouldCompleteAllThreeSeeds": 2,
+      "elbowCaseOnly": 0
+    },
+    "VLAB-Y both models": {
+      "rejectedVersions": 14,
+      "wouldCompleteAllThreeSeeds": 12
+    }
+  },
+  "developmentP2": {
+    "C": {
+      "runs": 9,
+      "trialsCompleted": 36,
+      "trialsPlanned": 45,
+      "controlFailureRuns": 0,
+      "interruptedRuns": 3,
+      "fullControllerRatiosP2": [
+        0.9,
+        1.11,
+        1.61,
+        1.73,
+        0.97,
+        1.72,
+        0.94,
+        1.12,
+        0.95
+      ],
+      "fullControllerRatioMedianP2": 1.11,
+      "fullControllersAbove1_3": 3,
+      "g3Ratios": [
+        0.92,
+        0.94,
+        0.93,
+        0.89,
+        0.95,
+        0.94,
+        1.01,
+        0.91,
+        0.9
+      ],
+      "g3TrialsCompleted": 44
+    },
+    "D": {
+      "runs": 9,
+      "trialsCompleted": 26,
+      "trialsPlanned": 45,
+      "controlFailureRuns": 2,
+      "interruptedRuns": 4
+    },
+    "E": {
+      "runs": 9,
+      "trialsCompleted": 45,
+      "trialsPlanned": 45,
+      "controlFailureRuns": 0,
+      "interruptedRuns": 0,
+      "ratioMedian": 1.06,
+      "ratioRange": [
+        0.95,
+        1.51
+      ],
+      "ratiosAbove1_3": 2,
+      "controllerGateTestsTotal": 17,
+      "controllerFirstTry": 2
+    }
+  },
+  "figures": [
+    "paper/figures/fig1_pipeline.png",
+    "paper/figures/fig2_holdout_runs.png",
+    "paper/figures/fig3_action_ratio.png"
+  ]
+}
